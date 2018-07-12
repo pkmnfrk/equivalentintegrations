@@ -27,6 +27,10 @@ public class TransmutationChamberTileEntity extends TileEntity implements IItemH
         @Override
         protected void onContentsChanged(int slot)
         {
+            ItemStack stack = this.getStackInSlot(0);
+            UUID owner = SoulboundTalisman.getOwnerFromStack(stack);
+
+            TransmutationChamberTileEntity.this.setOwner(owner);
             TransmutationChamberTileEntity.this.markDirty();
         }
 
@@ -44,10 +48,18 @@ public class TransmutationChamberTileEntity extends TileEntity implements IItemH
         }
     };
 
+    public ItemStackHandler getTalismanInventory() {
+        return talismanInventory;
+    }
+
     public void setOwner(UUID newOwner)
     {
-        this.owner = owner;
-        this.markDirty();
+        if(newOwner != owner)
+        {
+            this.owner = newOwner;
+            world.markBlockRangeForRenderUpdate(getPos(), getPos());
+            this.markDirty();
+        }
     }
 
     public boolean hasOwner()
@@ -114,6 +126,11 @@ public class TransmutationChamberTileEntity extends TileEntity implements IItemH
     public <T> T getCapability(Capability<T> capability, @Nullable EnumFacing facing)
     {
         if(capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY) {
+            //only return the talismanInventory if the call is coming from inside the house
+            if(facing == null) {
+                return CapabilityItemHandler.ITEM_HANDLER_CAPABILITY.cast(talismanInventory);
+            }
+            //if the facing has an actual value, assume they mean the EMC inventory
             return CapabilityItemHandler.ITEM_HANDLER_CAPABILITY.cast(this);
         }
         return super.getCapability(capability, facing);
@@ -162,7 +179,7 @@ public class TransmutationChamberTileEntity extends TileEntity implements IItemH
     public ItemStack extractItem(int slot, int amount, boolean simulate)
     {
         validateSlotIndex(slot);
-        return null;
+        return ItemStack.EMPTY;
     }
 
     @Override

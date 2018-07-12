@@ -122,4 +122,19 @@ public class SoulboundTalisman extends Item
 
         return owner != null;
     }
+
+    public static UUID getOwnerFromStack(ItemStack stack)
+    {
+        if(stack.hasTagCompound()) {
+            NBTTagCompound nbt = stack.getTagCompound();
+
+            if(nbt.hasKey(OWNER_UUID))
+            {
+                String uuid = nbt.getString(OWNER_UUID);
+                return UUID.fromString(uuid);
+            }
+        }
+
+        return null;
+    }
 }

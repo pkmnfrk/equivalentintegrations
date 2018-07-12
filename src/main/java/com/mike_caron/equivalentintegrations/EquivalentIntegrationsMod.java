@@ -36,7 +36,7 @@ public class EquivalentIntegrationsMod {
 
     @Mod.EventHandler
     public void init(FMLInitializationEvent event) {
-
+        proxy.init(event);
     }
 
     @Mod.EventHandler
