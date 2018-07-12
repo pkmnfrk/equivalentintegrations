@@ -108,8 +108,12 @@ public class SoulboundTalisman extends Item
         return isBound(stack);
     }
 
-    private boolean isBound(ItemStack stack)
+    public static boolean isBound(ItemStack stack)
     {
+        if(stack == ItemStack.EMPTY) return false;
+
+        if(stack.getItem() != ModItems.soulboundTalisman) return false;
+
         if(!stack.hasTagCompound()) return false;
         NBTTagCompound nbt = stack.getTagCompound();
 
