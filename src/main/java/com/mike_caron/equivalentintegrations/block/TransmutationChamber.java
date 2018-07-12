@@ -64,6 +64,7 @@ public class TransmutationChamber extends Block implements ITileEntityProvider
         return 0;
     }
 
+
     @Override
     public void onBlockPlacedBy(World worldIn, BlockPos pos, IBlockState state, EntityLivingBase placer, ItemStack stack)
     {
@@ -74,6 +75,13 @@ public class TransmutationChamber extends Block implements ITileEntityProvider
     protected BlockStateContainer createBlockState()
     {
         return new BlockStateContainer(this, ACTIVE);
+    }
+
+    @Override
+    @Deprecated
+    public IBlockState getStateFromMeta(int meta)
+    {
+        return getDefaultState();
     }
 
     private TransmutationChamberTileEntity getTE(IBlockAccess worldIn, BlockPos pos)

@@ -9,6 +9,8 @@ import moze_intel.projecte.api.proxy.ITransmutationProxy;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.network.NetworkManager;
+import net.minecraft.network.play.server.SPacketUpdateTileEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraftforge.common.capabilities.Capability;
@@ -68,6 +70,27 @@ public class TransmutationChamberTileEntity extends TileEntity implements IItemH
         return owner != null;
     }
 
+    @Nullable
+    @Override
+    public SPacketUpdateTileEntity getUpdatePacket()
+    {
+        NBTTagCompound nbt = new NBTTagCompound();
+        this.writeToNBT(nbt);
+        return new SPacketUpdateTileEntity(getPos(), 1, nbt);
+    }
+
+    @Override
+    public NBTTagCompound getUpdateTag()
+    {
+        return this.writeToNBT(new NBTTagCompound());
+    }
+
+    @Override
+    public void onDataPacket(NetworkManager net, SPacketUpdateTileEntity pkt)
+    {
+        this.readFromNBT(pkt.getNbtCompound());
+    }
+
     @Override
     public void readFromNBT(NBTTagCompound compound)
     {
@@ -75,7 +98,7 @@ public class TransmutationChamberTileEntity extends TileEntity implements IItemH
 
         if(compound.hasKey("owner"))
         {
-            owner = compound.getUniqueId("owner");
+            owner = UUID.fromString(compound.getString("owner"));
         }
         else
         {
@@ -94,7 +117,7 @@ public class TransmutationChamberTileEntity extends TileEntity implements IItemH
 
         if(owner != null)
         {
-            compound.setUniqueId("owner", owner);
+            compound.setString("owner", owner.toString());
         }
         else
         {
