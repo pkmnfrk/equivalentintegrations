@@ -45,13 +45,6 @@ public class TransmutationChamber extends Block implements ITileEntityProvider
         return new TransmutationChamberTileEntity();
     }
 
-
-    @Override
-    public boolean hasTileEntity(IBlockState state)
-    {
-        return true;
-    }
-
     @Override
     @Deprecated
     public IBlockState getActualState(IBlockState state, IBlockAccess worldIn, BlockPos pos)
