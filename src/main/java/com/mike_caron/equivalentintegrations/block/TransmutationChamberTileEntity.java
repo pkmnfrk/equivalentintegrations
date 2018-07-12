@@ -40,7 +40,16 @@ public class TransmutationChamberTileEntity extends TileEntity
     {
         super.writeToNBT(compound);
 
-        compound.setUniqueId("owner", owner);
+        if(owner != null)
+        {
+            compound.setUniqueId("owner", owner);
+        }
+        else
+        {
+            if(compound.hasKey("owner")) {
+                compound.removeTag("owner");
+            }
+        }
 
         return compound;
     }
