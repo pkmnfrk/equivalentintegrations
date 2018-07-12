@@ -45,6 +45,7 @@ public class TransmutationChamber extends Block implements ITileEntityProvider
         return new TransmutationChamberTileEntity();
     }
 
+
     @Override
     public boolean hasTileEntity(IBlockState state)
     {
@@ -52,6 +53,7 @@ public class TransmutationChamber extends Block implements ITileEntityProvider
     }
 
     @Override
+    @Deprecated
     public IBlockState getActualState(IBlockState state, IBlockAccess worldIn, BlockPos pos)
     {
         return state.withProperty(ACTIVE, getTE(worldIn, pos).hasOwner());
