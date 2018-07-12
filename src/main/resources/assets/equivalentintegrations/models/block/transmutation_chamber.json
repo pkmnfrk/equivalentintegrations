@@ -1,0 +1,7 @@
+{
+  "parent": "block/cube_top",
+  "textures": {
+    "side": "equivalentintegrations:blocks/transmutation_chamber_side",
+    "top": "#top"
+  }
+}

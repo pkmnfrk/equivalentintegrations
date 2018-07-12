@@ -23,7 +23,7 @@ import javax.annotation.Nullable;
 
 public class TransmutationChamber extends Block implements ITileEntityProvider
 {
-    public static final String id = "transmutationChamber";
+    public static final String id = "transmutation_chamber";
     public static final PropertyBool ACTIVE = PropertyBool.create("active");
 
     public TransmutationChamber() {

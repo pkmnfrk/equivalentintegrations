@@ -1,7 +1,7 @@
 {
 	"forge_marker": 1,
 	"defaults": {
-		"model": "equivalentintegrations:transmutationchamber",
+		"model": "equivalentintegrations:transmutation_chamber",
 		"textures": {
 			"top": "equivalentintegrations:blocks/transmutation_chamber_top_i"
 		}

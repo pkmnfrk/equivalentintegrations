@@ -30,7 +30,7 @@ import java.util.UUID;
 
 public class SoulboundTalisman extends Item
 {
-    public static final String id = "soulboundTalisman";
+    public static final String id = "soulbound_talisman";
     public static final String OWNER_UUID = "OwnerUUID";
     public static final String OWNER_NAME = "OwnerName";
 
@@ -82,18 +82,16 @@ public class SoulboundTalisman extends Item
                     playerName = nbt.getString(OWNER_NAME);
                 }
 
-                String tip = TextFormatting.BLUE + I18n.format("item.soulboundtalisman.bound", playerName);
+                String tip = TextFormatting.BLUE + I18n.format("item.soulbound_talisman.bound", playerName);
                 //tip = "Bound to " + nbt.getString(OWNER_UUID);
                 tooltip.add(tip);
 
                 ITransmutationProxy proxy = ProjectEAPI.getTransmutationProxy();
                 IKnowledgeProvider provider = proxy.getKnowledgeProviderFor(UUID.fromString(uuid));
-
-                tooltip.add(TextFormatting.GOLD + "Contains " + provider.getEmc() + " EMC");
             }
         }
-        tooltip.add(TextFormatting.GRAY + "" + TextFormatting.ITALIC + I18n.format("item.soulboundtalisman.desc1"));
-        tooltip.add(TextFormatting.GRAY + "" + TextFormatting.ITALIC + I18n.format("item.soulboundtalisman.desc2"));
+        tooltip.add(TextFormatting.GRAY + "" + TextFormatting.ITALIC + I18n.format("item.soulbound_talisman.desc1"));
+        tooltip.add(TextFormatting.GRAY + "" + TextFormatting.ITALIC + I18n.format("item.soulbound_talisman.desc2"));
 
 
 
