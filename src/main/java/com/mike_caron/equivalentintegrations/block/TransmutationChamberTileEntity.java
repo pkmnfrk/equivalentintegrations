@@ -4,6 +4,7 @@ import com.mike_caron.equivalentintegrations.item.ModItems;
 import com.mike_caron.equivalentintegrations.item.SoulboundTalisman;
 import moze_intel.projecte.api.ProjectEAPI;
 import moze_intel.projecte.api.capabilities.IKnowledgeProvider;
+import moze_intel.projecte.api.proxy.IEMCProxy;
 import moze_intel.projecte.api.proxy.ITransmutationProxy;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
@@ -158,12 +159,21 @@ public class TransmutationChamberTileEntity extends TileEntity implements IItemH
         validateSlotIndex(slot);
 
         IKnowledgeProvider knowledge = ProjectEAPI.getTransmutationProxy().getKnowledgeProviderFor(owner);
+        IEMCProxy emcProxy = ProjectEAPI.getEMCProxy();
 
         ItemStack stack = knowledge.getKnowledge().get(slot);
 
-        //TODO: is stack a count of 1, or a count of all? need to figure this out
+        double emc = knowledge.getEmc();
 
-        return stack;
+        long numItems = Math.floorDiv((long)emc, emcProxy.getValue(stack));
+        if(numItems > Integer.MAX_VALUE)
+        {
+            numItems = Integer.MAX_VALUE;
+        }
+
+        ItemStack ret = new ItemStack(stack.getItem(), (int)numItems, stack.getMetadata(), stack.getTagCompound());
+
+        return ret;
     }
 
     @Nonnull
