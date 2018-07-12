@@ -1,0 +1,5 @@
+tile.transmutationChamber.name=Transmutation Chamber
+item.soulboundTalisman.name=Soulbound Talisman
+item.soulboundtalisman.bound=Bound to %1$s
+item.soulboundtalisman.desc1=Right click to bind to yourself.
+item.soulboundtalisman.desc2=Use in Equivalent Integrations machines.

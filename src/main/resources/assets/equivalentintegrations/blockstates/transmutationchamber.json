@@ -1,0 +1,26 @@
+{
+	"forge_marker": 1,
+	"defaults": {
+		"model": "equivalentintegrations:transmutationchamber",
+		"textures": {
+			"top": "equivalentintegrations:blocks/transmutation_chamber_top_i"
+		}
+	},
+	"variants": {
+		"normal": [{
+		}],
+		"inventory": [{
+			"textures": {
+				"top": "equivalentintegrations:blocks/transmutation_chamber_top"
+			}
+		}],
+		"active": {
+			"false": {},
+			"true": {
+				"textures": {
+					"top": "equivalentintegrations:blocks/transmutation_chamber_top"
+				}
+			}
+		}
+	}
+}

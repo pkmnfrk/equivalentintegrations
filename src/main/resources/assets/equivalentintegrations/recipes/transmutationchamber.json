@@ -1,0 +1,24 @@
+{
+  "result": {
+    "item": "equivalentintegrations:transmutationchamber"
+},
+  "pattern": [
+    "oio",
+    "iti",
+    "oio"
+  ],
+  "type": "forge:ore_shaped",
+  "key": {
+    "o": {
+      "type": "forge:ore_dict",
+      "ore": "obsidian"
+    },
+    "i": {
+      "type": "forge:ore_dict",
+      "ore": "blockIron"
+    },
+    "t": {
+      "item": "projecte:item.pe_transmutation_tablet"
+    }
+  }
+}

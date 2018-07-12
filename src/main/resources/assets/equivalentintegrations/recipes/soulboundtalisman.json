@@ -1,0 +1,19 @@
+{
+  "result": {
+    "item": "equivalentintegrations:soulboundtalisman"
+},
+  "pattern": [
+    " i ",
+    "iti",
+    " i "
+  ],
+  "type": "forge:ore_shaped",
+  "key": {
+    "i": {
+      "item": "projecte:item.pe_repair_talisman"
+    },
+    "t": {
+      "item": "projecte:transmutation_table"
+    }
+  }
+}
