@@ -19,6 +19,7 @@ import net.minecraft.network.NetworkManager;
 import net.minecraft.network.play.server.SPacketUpdateTileEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.ITickable;
 import net.minecraft.world.ServerWorldEventHandler;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.capabilities.Capability;
@@ -37,12 +38,16 @@ import java.util.List;
 import java.util.UUID;
 
 @Mod.EventBusSubscriber
-public class TransmutationChamberTileEntity extends TileEntity implements IItemHandlerModifiable
+public class TransmutationChamberTileEntity extends TileEntity implements IItemHandlerModifiable, ITickable
 {
     private UUID owner = null;
     private List<ItemStack> cachedKnowledge = null;
     private HashMap<ItemStack, Integer> cachedInventory = null;
     private double cachedEmc = -1;
+
+    private boolean needsFullRefresh = false;
+
+    private int ticksSinceLastCacheUpdate = 0;
 
     private ItemStackHandler talismanInventory = new ItemStackHandler(1)
     {
@@ -85,7 +90,7 @@ public class TransmutationChamberTileEntity extends TileEntity implements IItemH
             this.owner = newOwner;
             this.markDirty();
 
-            refreshCachedKnowledge();
+            refreshCachedKnowledge(true);
 
             //world.markBlockRangeForRenderUpdate(getPos(), getPos());
             if(world != null)
@@ -185,7 +190,7 @@ public class TransmutationChamberTileEntity extends TileEntity implements IItemH
     @Override
     public void onLoad()
     {
-        ensureCache();
+        ensureCache(true);
         MinecraftForge.EVENT_BUS.register(this);
     }
 
@@ -228,7 +233,7 @@ public class TransmutationChamberTileEntity extends TileEntity implements IItemH
 
         EquivalentIntegrationsMod.logger.trace("Transmutation Chamber: Getting slot count");
 
-        if(!ensureCache()) {
+        if(!ensureCache(false)) {
             return 0;
         }
 
@@ -245,7 +250,7 @@ public class TransmutationChamberTileEntity extends TileEntity implements IItemH
 
         //EquivalentIntegrationsMod.logger.info("Transmutation Chamber: Getting stack in slot " + slot);
 
-        if(!ensureCache()) {
+        if(!ensureCache(false)) {
             return ItemStack.EMPTY;
         }
 
@@ -284,7 +289,7 @@ public class TransmutationChamberTileEntity extends TileEntity implements IItemH
                 {
                     setRealEMC(owner, (double)(emc + emcValue));
 
-                    refreshCachedKnowledge();
+                    refreshCachedKnowledge(false);
                 }
 
                 return ItemStack.EMPTY;
@@ -335,7 +340,7 @@ public class TransmutationChamberTileEntity extends TileEntity implements IItemH
             emc -= desiredEMC;
             setRealEMC(owner, emc);
 
-            refreshCachedKnowledge();
+            refreshCachedKnowledge(false);
         }
 
         return new ItemStack(desired.getItem(), actualAmount, desired.getMetadata(), desired.getTagCompound());
@@ -356,7 +361,7 @@ public class TransmutationChamberTileEntity extends TileEntity implements IItemH
         if(event.getPlayerUUID().equals(owner))
         {
             EquivalentIntegrationsMod.logger.info("Refreshing cached knowledge due to knowledge change");
-            refreshCachedKnowledge();
+            refreshCachedKnowledge(true);
         }
     }
 
@@ -370,7 +375,7 @@ public class TransmutationChamberTileEntity extends TileEntity implements IItemH
     public void onEMCRemap(EMCRemapEvent event)
     {
         EquivalentIntegrationsMod.logger.info("Refreshing cached knowledge due to global remap");
-        ensureCache();
+        ensureCache(true);
     }
 
     protected boolean validateSlotIndex(int slot, boolean fatal)
@@ -443,29 +448,40 @@ public class TransmutationChamberTileEntity extends TileEntity implements IItemH
         }
     }
 
-    private boolean ensureCache()
+    private boolean ensureCache(boolean comprehensive)
     {
         if(owner == null) return true;
+
+        boolean ret = true;
 
         if(cachedKnowledge == null)
         {
             try
             {
-                return refreshCachedKnowledge();
+                ret = refreshCachedKnowledge(comprehensive);
             } catch(IllegalStateException ex)
             {
                 EquivalentIntegrationsMod.logger.warn("Unable to refresh knowledge, due to something");
-                return false;
+                ret = false;
             }
+        }
+
+        if(!ret && comprehensive) {
+            needsFullRefresh = true;
         }
         return true;
     }
 
-    private boolean refreshCachedKnowledge()
+    private boolean refreshCachedKnowledge(boolean comprehensive)
             throws IllegalStateException
     {
         if(world == null) return false;
         if(world.isRemote) return true;
+
+        if(needsFullRefresh)
+        {
+            comprehensive = true;
+        }
 
         if(owner == null)
         {
@@ -477,11 +493,10 @@ public class TransmutationChamberTileEntity extends TileEntity implements IItemH
         {
             boolean updateInv = false;
 
-            IKnowledgeProvider knowledge;
+            if(comprehensive){
+                IKnowledgeProvider knowledge;
+                knowledge = ProjectEAPI.getTransmutationProxy().getKnowledgeProviderFor(owner);
 
-            knowledge = ProjectEAPI.getTransmutationProxy().getKnowledgeProviderFor(owner);
-
-            {
                 List<ItemStack> tmp = knowledge.getKnowledge();
 
                 cachedKnowledge = tmp;
@@ -513,9 +528,22 @@ public class TransmutationChamberTileEntity extends TileEntity implements IItemH
             }
         }
 
+        ticksSinceLastCacheUpdate = 0;
+        needsFullRefresh = false;
         EquivalentIntegrationsMod.logger.info("Successfully refreshed cache");
 
         return true;
 
+    }
+
+    @Override
+    public void update()
+    {
+        if(world.isRemote) return;
+
+        ticksSinceLastCacheUpdate += 1;
+        if(ticksSinceLastCacheUpdate >= 20) {
+            refreshCachedKnowledge(false);
+        }
     }
 }
