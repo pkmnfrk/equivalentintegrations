@@ -8,6 +8,8 @@ import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import com.mike_caron.equivalentintegrations.proxy.CommonProxy;
 
+import java.util.logging.Logger;
+
 @Mod(
         modid = EquivalentIntegrationsMod.modId,
         name = EquivalentIntegrationsMod.name,
@@ -20,11 +22,13 @@ public class EquivalentIntegrationsMod {
     public static final String name = "Equivalent Integrations";
     public static final String version = "0.1.0";
 
+    public static final Logger logger = Logger.getLogger(name);
+
     @Mod.Instance(modId)
     public static EquivalentIntegrationsMod instance;
 
     @SidedProxy(
-            serverSide = "com.mike_caron.equivalentintegrations.proxy.CommonProxy",
+            serverSide = "com.mike_caron.equivalentintegrations.proxy.ServerProxy",
             clientSide = "com.mike_caron.equivalentintegrations.proxy.ClientProxy"
     )
     public static CommonProxy proxy;
