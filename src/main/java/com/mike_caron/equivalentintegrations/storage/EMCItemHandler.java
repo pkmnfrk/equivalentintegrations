@@ -12,6 +12,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.items.IItemHandlerModifiable;
+import net.minecraftforge.items.ItemStackHandler;
 
 import javax.annotation.Nonnull;
 import java.util.ArrayList;
@@ -56,7 +57,7 @@ public final class EMCItemHandler implements IItemHandlerModifiable
         }
 
         EquivalentIntegrationsMod.logger.trace("Transmutation Chamber: Success");
-        return cachedInventory.size();
+        return cachedInventory.size() + 1;
     }
 
     @Nonnull
@@ -69,6 +70,11 @@ public final class EMCItemHandler implements IItemHandlerModifiable
         //EquivalentIntegrationsMod.logger.info("Transmutation Chamber: Getting stack in slot " + slot);
 
         if(!refresh(false)) {
+            return ItemStack.EMPTY;
+        }
+
+        if(slot == cachedInventory.size())
+        {
             return ItemStack.EMPTY;
         }
 
@@ -123,6 +129,11 @@ public final class EMCItemHandler implements IItemHandlerModifiable
     {
         validateSlotIndex(slot, true);
 
+        if(slot == cachedInventory.size())
+        {
+            return ItemStack.EMPTY;
+        }
+
         double emc = getRealEMC(owner);
 
         IEMCProxy emcProxy = ProjectEAPI.getEMCProxy();
@@ -173,7 +184,7 @@ public final class EMCItemHandler implements IItemHandlerModifiable
 
     protected boolean validateSlotIndex(int slot, boolean fatal)
     {
-        int size = cachedInventory.size();
+        int size = cachedInventory.size() + 1;
 
         if (slot < 0 || slot >= size)
         {
