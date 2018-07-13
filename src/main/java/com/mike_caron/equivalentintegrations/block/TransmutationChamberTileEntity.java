@@ -226,13 +226,13 @@ public class TransmutationChamberTileEntity extends TileEntity implements IItemH
         if (owner == null || world.isRemote)
             return 0;
 
-        EquivalentIntegrationsMod.logger.info("Transmutation Chamber: Getting slot count");
+        EquivalentIntegrationsMod.logger.trace("Transmutation Chamber: Getting slot count");
 
         if(!ensureCache()) {
             return 0;
         }
 
-        EquivalentIntegrationsMod.logger.info("Transmutation Chamber: Success");
+        EquivalentIntegrationsMod.logger.trace("Transmutation Chamber: Success");
         return cachedKnowledge.size();
     }
 
