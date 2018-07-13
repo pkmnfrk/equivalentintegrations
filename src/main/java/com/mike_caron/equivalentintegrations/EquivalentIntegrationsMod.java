@@ -7,6 +7,8 @@ import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import com.mike_caron.equivalentintegrations.proxy.CommonProxy;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.gameevent.PlayerEvent;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -17,6 +19,7 @@ import org.apache.logging.log4j.Logger;
         acceptedMinecraftVersions = "[1.12.2]",
         dependencies = "required-after:projecte"
 )
+@Mod.EventBusSubscriber
 public class EquivalentIntegrationsMod {
     public static final String modId = "equivalentintegrations";
     public static final String name = "Equivalent Integrations";
@@ -46,6 +49,12 @@ public class EquivalentIntegrationsMod {
     @Mod.EventHandler
     public void postInit(FMLPostInitializationEvent event) {
 
+    }
+
+    @SubscribeEvent
+    public static void onPlayerLogin(PlayerEvent.PlayerLoggedInEvent event)
+    {
+        proxy.onPlayerLogin(event);
     }
 
 }

@@ -18,6 +18,10 @@ public class OfflineEMCWorldData extends WorldSavedData
         super(IDENTIFIER);
     }
 
+    public OfflineEMCWorldData(String string) {
+        super(string);
+    }
+
     public boolean hasCachedEMC(UUID uuid)
     {
         if(cachedEMCValues == null || !cachedEMCValues.containsKey(uuid))

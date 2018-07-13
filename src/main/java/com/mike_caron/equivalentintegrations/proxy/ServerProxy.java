@@ -11,10 +11,9 @@ import net.minecraftforge.fml.common.gameevent.PlayerEvent;
 
 import java.util.UUID;
 
-@Mod.EventBusSubscriber
 public class ServerProxy extends CommonProxy
 {
-    @SubscribeEvent
+    @Override
     public void onPlayerLogin(PlayerEvent.PlayerLoggedInEvent event)
     {
         UUID owner = event.player.getUniqueID();

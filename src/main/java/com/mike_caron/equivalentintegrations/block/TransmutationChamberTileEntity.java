@@ -263,6 +263,36 @@ public class TransmutationChamberTileEntity extends TileEntity implements IItemH
         if(!validateSlotIndex(slot, false))
             return stack;
 
+        IEMCProxy emcProxy = ProjectEAPI.getEMCProxy();
+
+        if(emcProxy.hasValue(stack)){
+            IKnowledgeProvider knowledge;
+
+            knowledge = ProjectEAPI.getTransmutationProxy().getKnowledgeProviderFor(owner);
+
+            if(knowledge.hasKnowledge(stack))
+            {
+                double emc = getRealEMC(owner);
+
+                long singleValue = emcProxy.getValue(stack);
+
+                long emcValue = singleValue * stack.getCount();
+
+                EquivalentIntegrationsMod.logger.info("Burning a stack ({}) for {} EMC each, a total of {}", stack, singleValue, emcValue);
+
+                if(!simulate)
+                {
+                    setRealEMC(owner, (double)(emc + emcValue));
+
+                    refreshCachedKnowledge();
+                }
+
+                return ItemStack.EMPTY;
+
+            }
+
+        }
+
         return stack;
     }
 
