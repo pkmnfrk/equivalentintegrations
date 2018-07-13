@@ -13,7 +13,7 @@ import javax.annotation.Nullable;
 
 public class TransmutationChamberContainer extends Container
 {
-    private TransmutationChamberTileEntity te;
+    private final TransmutationChamberTileEntity te;
 
     public TransmutationChamberContainer(IInventory playerInventory, TransmutationChamberTileEntity te)
     {

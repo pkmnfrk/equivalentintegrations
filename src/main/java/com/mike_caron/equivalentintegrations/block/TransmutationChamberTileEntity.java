@@ -1,19 +1,9 @@
 package com.mike_caron.equivalentintegrations.block;
 
-import com.mike_caron.equivalentintegrations.EquivalentIntegrationsMod;
-import com.mike_caron.equivalentintegrations.OfflineEMCWorldData;
-import com.mike_caron.equivalentintegrations.item.ModItems;
 import com.mike_caron.equivalentintegrations.item.SoulboundTalisman;
 import com.mike_caron.equivalentintegrations.storage.EMCItemHandler;
-import moze_intel.projecte.api.ProjectEAPI;
-import moze_intel.projecte.api.capabilities.IKnowledgeProvider;
-import moze_intel.projecte.api.event.EMCRemapEvent;
-import moze_intel.projecte.api.event.PlayerKnowledgeChangeEvent;
-import moze_intel.projecte.api.proxy.IEMCProxy;
-import moze_intel.projecte.api.proxy.ITransmutationProxy;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.NetworkManager;
@@ -21,21 +11,13 @@ import net.minecraft.network.play.server.SPacketUpdateTileEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ITickable;
-import net.minecraft.world.ServerWorldEventHandler;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.event.world.WorldEvent;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.common.asm.transformers.ItemStackTransformer;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.items.CapabilityItemHandler;
-import net.minecraftforge.items.IItemHandlerModifiable;
 import net.minecraftforge.items.ItemStackHandler;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.HashMap;
-import java.util.List;
 import java.util.UUID;
 
 public class TransmutationChamberTileEntity extends TileEntity implements ITickable
@@ -46,7 +28,7 @@ public class TransmutationChamberTileEntity extends TileEntity implements ITicka
 
     private int ticksSinceLastCacheUpdate = 0;
 
-    private ItemStackHandler talismanInventory = new ItemStackHandler(1)
+    private final ItemStackHandler talismanInventory = new ItemStackHandler(1)
     {
         @Override
         protected void onContentsChanged(int slot)

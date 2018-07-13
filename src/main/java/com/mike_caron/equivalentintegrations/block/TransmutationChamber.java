@@ -24,6 +24,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 import javax.annotation.Nullable;
 
+@SuppressWarnings("NullableProblems")
 public class TransmutationChamber extends Block implements ITileEntityProvider
 {
     public static final String id = "transmutation_chamber";
@@ -40,6 +41,7 @@ public class TransmutationChamber extends Block implements ITileEntityProvider
         setDefaultState(this.blockState.getBaseState().withProperty(ACTIVE,false));
     }
 
+    @SuppressWarnings("ConstantConditions")
     @SideOnly(Side.CLIENT)
     public void initModel() {
         ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(this), 0, new ModelResourceLocation(getRegistryName(), "inventory"));
@@ -51,11 +53,15 @@ public class TransmutationChamber extends Block implements ITileEntityProvider
         return new TransmutationChamberTileEntity();
     }
 
+    @SuppressWarnings("deprecation")
     @Override
     @Deprecated
     public IBlockState getActualState(IBlockState state, IBlockAccess worldIn, BlockPos pos)
     {
-        return state.withProperty(ACTIVE, getTE(worldIn, pos).hasOwner());
+        TransmutationChamberTileEntity tileEntity = getTE(worldIn, pos);
+        if(tileEntity == null) return getDefaultState();
+
+        return state.withProperty(ACTIVE, tileEntity.hasOwner());
     }
 
     @Override
@@ -77,6 +83,7 @@ public class TransmutationChamber extends Block implements ITileEntityProvider
         return new BlockStateContainer(this, ACTIVE);
     }
 
+    @SuppressWarnings("deprecation")
     @Override
     @Deprecated
     public IBlockState getStateFromMeta(int meta)
@@ -84,6 +91,7 @@ public class TransmutationChamber extends Block implements ITileEntityProvider
         return getDefaultState();
     }
 
+    @Nullable
     private TransmutationChamberTileEntity getTE(IBlockAccess worldIn, BlockPos pos)
     {
         TileEntity ret = worldIn.getTileEntity(pos);

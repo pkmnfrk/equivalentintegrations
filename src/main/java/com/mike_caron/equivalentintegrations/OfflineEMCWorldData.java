@@ -1,13 +1,13 @@
 package com.mike_caron.equivalentintegrations;
 
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraft.world.storage.WorldSavedData;
 
 import java.util.HashMap;
 import java.util.UUID;
 
+@SuppressWarnings("NullableProblems")
 public class OfflineEMCWorldData extends WorldSavedData
 {
     public static final String IDENTIFIER = "EquivalentIntegrationsOfflineData";
@@ -24,10 +24,7 @@ public class OfflineEMCWorldData extends WorldSavedData
 
     public boolean hasCachedEMC(UUID uuid)
     {
-        if(cachedEMCValues == null || !cachedEMCValues.containsKey(uuid))
-            return false;
-
-        return true;
+        return cachedEMCValues != null && cachedEMCValues.containsKey(uuid);
     }
     public double getCachedEMC(UUID uuid)
     {

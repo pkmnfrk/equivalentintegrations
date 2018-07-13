@@ -1,10 +1,5 @@
 package com.mike_caron.equivalentintegrations.item;
 
-import com.mike_caron.equivalentintegrations.EquivalentIntegrationsMod;
-import moze_intel.projecte.api.ProjectEAPI;
-import moze_intel.projecte.api.proxy.IConversionProxy;
-import moze_intel.projecte.api.capabilities.IKnowledgeProvider;
-import moze_intel.projecte.api.proxy.ITransmutationProxy;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.player.EntityPlayer;
@@ -17,16 +12,14 @@ import net.minecraft.util.EnumHand;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 import net.minecraftforge.client.model.ModelLoader;
-import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraft.client.resources.I18n;
 
 import javax.annotation.Nullable;
-import javax.xml.soap.Text;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
-
 
 public class SoulboundTalisman extends Item
 {
@@ -46,14 +39,15 @@ public class SoulboundTalisman extends Item
         ItemStack talisman = playerIn.getHeldItem(handIn);
 
         if(worldIn.isRemote || isBound(talisman))
-            return new ActionResult<ItemStack>(EnumActionResult.PASS, talisman);
+            return new ActionResult<>(EnumActionResult.PASS, talisman);
 
-        NBTTagCompound nbt;
+        NBTTagCompound nbt = null;
 
         if(talisman.hasTagCompound()) {
             nbt = talisman.getTagCompound();
         }
-        else
+
+        if(nbt == null)
         {
             nbt = new NBTTagCompound();
         }
@@ -63,7 +57,7 @@ public class SoulboundTalisman extends Item
 
         talisman.setTagCompound(nbt);
 
-        return new ActionResult<ItemStack>(EnumActionResult.PASS, talisman);
+        return new ActionResult<>(EnumActionResult.PASS, talisman);
     }
 
     @Override
@@ -71,7 +65,7 @@ public class SoulboundTalisman extends Item
     public void addInformation(ItemStack stack, @Nullable World worldIn, List<String> tooltip, ITooltipFlag flagIn)
     {
         if(stack.hasTagCompound()) {
-            NBTTagCompound nbt = stack.getTagCompound();
+            NBTTagCompound nbt = Objects.requireNonNull(stack.getTagCompound());
 
             if(nbt.hasKey(OWNER_UUID))
             {
@@ -85,9 +79,6 @@ public class SoulboundTalisman extends Item
                 String tip = TextFormatting.BLUE + I18n.format("item.soulbound_talisman.bound", playerName);
                 //tip = "Bound to " + nbt.getString(OWNER_UUID);
                 tooltip.add(tip);
-
-                ITransmutationProxy proxy = ProjectEAPI.getTransmutationProxy();
-                IKnowledgeProvider provider = proxy.getKnowledgeProviderFor(UUID.fromString(uuid));
             }
         }
         tooltip.add(TextFormatting.GRAY + "" + TextFormatting.ITALIC + I18n.format("item.soulbound_talisman.desc1"));
@@ -97,6 +88,7 @@ public class SoulboundTalisman extends Item
 
     }
 
+    @SuppressWarnings("ConstantConditions")
     @SideOnly(Side.CLIENT)
     public void initModel() {
         ModelLoader.setCustomModelResourceLocation(this, 0, new ModelResourceLocation(getRegistryName(), "inventory"));
@@ -116,17 +108,16 @@ public class SoulboundTalisman extends Item
 
         if(!stack.hasTagCompound()) return false;
         NBTTagCompound nbt = stack.getTagCompound();
+        if(nbt == null) return false;
 
-        if(!nbt.hasKey(OWNER_UUID)) return false;
-        String owner = nbt.getString(OWNER_UUID);
-
-        return owner != null;
+        return nbt.hasKey(OWNER_UUID);
     }
 
+    @Nullable
     public static UUID getOwnerFromStack(ItemStack stack)
     {
         if(stack.hasTagCompound()) {
-            NBTTagCompound nbt = stack.getTagCompound();
+            NBTTagCompound nbt = Objects.requireNonNull(stack.getTagCompound());
 
             if(nbt.hasKey(OWNER_UUID))
             {

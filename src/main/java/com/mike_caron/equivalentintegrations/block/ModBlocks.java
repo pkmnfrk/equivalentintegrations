@@ -30,6 +30,7 @@ public class ModBlocks
         GameRegistry.registerTileEntity(TransmutationChamberTileEntity.class, new ResourceLocation(EquivalentIntegrationsMod.modId, TransmutationChamber.id));
     }
 
+    @SuppressWarnings("ConstantConditions")
     @SubscribeEvent
     public static void registerItems(RegistryEvent.Register<Item> event)
     {

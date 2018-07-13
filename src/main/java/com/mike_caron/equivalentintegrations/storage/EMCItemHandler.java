@@ -9,20 +9,22 @@ import moze_intel.projecte.api.event.PlayerKnowledgeChangeEvent;
 import moze_intel.projecte.api.proxy.IEMCProxy;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.items.IItemHandlerModifiable;
-import net.minecraftforge.items.ItemStackHandler;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 
 public final class EMCItemHandler implements IItemHandlerModifiable
 {
+    @Nonnull
     private final UUID owner;
+    @Nonnull
     private final World world;
 
     private List<ItemStack> cachedKnowledge = null;
@@ -39,6 +41,7 @@ public final class EMCItemHandler implements IItemHandlerModifiable
         refresh(true);
     }
 
+    @SuppressWarnings("EmptyMethod")
     @Override
     public void setStackInSlot(int slot, @Nonnull ItemStack stack)
     {
@@ -78,9 +81,7 @@ public final class EMCItemHandler implements IItemHandlerModifiable
             return ItemStack.EMPTY;
         }
 
-        ItemStack stack = cachedInventory.get(slot);
-
-        return stack;
+        return cachedInventory.get(slot);
     }
 
     @Nonnull
@@ -109,7 +110,7 @@ public final class EMCItemHandler implements IItemHandlerModifiable
 
                 if(!simulate)
                 {
-                    setRealEMC(owner, (double)(emc + emcValue));
+                    setRealEMC(owner, emc + emcValue);
 
                     refreshCachedKnowledge(false);
                 }
@@ -182,7 +183,7 @@ public final class EMCItemHandler implements IItemHandlerModifiable
         return Integer.MAX_VALUE;
     }
 
-    protected boolean validateSlotIndex(int slot, boolean fatal)
+    private boolean validateSlotIndex(int slot, boolean fatal)
     {
         int size = cachedInventory.size() + 1;
 
@@ -201,9 +202,7 @@ public final class EMCItemHandler implements IItemHandlerModifiable
 
     private double getRealEMC(UUID owner)
     {
-        EntityPlayerMP player = world.getMinecraftServer().getPlayerList().getPlayerByUUID(owner);
-
-        double ret;
+        EntityPlayerMP player = getEntityPlayerMP(owner);
 
         if(player == null && OfflineEMCWorldData.get(world).hasCachedEMC(owner))
         {
@@ -218,9 +217,21 @@ public final class EMCItemHandler implements IItemHandlerModifiable
 
     }
 
+    @Nullable
+    private EntityPlayerMP getEntityPlayerMP(UUID owner)
+    {
+        EntityPlayerMP player = null;
+        MinecraftServer server = world.getMinecraftServer();
+        if (server != null)
+        {
+            player = server.getPlayerList().getPlayerByUUID(owner);
+        }
+        return player;
+    }
+
     private void setRealEMC(UUID owner, double emc)
     {
-        EntityPlayerMP player = world.getMinecraftServer().getPlayerList().getPlayerByUUID(owner);
+        EntityPlayerMP player = getEntityPlayerMP(owner);
 
         if (player != null)
         {
@@ -250,15 +261,14 @@ public final class EMCItemHandler implements IItemHandlerModifiable
 
     public boolean refresh(boolean comprehensive)
     {
-        if(owner == null) return true;
-
         boolean ret = true;
 
         if(cachedKnowledge == null)
         {
             try
             {
-                ret = refreshCachedKnowledge(comprehensive);
+                refreshCachedKnowledge(comprehensive);
+                ret = true;
             } catch(IllegalStateException ex)
             {
                 EquivalentIntegrationsMod.logger.warn("Unable to refresh knowledge, due to something");
@@ -269,63 +279,51 @@ public final class EMCItemHandler implements IItemHandlerModifiable
         if(!ret && comprehensive) {
             needsFullRefresh = true;
         }
-        return true;
+        return ret;
     }
 
-    private boolean refreshCachedKnowledge(boolean comprehensive)
+    private void refreshCachedKnowledge(boolean comprehensive)
             throws IllegalStateException
     {
-        if(world == null) return false;
-        if(world.isRemote) return true;
+        if(world.isRemote) return;
 
         if(needsFullRefresh)
         {
             comprehensive = true;
         }
 
-        if(owner == null)
-        {
-            cachedKnowledge = null;
-            cachedEmc = -1;
-            cachedInventory = null;
+        boolean updateInv = false;
+
+        if(comprehensive){
+            IKnowledgeProvider knowledge;
+            knowledge = ProjectEAPI.getTransmutationProxy().getKnowledgeProviderFor(owner);
+
+            cachedKnowledge = knowledge.getKnowledge();
+
+            updateInv = true;
+
         }
-        else
         {
-            boolean updateInv = false;
-
-            if(comprehensive){
-                IKnowledgeProvider knowledge;
-                knowledge = ProjectEAPI.getTransmutationProxy().getKnowledgeProviderFor(owner);
-
-                List<ItemStack> tmp = knowledge.getKnowledge();
-
-                cachedKnowledge = tmp;
+            double tmp = getRealEMC(owner);
+            if (cachedEmc != tmp)
+            {
+                cachedEmc = tmp;
                 updateInv = true;
-
             }
+        }
+
+        if(updateInv)
+        {
+            IEMCProxy emcProxy = ProjectEAPI.getEMCProxy();
+            double emc = getRealEMC(owner);
+            cachedInventory = new ArrayList<>();
+
+            for(ItemStack is : cachedKnowledge)
             {
-                double tmp = getRealEMC(owner);
-                if (cachedEmc != tmp)
-                {
-                    cachedEmc = tmp;
-                    updateInv = true;
-                }
-            }
+                int num = howManyCanWeMake(emc, emcProxy.getValue(is));
 
-            if(updateInv)
-            {
-                IEMCProxy emcProxy = ProjectEAPI.getEMCProxy();
-                double emc = getRealEMC(owner);
-                cachedInventory = new ArrayList<>();
-
-                for(int i = 0; i < cachedKnowledge.size(); i++)
-                {
-                    ItemStack is = cachedKnowledge.get(i);
-                    int num = howManyCanWeMake(emc, emcProxy.getValue(is));
-
-                    if(num > 0) {
-                        cachedInventory.add(new ItemStack(is.getItem(), num, is.getMetadata(), is.getTagCompound()));
-                    }
+                if(num > 0) {
+                    cachedInventory.add(new ItemStack(is.getItem(), num, is.getMetadata(), is.getTagCompound()));
                 }
             }
         }
@@ -333,10 +331,9 @@ public final class EMCItemHandler implements IItemHandlerModifiable
         needsFullRefresh = false;
         //EquivalentIntegrationsMod.logger.info("Successfully refreshed cache");
 
-        return true;
-
     }
 
+    @SuppressWarnings("unused")
     @SubscribeEvent
     public void onEMCRemap(EMCRemapEvent event)
     {

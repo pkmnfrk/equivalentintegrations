@@ -1,6 +1,5 @@
 package com.mike_caron.equivalentintegrations;
 
-import net.minecraft.launchwrapper.Launch;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.SidedProxy;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
@@ -12,6 +11,7 @@ import net.minecraftforge.fml.common.gameevent.PlayerEvent;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+@SuppressWarnings("unused")
 @Mod(
         modid = EquivalentIntegrationsMod.modId,
         name = EquivalentIntegrationsMod.name,
@@ -27,6 +27,7 @@ public class EquivalentIntegrationsMod {
 
     public static final Logger logger = LogManager.getLogger(modId);
 
+    @SuppressWarnings("unused")
     @Mod.Instance(modId)
     public static EquivalentIntegrationsMod instance;
 
@@ -38,7 +39,7 @@ public class EquivalentIntegrationsMod {
 
     @Mod.EventHandler
     public  void preInit(FMLPreInitializationEvent event) {
-
+        proxy.preInit(event);
     }
 
     @Mod.EventHandler
@@ -48,7 +49,7 @@ public class EquivalentIntegrationsMod {
 
     @Mod.EventHandler
     public void postInit(FMLPostInitializationEvent event) {
-
+        proxy.postInit(event);
     }
 
     @SubscribeEvent
