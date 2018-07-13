@@ -7,8 +7,8 @@ import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import com.mike_caron.equivalentintegrations.proxy.CommonProxy;
-
-import java.util.logging.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 @Mod(
         modid = EquivalentIntegrationsMod.modId,
@@ -22,7 +22,7 @@ public class EquivalentIntegrationsMod {
     public static final String name = "Equivalent Integrations";
     public static final String version = "0.1.0";
 
-    public static final Logger logger = Logger.getLogger(name);
+    public static final Logger logger = LogManager.getLogger(modId);
 
     @Mod.Instance(modId)
     public static EquivalentIntegrationsMod instance;

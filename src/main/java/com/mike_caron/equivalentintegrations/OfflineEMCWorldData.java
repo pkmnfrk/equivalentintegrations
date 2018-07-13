@@ -18,9 +18,16 @@ public class OfflineEMCWorldData extends WorldSavedData
         super(IDENTIFIER);
     }
 
+    public boolean hasCachedEMC(UUID uuid)
+    {
+        if(cachedEMCValues == null || !cachedEMCValues.containsKey(uuid))
+            return false;
+
+        return true;
+    }
     public double getCachedEMC(UUID uuid)
     {
-        if(cachedEMCValues.containsKey(uuid))
+        if(cachedEMCValues != null && cachedEMCValues.containsKey(uuid))
         {
             return cachedEMCValues.get(uuid);
         }
@@ -29,13 +36,17 @@ public class OfflineEMCWorldData extends WorldSavedData
 
     public void setCachedEMC(UUID uuid, double d)
     {
+        if(cachedEMCValues == null)
+            cachedEMCValues = new HashMap<>();
+
         cachedEMCValues.put(uuid, d);
+
         markDirty();
     }
 
     public void clearCachedEMC(UUID uuid)
     {
-        if(cachedEMCValues.containsKey(uuid))
+        if(cachedEMCValues != null && cachedEMCValues.containsKey(uuid))
         {
             cachedEMCValues.remove(uuid);
             markDirty();
@@ -45,10 +56,10 @@ public class OfflineEMCWorldData extends WorldSavedData
     @Override
     public void readFromNBT(NBTTagCompound nbt)
     {
+        cachedEMCValues = new HashMap<>();
         if(nbt.hasKey("players"))
         {
             NBTTagCompound players = nbt.getCompoundTag("players");
-            cachedEMCValues = new HashMap<>();
             for(String id : players.getKeySet())
             {
                 UUID uuid = UUID.fromString(id);
@@ -61,12 +72,15 @@ public class OfflineEMCWorldData extends WorldSavedData
     @Override
     public NBTTagCompound writeToNBT(NBTTagCompound compound)
     {
-        NBTTagCompound players = new NBTTagCompound();
-        for(UUID uuid : cachedEMCValues.keySet())
+        if(cachedEMCValues != null)
         {
-            players.setDouble(uuid.toString(), cachedEMCValues.get(uuid));
+            NBTTagCompound players = new NBTTagCompound();
+            for (UUID uuid : cachedEMCValues.keySet())
+            {
+                players.setDouble(uuid.toString(), cachedEMCValues.get(uuid));
+            }
+            compound.setTag("players", players);
         }
-        compound.setTag("players", players);
 
         return compound;
     }

@@ -10,6 +10,7 @@ import moze_intel.projecte.api.event.EMCRemapEvent;
 import moze_intel.projecte.api.event.PlayerKnowledgeChangeEvent;
 import moze_intel.projecte.api.proxy.IEMCProxy;
 import moze_intel.projecte.api.proxy.ITransmutationProxy;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
@@ -18,7 +19,10 @@ import net.minecraft.network.NetworkManager;
 import net.minecraft.network.play.server.SPacketUpdateTileEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.world.ServerWorldEventHandler;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.asm.transformers.ItemStackTransformer;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -36,9 +40,9 @@ import java.util.UUID;
 public class TransmutationChamberTileEntity extends TileEntity implements IItemHandlerModifiable
 {
     private UUID owner = null;
-    private List<ItemStack> cachedKnowledge;
-    private HashMap<ItemStack, Integer> cachedInventory;
-    private double cachedEmc;
+    private List<ItemStack> cachedKnowledge = null;
+    private HashMap<ItemStack, Integer> cachedInventory = null;
+    private double cachedEmc = -1;
 
     private ItemStackHandler talismanInventory = new ItemStackHandler(1)
     {
@@ -79,9 +83,16 @@ public class TransmutationChamberTileEntity extends TileEntity implements IItemH
         if (newOwner != owner)
         {
             this.owner = newOwner;
-            refreshCachedKnowledge();
-            world.markBlockRangeForRenderUpdate(getPos(), getPos());
             this.markDirty();
+
+            refreshCachedKnowledge();
+
+            //world.markBlockRangeForRenderUpdate(getPos(), getPos());
+            if(world != null)
+            {
+                IBlockState state = world.getBlockState(pos);
+                world.notifyBlockUpdate(getPos(), state, state, 3);
+            }
         }
     }
 
@@ -118,12 +129,11 @@ public class TransmutationChamberTileEntity extends TileEntity implements IItemH
 
         if (compound.hasKey("owner"))
         {
-            owner = UUID.fromString(compound.getString("owner"));
-            refreshCachedKnowledge();
+            setOwner(UUID.fromString(compound.getString("owner")));
         }
         else
         {
-            owner = null;
+            setOwner(null);
         }
 
         if (compound.hasKey("items"))
@@ -151,6 +161,9 @@ public class TransmutationChamberTileEntity extends TileEntity implements IItemH
 
         compound.setTag("items", talismanInventory.serializeNBT());
 
+        //EquivalentIntegrationsMod.logger.info("Writing To NBT:");
+        //EquivalentIntegrationsMod.logger.info(compound.toString());
+
         return compound;
     }
 
@@ -167,6 +180,19 @@ public class TransmutationChamberTileEntity extends TileEntity implements IItemH
             return true;
         }
         return super.hasCapability(capability, facing);
+    }
+
+    @Override
+    public void onLoad()
+    {
+        ensureCache();
+        MinecraftForge.EVENT_BUS.register(this);
+    }
+
+    @Override
+    public void onChunkUnload()
+    {
+        MinecraftForge.EVENT_BUS.unregister(this);
     }
 
     @Nullable
@@ -197,11 +223,16 @@ public class TransmutationChamberTileEntity extends TileEntity implements IItemH
     @Override
     public int getSlots()
     {
-        if (owner == null)
+        if (owner == null || world.isRemote)
             return 0;
 
         EquivalentIntegrationsMod.logger.info("Transmutation Chamber: Getting slot count");
 
+        if(!ensureCache()) {
+            return 0;
+        }
+
+        EquivalentIntegrationsMod.logger.info("Transmutation Chamber: Success");
         return cachedKnowledge.size();
     }
 
@@ -209,9 +240,14 @@ public class TransmutationChamberTileEntity extends TileEntity implements IItemH
     @Override
     public ItemStack getStackInSlot(int slot)
     {
-        validateSlotIndex(slot);
+        if(!validateSlotIndex(slot, false))
+            return ItemStack.EMPTY;
 
-        EquivalentIntegrationsMod.logger.info("Transmutation Chamber: Getting stack in slot " + slot);
+        //EquivalentIntegrationsMod.logger.info("Transmutation Chamber: Getting stack in slot " + slot);
+
+        if(!ensureCache()) {
+            return ItemStack.EMPTY;
+        }
 
         ItemStack stack = cachedKnowledge.get(slot);
 
@@ -224,7 +260,9 @@ public class TransmutationChamberTileEntity extends TileEntity implements IItemH
     @Override
     public ItemStack insertItem(int slot, @Nonnull ItemStack stack, boolean simulate)
     {
-        validateSlotIndex(slot);
+        if(!validateSlotIndex(slot, false))
+            return stack;
+
         return stack;
     }
 
@@ -232,7 +270,7 @@ public class TransmutationChamberTileEntity extends TileEntity implements IItemH
     @Override
     public ItemStack extractItem(int slot, int amount, boolean simulate)
     {
-        validateSlotIndex(slot);
+        validateSlotIndex(slot, true);
 
         if (world.isRemote)
         {
@@ -276,7 +314,8 @@ public class TransmutationChamberTileEntity extends TileEntity implements IItemH
     @Override
     public int getSlotLimit(int slot)
     {
-        validateSlotIndex(slot);
+        if(!validateSlotIndex(slot, false))
+            return 0;
         //IKnowledgeProvider knowledge = ProjectEAPI.getTransmutationProxy().getKnowledgeProviderFor(owner);
         return Integer.MAX_VALUE;
     }
@@ -284,21 +323,27 @@ public class TransmutationChamberTileEntity extends TileEntity implements IItemH
     @SubscribeEvent
     public void onPlayerKnowledgeChange(PlayerKnowledgeChangeEvent event)
     {
-        if(event.getPlayerUUID() == owner)
+        if(event.getPlayerUUID().equals(owner))
         {
             EquivalentIntegrationsMod.logger.info("Refreshing cached knowledge due to knowledge change");
             refreshCachedKnowledge();
         }
     }
 
+    @Override
+    public void invalidate()
+    {
+        super.invalidate();
+    }
+
     @SubscribeEvent
     public void onEMCRemap(EMCRemapEvent event)
     {
         EquivalentIntegrationsMod.logger.info("Refreshing cached knowledge due to global remap");
-        refreshCachedKnowledge();
+        ensureCache();
     }
 
-    protected void validateSlotIndex(int slot)
+    protected boolean validateSlotIndex(int slot, boolean fatal)
     {
         int size = 0;
         if (owner != null)
@@ -307,22 +352,35 @@ public class TransmutationChamberTileEntity extends TileEntity implements IItemH
         }
 
         if (slot < 0 || slot >= size)
-            throw new RuntimeException("Slot " + slot + " not in valid range - [0," + size + ")");
+        {
+            if(fatal)
+            {
+                throw new RuntimeException("Slot " + slot + " not in valid range - [0," + size + ")");
+            }
+            EquivalentIntegrationsMod.logger.warn("Slot " + slot + " not in valid range - [0," + size + ")");
+            return false;
+        }
+
+        return true;
     }
 
     private double getRealEMC(UUID owner)
     {
         EntityPlayerMP player = world.getMinecraftServer().getPlayerList().getPlayerByUUID(owner);
 
-        if (player != null)
+        double ret;
+
+        if(player == null && OfflineEMCWorldData.get(world).hasCachedEMC(owner))
         {
-            IKnowledgeProvider knowledge = ProjectEAPI.getTransmutationProxy().getKnowledgeProviderFor(owner);
-            return knowledge.getEmc();
-        }
-        else
-        {
+            EquivalentIntegrationsMod.logger.info("Retrieving cached RMC value for {}", owner);
             return OfflineEMCWorldData.get(world).getCachedEMC(owner);
         }
+
+        EquivalentIntegrationsMod.logger.info("Retrieving live RMC value for {}", owner);
+        IKnowledgeProvider knowledge = ProjectEAPI.getTransmutationProxy().getKnowledgeProviderFor(owner);
+        return knowledge.getEmc();
+
+
     }
 
     private void setRealEMC(UUID owner, double emc)
@@ -355,25 +413,50 @@ public class TransmutationChamberTileEntity extends TileEntity implements IItemH
         }
     }
 
-    private void refreshCachedKnowledge()
+    private boolean ensureCache()
     {
+        if(owner == null) return true;
+
+        if(cachedKnowledge == null)
+        {
+            try
+            {
+                return refreshCachedKnowledge();
+            } catch(IllegalStateException ex)
+            {
+                EquivalentIntegrationsMod.logger.warn("Unable to refresh knowledge, due to something");
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private boolean refreshCachedKnowledge()
+            throws IllegalStateException
+    {
+        if(world == null) return false;
+        if(world.isRemote) return true;
+
         if(owner == null)
         {
             cachedKnowledge = null;
+            cachedEmc = -1;
+            cachedInventory = null;
         }
         else
         {
             boolean updateInv = false;
 
-            IKnowledgeProvider knowledge = ProjectEAPI.getTransmutationProxy().getKnowledgeProviderFor(owner);
+            IKnowledgeProvider knowledge;
+
+            knowledge = ProjectEAPI.getTransmutationProxy().getKnowledgeProviderFor(owner);
 
             {
                 List<ItemStack> tmp = knowledge.getKnowledge();
-                if(cachedKnowledge == null || tmp.hashCode() != cachedKnowledge.hashCode())
-                {
-                    cachedKnowledge = tmp;
-                    updateInv = true;
-                }
+
+                cachedKnowledge = tmp;
+                updateInv = true;
+
             }
             {
                 double tmp = getRealEMC(owner);
@@ -388,13 +471,21 @@ public class TransmutationChamberTileEntity extends TileEntity implements IItemH
             {
                 IEMCProxy emcProxy = ProjectEAPI.getEMCProxy();
                 double emc = getRealEMC(owner);
+                cachedInventory = new HashMap<>();
+                /*
                 for (ItemStack is : cachedKnowledge)
+                */
+                for(int i = 0; i < cachedKnowledge.size(); i++)
                 {
+                    ItemStack is = cachedKnowledge.get(i);
                     cachedInventory.put(is, howManyCanWeMake(emc, emcProxy.getValue(is)));
                 }
             }
         }
 
+        EquivalentIntegrationsMod.logger.info("Successfully refreshed cache");
+
+        return true;
 
     }
 }
