@@ -63,7 +63,7 @@ public class TransmutationChamberTileEntity extends TileEntity implements IItemH
         @Override
         public ItemStack insertItem(int slot, @Nonnull ItemStack stack, boolean simulate)
         {
-            if (stack == ItemStack.EMPTY)
+            if (stack.isEmpty())
                 return ItemStack.EMPTY;
 
             if (!SoulboundTalisman.isBound(stack))
@@ -278,7 +278,7 @@ public class TransmutationChamberTileEntity extends TileEntity implements IItemH
 
                 long emcValue = singleValue * stack.getCount();
 
-                EquivalentIntegrationsMod.logger.info("Burning a stack ({}) for {} EMC each, a total of {}", stack, singleValue, emcValue);
+                EquivalentIntegrationsMod.logger.debug("Burning a stack ({}) for {} EMC each, a total of {}", stack, singleValue, emcValue);
 
                 if(!simulate)
                 {
@@ -402,11 +402,11 @@ public class TransmutationChamberTileEntity extends TileEntity implements IItemH
 
         if(player == null && OfflineEMCWorldData.get(world).hasCachedEMC(owner))
         {
-            EquivalentIntegrationsMod.logger.info("Retrieving cached RMC value for {}", owner);
+            EquivalentIntegrationsMod.logger.debug("Retrieving cached EMC value for {}", owner);
             return OfflineEMCWorldData.get(world).getCachedEMC(owner);
         }
 
-        EquivalentIntegrationsMod.logger.info("Retrieving live RMC value for {}", owner);
+        EquivalentIntegrationsMod.logger.debug("Retrieving live EMC value for {}", owner);
         IKnowledgeProvider knowledge = ProjectEAPI.getTransmutationProxy().getKnowledgeProviderFor(owner);
         return knowledge.getEmc();
 
