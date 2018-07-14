@@ -2,6 +2,8 @@ package com.mike_caron.equivalentintegrations.storage;
 
 import com.mike_caron.equivalentintegrations.EquivalentIntegrationsMod;
 import com.mike_caron.equivalentintegrations.OfflineEMCWorldData;
+import com.mike_caron.equivalentintegrations.api.capabilities.IEMCManager;
+import com.mike_caron.equivalentintegrations.impl.EMCManagerProvider;
 import moze_intel.projecte.api.ProjectEAPI;
 import moze_intel.projecte.api.capabilities.IKnowledgeProvider;
 import moze_intel.projecte.api.event.EMCRemapEvent;
@@ -136,7 +138,9 @@ public final class EMCItemHandler implements IItemHandlerModifiable
 
             if(knowledge.hasKnowledge(stack))
             {
-                double emc = getRealEMC(owner);
+                IEMCManager emcManager = world.getCapability(EMCManagerProvider.EMC_MANAGER_CAPABILITY, null);
+
+                double emc = emcManager.getEMC(owner);
 
                 long singleValue = emcProxy.getValue(stack);
 
@@ -148,7 +152,7 @@ public final class EMCItemHandler implements IItemHandlerModifiable
 
                 if(!simulate)
                 {
-                    setRealEMC(owner, emc + emcValue);
+                    emcManager.setEMC(owner, emc + emcValue);
 
                     refreshCachedKnowledge(false);
                 }
@@ -171,7 +175,9 @@ public final class EMCItemHandler implements IItemHandlerModifiable
             return ItemStack.EMPTY;
         }
 
-        double emc = getRealEMC(owner);
+        IEMCManager emcManager = world.getCapability(EMCManagerProvider.EMC_MANAGER_CAPABILITY, null);
+
+        double emc = emcManager.getEMC(owner);
 
         IEMCProxy emcProxy = ProjectEAPI.getEMCProxy();
 
@@ -214,7 +220,7 @@ public final class EMCItemHandler implements IItemHandlerModifiable
         if (!simulate && desiredEMC > 0)
         {
             emc -= desiredEMC;
-            setRealEMC(owner, emc);
+            emcManager.setEMC(owner, emc);
 
             refreshCachedKnowledge(false);
         }
@@ -259,6 +265,7 @@ public final class EMCItemHandler implements IItemHandlerModifiable
         return true;
     }
 
+    /*
     private double getRealEMC(UUID owner)
     {
         EntityPlayerMP player = getEntityPlayerMP(owner);
@@ -303,6 +310,7 @@ public final class EMCItemHandler implements IItemHandlerModifiable
             OfflineEMCWorldData.get(world).setCachedEMC(owner, emc);
         }
     }
+    */
 
     private static int howManyCanWeMake(double emc, long cost)
     {
@@ -346,6 +354,8 @@ public final class EMCItemHandler implements IItemHandlerModifiable
     {
         if(world.isRemote) return;
 
+        IEMCManager emcManager = world.getCapability(EMCManagerProvider.EMC_MANAGER_CAPABILITY, null);
+
         if(needsFullRefresh)
         {
             comprehensive = true;
@@ -363,7 +373,7 @@ public final class EMCItemHandler implements IItemHandlerModifiable
 
         }
         {
-            double tmp = getRealEMC(owner);
+            double tmp = emcManager.getEMC(owner);
             if (cachedEmc != tmp)
             {
                 cachedEmc = tmp;
@@ -374,7 +384,7 @@ public final class EMCItemHandler implements IItemHandlerModifiable
         if(updateInv)
         {
             IEMCProxy emcProxy = ProjectEAPI.getEMCProxy();
-            double emc = getRealEMC(owner);
+            double emc = emcManager.getEMC(owner);
             cachedInventory = new ArrayList<>();
 
             for(ItemStack is : cachedKnowledge)

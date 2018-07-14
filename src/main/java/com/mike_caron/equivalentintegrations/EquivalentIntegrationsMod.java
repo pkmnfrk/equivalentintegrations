@@ -1,5 +1,9 @@
 package com.mike_caron.equivalentintegrations;
 
+import com.mike_caron.equivalentintegrations.impl.EMCManagerProvider;
+import net.minecraft.util.ResourceLocation;
+import net.minecraft.world.World;
+import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.SidedProxy;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
@@ -32,7 +36,7 @@ public class EquivalentIntegrationsMod {
     public static EquivalentIntegrationsMod instance;
 
     @SidedProxy(
-            serverSide = "com.mike_caron.equivalentintegrations.proxy.ServerProxy",
+            serverSide = "com.mike_caron.equivalentintegrations.proxy.CommonProxy",
             clientSide = "com.mike_caron.equivalentintegrations.proxy.ClientProxy"
     )
     public static CommonProxy proxy;
@@ -56,6 +60,12 @@ public class EquivalentIntegrationsMod {
     public static void onPlayerLogin(PlayerEvent.PlayerLoggedInEvent event)
     {
         proxy.onPlayerLogin(event);
+    }
+
+    @SubscribeEvent
+    public static void onAttachWorldCapabilities(AttachCapabilitiesEvent<World> event)
+    {
+        event.addCapability(new ResourceLocation(modId, "emcManager"), new EMCManagerProvider());
     }
 
 }
