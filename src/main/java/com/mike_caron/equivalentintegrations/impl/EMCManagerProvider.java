@@ -1,14 +1,21 @@
 package com.mike_caron.equivalentintegrations.impl;
 
+import com.mike_caron.equivalentintegrations.EquivalentIntegrationsMod;
 import com.mike_caron.equivalentintegrations.api.capabilities.IEMCManager;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.ResourceLocation;
+import net.minecraft.world.World;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityInject;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
+import net.minecraftforge.event.AttachCapabilitiesEvent;
+import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+@Mod.EventBusSubscriber
 public class EMCManagerProvider implements ICapabilityProvider
 {
     @CapabilityInject(IEMCManager.class)
@@ -32,5 +39,11 @@ public class EMCManagerProvider implements ICapabilityProvider
         }
 
         return null;
+    }
+
+    @SubscribeEvent
+    public static void onAttachWorldCapabilities(AttachCapabilitiesEvent<World> event)
+    {
+        event.addCapability(new ResourceLocation(EquivalentIntegrationsMod.modId, "emcManager"), new EMCManagerProvider());
     }
 }

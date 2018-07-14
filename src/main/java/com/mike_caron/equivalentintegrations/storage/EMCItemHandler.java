@@ -3,6 +3,7 @@ package com.mike_caron.equivalentintegrations.storage;
 import com.mike_caron.equivalentintegrations.EquivalentIntegrationsMod;
 import com.mike_caron.equivalentintegrations.OfflineEMCWorldData;
 import com.mike_caron.equivalentintegrations.api.capabilities.IEMCManager;
+import com.mike_caron.equivalentintegrations.api.events.EMCChangedEvent;
 import com.mike_caron.equivalentintegrations.impl.EMCManagerProvider;
 import moze_intel.projecte.api.ProjectEAPI;
 import moze_intel.projecte.api.capabilities.IKnowledgeProvider;
@@ -148,7 +149,7 @@ public final class EMCItemHandler implements IItemHandlerModifiable
 
                 emcValue -= getEfficiencyCost(stack, emcValue);
 
-                EquivalentIntegrationsMod.logger.info("Burning a stack ({}, {}) for {} EMC each, a total of {} (Simulation: {})", stack, System.identityHashCode(stack) , singleValue, emcValue, simulate);
+                //EquivalentIntegrationsMod.logger.info("Burning a stack ({}, {}) for {} EMC each, a total of {} (Simulation: {})", stack, System.identityHashCode(stack) , singleValue, emcValue, simulate);
 
                 if(!simulate)
                 {
@@ -227,7 +228,7 @@ public final class EMCItemHandler implements IItemHandlerModifiable
 
 
 
-        EquivalentIntegrationsMod.logger.info("Returning stack with id {}", System.identityHashCode(ret));
+        //EquivalentIntegrationsMod.logger.info("Returning stack with id {}", System.identityHashCode(ret));
 
         return ret;
     }
@@ -418,6 +419,11 @@ public final class EMCItemHandler implements IItemHandlerModifiable
             EquivalentIntegrationsMod.logger.info("Refreshing cached knowledge due to knowledge change");
             refreshCachedKnowledge(true);
         }
+    }
+
+    public void onEmcChanged(EMCChangedEvent event)
+    {
+        refresh(true);
     }
 
 }

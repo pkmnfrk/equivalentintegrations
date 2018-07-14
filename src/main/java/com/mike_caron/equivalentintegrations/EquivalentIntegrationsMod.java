@@ -56,16 +56,4 @@ public class EquivalentIntegrationsMod {
         proxy.postInit(event);
     }
 
-    @SubscribeEvent
-    public static void onPlayerLogin(PlayerEvent.PlayerLoggedInEvent event)
-    {
-        proxy.onPlayerLogin(event);
-    }
-
-    @SubscribeEvent
-    public static void onAttachWorldCapabilities(AttachCapabilitiesEvent<World> event)
-    {
-        event.addCapability(new ResourceLocation(modId, "emcManager"), new EMCManagerProvider());
-    }
-
 }

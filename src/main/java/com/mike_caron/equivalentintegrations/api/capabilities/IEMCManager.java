@@ -6,4 +6,8 @@ public interface IEMCManager
 {
     double getEMC(UUID player);
     void setEMC(UUID player, double newEmc);
+
+    void tick();
+
+    void playerLoggedIn(UUID owner);
 }

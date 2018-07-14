@@ -38,19 +38,4 @@ public class CommonProxy {
     {
 
     }
-
-    public void onPlayerLogin(PlayerEvent.PlayerLoggedInEvent event)
-    {
-        UUID owner = event.player.getUniqueID();
-        OfflineEMCWorldData data = OfflineEMCWorldData.get(FMLCommonHandler.instance().getMinecraftServerInstance().getEntityWorld());
-        if(data.getCachedEMC(owner) != 0D)
-        {
-            IKnowledgeProvider knowledge = ProjectEAPI.getTransmutationProxy().getKnowledgeProviderFor(owner);
-            knowledge.setEmc(data.getCachedEMC(owner));
-            data.clearCachedEMC(owner);
-
-            EntityPlayerMP player = FMLCommonHandler.instance().getMinecraftServerInstance().getPlayerList().getPlayerByUUID(owner);
-            knowledge.sync(player);
-        }
-    }
 }

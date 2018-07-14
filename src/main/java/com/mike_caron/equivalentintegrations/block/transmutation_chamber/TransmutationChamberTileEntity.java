@@ -18,7 +18,6 @@ import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.ItemStackHandler;
 import scala.Int;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.UUID;
 
@@ -28,7 +27,7 @@ public class TransmutationChamberTileEntity extends TileEntity implements ITicka
 
     private EMCItemHandler emcItemHandler;
 
-    private int ticksSinceLastCacheUpdate = 0;
+    private int ticksSinceLastUpdate = 0;
 
     private final TransmutationChamberItemStackHandler talismanInventory = new TransmutationChamberItemStackHandler()
     {
@@ -251,14 +250,14 @@ public class TransmutationChamberTileEntity extends TileEntity implements ITicka
             //things can get weird right at world load, so this is a fallback just in case
             createEmcItemHandler(owner);
         }
+
         if(emcItemHandler != null)
         {
-            ticksSinceLastCacheUpdate += 1;
-            if (ticksSinceLastCacheUpdate >= 20)
+            ticksSinceLastUpdate += 1;
+            if (ticksSinceLastUpdate >= 20)
             {
-                emcItemHandler.refresh(false);
                 setTransmutationParameters();
-                ticksSinceLastCacheUpdate = 0;
+                ticksSinceLastUpdate = 0;
             }
         }
     }
