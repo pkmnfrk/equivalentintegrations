@@ -1,0 +1,21 @@
+{
+  "result": {
+    "item": "equivalentintegrations:efficiency_catalyst"
+  },
+  "pattern": [
+    "e e",
+    "ele",
+    "eee"
+  ],
+  "type": "forge:ore_shaped",
+  "key": {
+    "e": {
+      "type": "forge:ore_dict",
+      "ore": "gemEmerald"
+    },
+    "l": {
+      "type": "forge:ore_dict",
+      "ore": "gemLapis"
+    }
+  }
+}

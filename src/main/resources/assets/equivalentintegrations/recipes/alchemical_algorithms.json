@@ -1,0 +1,19 @@
+{
+  "result": {
+    "item": "equivalentintegrations:alchemical_algorithms"
+  },
+  "pattern": [
+    " b ",
+    "bab",
+    " b "
+  ],
+  "type": "forge:ore_shaped",
+  "key": {
+    "b": {
+      "item": "minecraft:writable_book"
+    },
+    "a":{
+      "item": "projecte:transmutation_table"
+    }
+  }
+}

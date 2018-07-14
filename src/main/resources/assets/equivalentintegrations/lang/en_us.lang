@@ -1,5 +1,17 @@
 tile.transmutation_chamber.name=Transmutation Chamber
+
 item.soulbound_talisman.name=Soulbound Talisman
 item.soulbound_talisman.bound=Bound to %1$s
 item.soulbound_talisman.desc1=Right click to bind to yourself.
 item.soulbound_talisman.desc2=Use in Equivalent Integrations machines.
+
+item.alchemical_algorithms.name=Alchemical Algorithms
+item.alchemical_algorithms.desc1=Allows Transmutation Chambers to learn new items.
+#in case you need more room or something
+item.alchemical_algorithms.desc2=
+
+item.efficiency_catalyst.name=Efficiency Catalyst
+item.efficiency_catalyst.desc1=Increases the transumtation cost threshold
+item.efficiency_catalyst.desc2=by a factor of 10 per catalyst, up to 4.
+item.efficiency_catalyst.effect=Threshold: %2$s%1$d%3$s
+item.efficiency_catalyst.effect_inf=%2$sThreshold: %1$sUnlimited%2$s

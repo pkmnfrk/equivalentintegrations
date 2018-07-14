@@ -41,6 +41,12 @@ public final class EMCItemHandler implements IItemHandlerModifiable
         refresh(true);
     }
 
+    @Nonnull
+    public UUID getOwner()
+    {
+        return owner;
+    }
+
     @SuppressWarnings("EmptyMethod")
     @Override
     public void setStackInSlot(int slot, @Nonnull ItemStack stack)
@@ -106,7 +112,7 @@ public final class EMCItemHandler implements IItemHandlerModifiable
 
                 long emcValue = singleValue * stack.getCount();
 
-                EquivalentIntegrationsMod.logger.debug("Burning a stack ({}) for {} EMC each, a total of {} (Simulation: {})", stack, singleValue, emcValue, simulate);
+                EquivalentIntegrationsMod.logger.info("Burning a stack ({}, {}) for {} EMC each, a total of {} (Simulation: {})", stack, System.identityHashCode(stack) , singleValue, emcValue, simulate);
 
                 if(!simulate)
                 {
@@ -171,7 +177,11 @@ public final class EMCItemHandler implements IItemHandlerModifiable
             refreshCachedKnowledge(false);
         }
 
-        return new ItemStack(desired.getItem(), actualAmount, desired.getMetadata(), desired.getTagCompound());
+        ItemStack ret = new ItemStack(desired.getItem(), actualAmount, desired.getMetadata(), desired.getTagCompound());
+
+        EquivalentIntegrationsMod.logger.info("Returning stack with id {}", System.identityHashCode(ret));
+
+        return ret;
     }
 
     @Override
@@ -263,8 +273,8 @@ public final class EMCItemHandler implements IItemHandlerModifiable
     {
         boolean ret = true;
 
-        if(cachedKnowledge == null)
-        {
+        //if(cachedKnowledge == null)
+       // {
             try
             {
                 refreshCachedKnowledge(comprehensive);
@@ -274,7 +284,7 @@ public final class EMCItemHandler implements IItemHandlerModifiable
                 EquivalentIntegrationsMod.logger.warn("Unable to refresh knowledge, due to something");
                 ret = false;
             }
-        }
+       //}
 
         if(!ret && comprehensive) {
             needsFullRefresh = true;

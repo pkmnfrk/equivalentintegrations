@@ -21,7 +21,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
-public class SoulboundTalisman extends Item
+public class SoulboundTalisman extends ItemBase
 {
     public static final String id = "soulbound_talisman";
     public static final String OWNER_UUID = "OwnerUUID";
@@ -86,12 +86,6 @@ public class SoulboundTalisman extends Item
 
 
 
-    }
-
-    @SuppressWarnings("ConstantConditions")
-    @SideOnly(Side.CLIENT)
-    public void initModel() {
-        ModelLoader.setCustomModelResourceLocation(this, 0, new ModelResourceLocation(getRegistryName(), "inventory"));
     }
 
     @Override
