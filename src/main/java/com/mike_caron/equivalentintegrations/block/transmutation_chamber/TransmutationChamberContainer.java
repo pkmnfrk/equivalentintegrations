@@ -1,5 +1,6 @@
 package com.mike_caron.equivalentintegrations.block.transmutation_chamber;
 
+import com.mike_caron.equivalentintegrations.EquivalentIntegrationsMod;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.Container;
 import net.minecraft.inventory.IInventory;
@@ -9,11 +10,15 @@ import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.SlotItemHandler;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 public class TransmutationChamberContainer extends Container
 {
     private final TransmutationChamberTileEntity te;
+    private Slot talismanSlot;
+    private Slot algorithmsSlot;
+    private Slot efficiencySlot;
 
     public TransmutationChamberContainer(IInventory playerInventory, TransmutationChamberTileEntity te)
     {
@@ -46,12 +51,12 @@ public class TransmutationChamberContainer extends Container
     {
         IItemHandler itemHandler = this.te.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null);
 
-        addSlotToContainer(new SlotItemHandler(itemHandler, 0, 47, 27));
-        addSlotToContainer(new SlotItemHandler(itemHandler, 1, 101, 27));
-        addSlotToContainer(new SlotItemHandler(itemHandler, 2, 119, 27));
+        talismanSlot = addSlotToContainer(new SlotItemHandler(itemHandler, 0, 47, 27));
+        algorithmsSlot = addSlotToContainer(new SlotItemHandler(itemHandler, 1, 101, 27));
+        efficiencySlot = addSlotToContainer(new SlotItemHandler(itemHandler, 2, 119, 27));
     }
 
-    @Nullable
+    @Nonnull
     @Override
     public ItemStack transferStackInSlot(EntityPlayer playerIn, int index) {
         ItemStack itemstack = ItemStack.EMPTY;
@@ -63,20 +68,33 @@ public class TransmutationChamberContainer extends Container
 
             if (index < TransmutationChamberItemStackHandler.NUM_SLOTS)
             { //transferring from block -> player
+                EquivalentIntegrationsMod.logger.info("Transferring {} into the player", itemstack1);
                 if (!this.mergeItemStack(itemstack1, TransmutationChamberItemStackHandler.NUM_SLOTS, this.inventorySlots.size(), true)) {
+                    EquivalentIntegrationsMod.logger.info("Transferred {} into the player", itemstack1);
                     return ItemStack.EMPTY;
                 }
             }
-            else if (!this.mergeItemStack(itemstack1, 0, TransmutationChamberItemStackHandler.NUM_SLOTS, false))
-            { //transferring from player -> block
-                return ItemStack.EMPTY;
+            else
+            {
+                EquivalentIntegrationsMod.logger.info("Transferring {} into the block", itemstack1);
+                if (!this.mergeItemStack(itemstack1, 0, TransmutationChamberItemStackHandler.NUM_SLOTS, false))
+                { //transferring from player -> block
+                    EquivalentIntegrationsMod.logger.info("Transferred {} into the block", itemstack1);
+                    return ItemStack.EMPTY;
+                }
             }
 
+            EquivalentIntegrationsMod.logger.info("Itemstack1: {}", itemstack1);
             if (itemstack1.isEmpty()) {
+
                 slot.putStack(ItemStack.EMPTY);
             } else {
                 slot.onSlotChanged();
             }
+        }
+        else
+        {
+            EquivalentIntegrationsMod.logger.info("Did nothing");
         }
 
         return itemstack;

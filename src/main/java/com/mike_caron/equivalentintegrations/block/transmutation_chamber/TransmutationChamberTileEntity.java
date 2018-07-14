@@ -1,5 +1,6 @@
 package com.mike_caron.equivalentintegrations.block.transmutation_chamber;
 
+import com.mike_caron.equivalentintegrations.EquivalentIntegrationsMod;
 import com.mike_caron.equivalentintegrations.item.SoulboundTalisman;
 import com.mike_caron.equivalentintegrations.storage.EMCItemHandler;
 import net.minecraft.block.state.IBlockState;
@@ -15,6 +16,7 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.ItemStackHandler;
+import scala.Int;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -41,6 +43,8 @@ public class TransmutationChamberTileEntity extends TileEntity implements ITicka
 
             TransmutationChamberTileEntity.this.setOwner(owner);
             TransmutationChamberTileEntity.this.markDirty();
+
+            TransmutationChamberTileEntity.this.setTransmutationParameters();
         }
         /*
         @Nonnull
@@ -82,6 +86,7 @@ public class TransmutationChamberTileEntity extends TileEntity implements ITicka
                     if (newOwner != null)
                     {
                         createEmcItemHandler(newOwner);
+                        setTransmutationParameters();
                     }
                 }
 
@@ -97,6 +102,34 @@ public class TransmutationChamberTileEntity extends TileEntity implements ITicka
     {
         emcItemHandler = new EMCItemHandler(newOwner, world);
         MinecraftForge.EVENT_BUS.register(emcItemHandler);
+    }
+
+    private int getEfficiencyThreshold()
+    {
+        ItemStack stack = talismanInventory.getStackInSlot(2);
+
+        if(stack.getCount() > 3) return Int.MaxValue();
+
+        int ret = (int)(10 * Math.pow(10, stack.getCount()));
+
+        EquivalentIntegrationsMod.logger.info("Returning efficiency of {} for {}", ret, stack);
+
+        return ret;
+    }
+
+    private boolean getCanLearn()
+    {
+        ItemStack stack = talismanInventory.getStackInSlot(1);
+
+        return !stack.isEmpty();
+    }
+
+    private void setTransmutationParameters()
+    {
+        if(emcItemHandler == null) return;
+
+        emcItemHandler.setCanLearn(getCanLearn());
+        emcItemHandler.setEfficiencyThreshold(getEfficiencyThreshold());
     }
 
     private void destroyEmcItemHandler()
@@ -224,6 +257,7 @@ public class TransmutationChamberTileEntity extends TileEntity implements ITicka
             if (ticksSinceLastCacheUpdate >= 20)
             {
                 emcItemHandler.refresh(false);
+                setTransmutationParameters();
                 ticksSinceLastCacheUpdate = 0;
             }
         }

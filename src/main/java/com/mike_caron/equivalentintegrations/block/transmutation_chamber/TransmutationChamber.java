@@ -10,17 +10,21 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.inventory.InventoryHelper;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.tileentity.TileEntityFurnace;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
+import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.items.ItemStackHandler;
 
 import javax.annotation.Nullable;
 
@@ -37,6 +41,7 @@ public class TransmutationChamber extends Block implements ITileEntityProvider
         setRegistryName(id);
         setUnlocalizedName(id);
         setHardness(3.5f);
+        setHarvestLevel("pickaxe", 1);
 
         setDefaultState(this.blockState.getBaseState().withProperty(ACTIVE,false));
     }
@@ -97,6 +102,28 @@ public class TransmutationChamber extends Block implements ITileEntityProvider
         TileEntity ret = worldIn.getTileEntity(pos);
         if(ret instanceof TransmutationChamberTileEntity) return (TransmutationChamberTileEntity)ret;
         return null;
+    }
+
+    @Override
+    public void onBlockHarvested(World worldIn, BlockPos pos, IBlockState state, EntityPlayer player)
+    {
+        if(!worldIn.isRemote)
+        {
+            TransmutationChamberTileEntity te = getTE(worldIn, pos);
+            ItemStackHandler inventory = te.getTalismanInventory();
+
+            for (int i = 0; i < inventory.getSlots(); ++i)
+            {
+                ItemStack itemstack = inventory.getStackInSlot(i);
+
+                if (!itemstack.isEmpty())
+                {
+                    InventoryHelper.spawnItemStack(worldIn, pos.getX(), pos.getY(), pos.getZ(), itemstack);
+                }
+            }
+        }
+
+        super.onBlockHarvested(worldIn, pos, state, player);
     }
 
     @Override

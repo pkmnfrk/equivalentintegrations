@@ -31,6 +31,9 @@ public final class EMCItemHandler implements IItemHandlerModifiable
     private List<ItemStack> cachedInventory = null;
     private double cachedEmc = -1;
 
+    private int efficiencyThreshold = 10;
+    private boolean canLearn = false;
+
     private boolean needsFullRefresh = false;
 
     public EMCItemHandler(@Nonnull UUID owner,@Nonnull World world)
@@ -45,6 +48,26 @@ public final class EMCItemHandler implements IItemHandlerModifiable
     public UUID getOwner()
     {
         return owner;
+    }
+
+    public void setEfficiencyThreshold(int efficiencyThreshold)
+    {
+        this.efficiencyThreshold = efficiencyThreshold;
+    }
+
+    public int getEfficiencyThreshold()
+    {
+        return this.efficiencyThreshold;
+    }
+
+    public void setCanLearn(boolean canLearn)
+    {
+        this.canLearn = canLearn;
+    }
+
+    public boolean getCanLearn()
+    {
+        return this.canLearn;
     }
 
     @SuppressWarnings("EmptyMethod")
@@ -104,6 +127,13 @@ public final class EMCItemHandler implements IItemHandlerModifiable
 
             knowledge = ProjectEAPI.getTransmutationProxy().getKnowledgeProviderFor(owner);
 
+            if(canLearn && !knowledge.hasKnowledge(stack))
+            {
+                //note: this will not work if the user is offline. In this case, the later
+                //knowledge check will return false, thus rejecting the item
+                knowledge.addKnowledge(stack);
+            }
+
             if(knowledge.hasKnowledge(stack))
             {
                 double emc = getRealEMC(owner);
@@ -111,6 +141,8 @@ public final class EMCItemHandler implements IItemHandlerModifiable
                 long singleValue = emcProxy.getValue(stack);
 
                 long emcValue = singleValue * stack.getCount();
+
+                emcValue -= getEfficiencyCost(stack, emcValue);
 
                 EquivalentIntegrationsMod.logger.info("Burning a stack ({}, {}) for {} EMC each, a total of {} (Simulation: {})", stack, System.identityHashCode(stack) , singleValue, emcValue, simulate);
 
@@ -122,9 +154,7 @@ public final class EMCItemHandler implements IItemHandlerModifiable
                 }
 
                 return ItemStack.EMPTY;
-
             }
-
         }
 
         return stack;
@@ -164,9 +194,21 @@ public final class EMCItemHandler implements IItemHandlerModifiable
 
         //now we know that actualAmount is how many we can do.
 
+        ItemStack ret = new ItemStack(desired.getItem(), actualAmount, desired.getMetadata(), desired.getTagCompound());
+
+        //before this point, desiredEMC is guaranteed to be < emc
+        //but, the efficiency cost may put it over
+        desiredEMC += getEfficiencyCost(ret, desiredEMC);
+
         EquivalentIntegrationsMod.logger.debug("Materializing {} x ({}) for {} EMC each, a total of {} (Simulation: {})", actualAmount, desired, emcCost, desiredEMC, simulate);
         if(actualAmount < amount) {
             EquivalentIntegrationsMod.logger.debug("Sadly, this was less than the {} that was asked for", amount);
+        }
+
+        //if that happens, rather than trying to solve this calculus, just round it off
+        if(desiredEMC > emc)
+        {
+            desiredEMC = (long)emc;
         }
 
         if (!simulate && desiredEMC > 0)
@@ -177,11 +219,18 @@ public final class EMCItemHandler implements IItemHandlerModifiable
             refreshCachedKnowledge(false);
         }
 
-        ItemStack ret = new ItemStack(desired.getItem(), actualAmount, desired.getMetadata(), desired.getTagCompound());
+
 
         EquivalentIntegrationsMod.logger.info("Returning stack with id {}", System.identityHashCode(ret));
 
         return ret;
+    }
+
+    private int getEfficiencyCost(ItemStack stack, long emcCost)
+    {
+        if(emcCost < efficiencyThreshold) return 0;
+
+        return stack.getCount();
     }
 
     @Override
