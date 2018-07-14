@@ -15,3 +15,5 @@ item.efficiency_catalyst.desc1=Increases the transumtation cost threshold
 item.efficiency_catalyst.desc2=by a factor of 10 per catalyst, up to 4.
 item.efficiency_catalyst.effect=Threshold: %2$s%1$d%3$s
 item.efficiency_catalyst.effect_inf=%2$sThreshold: %1$sUnlimited%2$s
+
+container.transmutation_chamber.title=Transmutation Chamber

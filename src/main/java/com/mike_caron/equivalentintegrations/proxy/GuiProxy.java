@@ -1,8 +1,8 @@
 package com.mike_caron.equivalentintegrations.proxy;
 
-import com.mike_caron.equivalentintegrations.block.TransmutationChamberContainer;
-import com.mike_caron.equivalentintegrations.block.TransmutationChamberContainerGui;
-import com.mike_caron.equivalentintegrations.block.TransmutationChamberTileEntity;
+import com.mike_caron.equivalentintegrations.block.transmutation_chamber.TransmutationChamberContainer;
+import com.mike_caron.equivalentintegrations.block.transmutation_chamber.TransmutationChamberContainerGui;
+import com.mike_caron.equivalentintegrations.block.transmutation_chamber.TransmutationChamberTileEntity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;

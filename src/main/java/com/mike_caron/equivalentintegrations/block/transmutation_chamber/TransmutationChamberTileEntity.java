@@ -1,4 +1,4 @@
-package com.mike_caron.equivalentintegrations.block;
+package com.mike_caron.equivalentintegrations.block.transmutation_chamber;
 
 import com.mike_caron.equivalentintegrations.item.SoulboundTalisman;
 import com.mike_caron.equivalentintegrations.storage.EMCItemHandler;
@@ -28,7 +28,7 @@ public class TransmutationChamberTileEntity extends TileEntity implements ITicka
 
     private int ticksSinceLastCacheUpdate = 0;
 
-    private final ItemStackHandler talismanInventory = new ItemStackHandler(1)
+    private final TransmutationChamberItemStackHandler talismanInventory = new TransmutationChamberItemStackHandler()
     {
         @Override
         protected void onContentsChanged(int slot)
@@ -42,7 +42,7 @@ public class TransmutationChamberTileEntity extends TileEntity implements ITicka
             TransmutationChamberTileEntity.this.setOwner(owner);
             TransmutationChamberTileEntity.this.markDirty();
         }
-
+        /*
         @Nonnull
         @Override
         public ItemStack insertItem(int slot, @Nonnull ItemStack stack, boolean simulate)
@@ -55,6 +55,7 @@ public class TransmutationChamberTileEntity extends TileEntity implements ITicka
 
             return super.insertItem(slot, stack, simulate);
         }
+        */
     };
 
     public ItemStackHandler getTalismanInventory()

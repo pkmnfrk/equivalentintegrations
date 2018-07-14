@@ -1,4 +1,4 @@
-package com.mike_caron.equivalentintegrations.block;
+package com.mike_caron.equivalentintegrations.block.transmutation_chamber;
 
 import com.mike_caron.equivalentintegrations.EquivalentIntegrationsMod;
 import net.minecraft.block.Block;

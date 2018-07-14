@@ -1,6 +1,8 @@
 package com.mike_caron.equivalentintegrations.block;
 
 import com.mike_caron.equivalentintegrations.EquivalentIntegrationsMod;
+import com.mike_caron.equivalentintegrations.block.transmutation_chamber.TransmutationChamber;
+import com.mike_caron.equivalentintegrations.block.transmutation_chamber.TransmutationChamberTileEntity;
 import net.minecraft.block.Block;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
