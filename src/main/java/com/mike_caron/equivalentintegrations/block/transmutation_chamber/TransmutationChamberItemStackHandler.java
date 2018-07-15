@@ -1,6 +1,6 @@
 package com.mike_caron.equivalentintegrations.block.transmutation_chamber;
 
-import com.mike_caron.equivalentintegrations.BetterItemStackHandler;
+import com.mike_caron.equivalentintegrations.inventory.BetterItemStackHandler;
 import com.mike_caron.equivalentintegrations.item.ModItems;
 import com.mike_caron.equivalentintegrations.item.SoulboundTalisman;
 import net.minecraft.item.ItemStack;
@@ -15,13 +15,6 @@ public class TransmutationChamberItemStackHandler extends BetterItemStackHandler
     public TransmutationChamberItemStackHandler()
     {
         super(NUM_SLOTS);
-    }
-
-    @Override
-    public void deserializeNBT(NBTTagCompound nbt)
-    {
-        super.deserializeNBT(nbt);
-        setSize(NUM_SLOTS);
     }
 
     @Override

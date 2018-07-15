@@ -21,6 +21,9 @@
     ],
     "active": {
       "false": {
+        "textures": {
+          "top": "equivalentintegrations:blocks/transmutation_chamber_top_i"
+        }
       },
       "true": {
         "textures": {
@@ -30,6 +33,9 @@
     },
     "generating": {
       "false": {
+        "textures": {
+          "side": "equivalentintegrations:blocks/transmutation_generator_front"
+        }
       },
       "true": {
         "textures": {

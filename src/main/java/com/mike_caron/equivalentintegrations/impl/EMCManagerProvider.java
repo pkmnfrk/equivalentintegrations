@@ -44,6 +44,7 @@ public class EMCManagerProvider implements ICapabilityProvider
     @SubscribeEvent
     public static void onAttachWorldCapabilities(AttachCapabilitiesEvent<World> event)
     {
+        if(event.getObject().isRemote) return;
         event.addCapability(new ResourceLocation(EquivalentIntegrationsMod.modId, "emcManager"), new EMCManagerProvider());
     }
 }

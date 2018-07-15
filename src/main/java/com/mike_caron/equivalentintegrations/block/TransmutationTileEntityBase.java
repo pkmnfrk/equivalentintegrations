@@ -66,10 +66,8 @@ public abstract class TransmutationTileEntityBase extends TileEntity
             this.markDirty();
             if(world != null)
             {
-                if(!world.isRemote)
-                {
-                    onNewOwner();
-                }
+
+                onNewOwner();
 
                 IBlockState state = world.getBlockState(pos);
                 world.notifyBlockUpdate(getPos(), state, state, 3);

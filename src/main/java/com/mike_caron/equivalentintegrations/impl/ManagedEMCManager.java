@@ -202,7 +202,11 @@ public class ManagedEMCManager implements IEMCManager
         @Override
         public IEMCManager call() throws Exception
         {
-            return new ManagedEMCManager(FMLCommonHandler.instance().getMinecraftServerInstance().getEntityWorld());
+            MinecraftServer server = FMLCommonHandler.instance().getMinecraftServerInstance();
+            if(server == null)
+                return null;
+
+            return new ManagedEMCManager(server.getEntityWorld());
         }
     }
 }

@@ -1,6 +1,7 @@
 package com.mike_caron.equivalentintegrations.block.transmutation_chamber;
 
 import com.mike_caron.equivalentintegrations.EquivalentIntegrationsMod;
+import com.mike_caron.equivalentintegrations.inventory.SoulboundTalismanSlot;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.Container;
 import net.minecraft.inventory.IInventory;
@@ -50,7 +51,7 @@ public class TransmutationChamberContainer extends Container
     {
         IItemHandler itemHandler = this.te.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null);
 
-        talismanSlot = addSlotToContainer(new SlotItemHandler(itemHandler, 0, 47, 27));
+        talismanSlot = addSlotToContainer(new SoulboundTalismanSlot(itemHandler, 0, 47, 27));
         algorithmsSlot = addSlotToContainer(new SlotItemHandler(itemHandler, 1, 101, 27));
         efficiencySlot = addSlotToContainer(new SlotItemHandler(itemHandler, 2, 119, 27));
     }

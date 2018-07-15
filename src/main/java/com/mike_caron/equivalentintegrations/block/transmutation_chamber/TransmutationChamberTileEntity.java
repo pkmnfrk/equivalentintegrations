@@ -50,6 +50,8 @@ public class TransmutationChamberTileEntity
     @Override
     protected void onNewOwner()
     {
+        if(world.isRemote) return;
+
         if (owner != null)
         {
             createEmcItemHandler(owner);
@@ -71,7 +73,7 @@ public class TransmutationChamberTileEntity
 
         int ret = (int)(10 * Math.pow(10, stack.getCount()));
 
-        EquivalentIntegrationsMod.logger.info("Returning efficiency of {} for {}", ret, stack);
+        //EquivalentIntegrationsMod.logger.info("Returning efficiency of {} for {}", ret, stack);
 
         return ret;
     }
