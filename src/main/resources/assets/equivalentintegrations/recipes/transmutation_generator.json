@@ -1,0 +1,23 @@
+{
+  "result": {
+    "item": "equivalentintegrations:transmutation_generator"
+},
+  "pattern": [
+    "oio",
+    "iti",
+    "oio"
+  ],
+  "type": "forge:ore_shaped",
+  "key": {
+    "o": {
+      "item": "minecraft:furnace"
+    },
+    "i": {
+      "type": "forge:ore_dict",
+      "ore": "blockIron"
+    },
+    "t": {
+      "item": "projecte:item.pe_transmutation_tablet"
+    }
+  }
+}

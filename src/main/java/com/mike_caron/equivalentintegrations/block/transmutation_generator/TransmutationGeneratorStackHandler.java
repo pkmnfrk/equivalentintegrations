@@ -1,4 +1,4 @@
-package com.mike_caron.equivalentintegrations.block.transmutation_chamber;
+package com.mike_caron.equivalentintegrations.block.transmutation_generator;
 
 import com.mike_caron.equivalentintegrations.item.ModItems;
 import com.mike_caron.equivalentintegrations.item.SoulboundTalisman;
@@ -8,11 +8,11 @@ import net.minecraftforge.items.ItemStackHandler;
 
 import javax.annotation.Nonnull;
 
-public class TransmutationChamberItemStackHandler extends ItemStackHandler
+public class TransmutationGeneratorStackHandler extends ItemStackHandler
 {
-    public static final int NUM_SLOTS = 3;
+    public static final int NUM_SLOTS = 2;
 
-    public TransmutationChamberItemStackHandler()
+    public TransmutationGeneratorStackHandler()
     {
         super(NUM_SLOTS);
     }
@@ -31,11 +31,7 @@ public class TransmutationChamberItemStackHandler extends ItemStackHandler
         {
             return 1;
         }
-        else if(slot == 1 && stack.getItem() == ModItems.alchemicalAlgorithms)
-        {
-            return 1;
-        }
-        else if(slot == 2 && stack.getItem() == ModItems.efficiencyCatalyst)
+        else if(slot == 1 && stack.getItem() == ModItems.efficiencyCatalyst)
         {
             return 4;
         }

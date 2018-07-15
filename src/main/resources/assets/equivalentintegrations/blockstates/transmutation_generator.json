@@ -1,0 +1,41 @@
+{
+  "forge_marker": 1,
+  "defaults": {
+    "model": "equivalentintegrations:transmutation_generator",
+    "textures": {
+      "top": "equivalentintegrations:blocks/transmutation_chamber_top_i",
+      "side": "equivalentintegrations:blocks/transmutation_generator_front"
+    }
+  },
+  "variants": {
+    "normal": [
+      {
+      }
+    ],
+    "inventory": [
+      {
+        "textures": {
+          "top": "equivalentintegrations:blocks/transmutation_chamber_top"
+        }
+      }
+    ],
+    "active": {
+      "false": {
+      },
+      "true": {
+        "textures": {
+          "top": "equivalentintegrations:blocks/transmutation_chamber_top"
+        }
+      }
+    },
+    "generating": {
+      "false": {
+      },
+      "true": {
+        "textures": {
+          "side": "equivalentintegrations:blocks/transmutation_generator_front_a"
+        }
+      }
+    }
+  }
+}

@@ -1,6 +1,8 @@
-package com.mike_caron.equivalentintegrations.block.transmutation_chamber;
+package com.mike_caron.equivalentintegrations.block.transmutation_generator;
 
 import com.mike_caron.equivalentintegrations.EquivalentIntegrationsMod;
+import com.mike_caron.equivalentintegrations.block.transmutation_chamber.TransmutationChamberItemStackHandler;
+import com.mike_caron.equivalentintegrations.block.transmutation_chamber.TransmutationChamberTileEntity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.Container;
 import net.minecraft.inventory.IInventory;
@@ -11,16 +13,14 @@ import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.SlotItemHandler;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
-public class TransmutationChamberContainer extends Container
+public class TransmutationGeneratorContainer extends Container
 {
-    private final TransmutationChamberTileEntity te;
+    private final TransmutationGeneratorTileEntity te;
     private Slot talismanSlot;
-    private Slot algorithmsSlot;
     private Slot efficiencySlot;
 
-    public TransmutationChamberContainer(IInventory playerInventory, TransmutationChamberTileEntity te)
+    public TransmutationGeneratorContainer(IInventory playerInventory, TransmutationGeneratorTileEntity te)
     {
         this.te = te;
 
@@ -52,8 +52,7 @@ public class TransmutationChamberContainer extends Container
         IItemHandler itemHandler = this.te.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null);
 
         talismanSlot = addSlotToContainer(new SlotItemHandler(itemHandler, 0, 47, 27));
-        algorithmsSlot = addSlotToContainer(new SlotItemHandler(itemHandler, 1, 101, 27));
-        efficiencySlot = addSlotToContainer(new SlotItemHandler(itemHandler, 2, 119, 27));
+        efficiencySlot = addSlotToContainer(new SlotItemHandler(itemHandler, 1, 119, 27));
     }
 
     @Nonnull
@@ -66,10 +65,10 @@ public class TransmutationChamberContainer extends Container
             ItemStack itemstack1 = slot.getStack();
             itemstack = itemstack1.copy();
 
-            if (index < TransmutationChamberItemStackHandler.NUM_SLOTS)
+            if (index < TransmutationGeneratorStackHandler.NUM_SLOTS)
             { //transferring from block -> player
                 EquivalentIntegrationsMod.logger.info("Transferring {} into the player", itemstack1);
-                if (!this.mergeItemStack(itemstack1, TransmutationChamberItemStackHandler.NUM_SLOTS, this.inventorySlots.size(), true)) {
+                if (!this.mergeItemStack(itemstack1, TransmutationGeneratorStackHandler.NUM_SLOTS, this.inventorySlots.size(), true)) {
                     EquivalentIntegrationsMod.logger.info("Transferred {} into the player", itemstack1);
                     return ItemStack.EMPTY;
                 }
@@ -77,7 +76,7 @@ public class TransmutationChamberContainer extends Container
             else
             {
                 EquivalentIntegrationsMod.logger.info("Transferring {} into the block", itemstack1);
-                if (!this.mergeItemStack(itemstack1, 0, TransmutationChamberItemStackHandler.NUM_SLOTS, false))
+                if (!this.mergeItemStack(itemstack1, 0, TransmutationGeneratorStackHandler.NUM_SLOTS, false))
                 { //transferring from player -> block
                     EquivalentIntegrationsMod.logger.info("Transferred {} into the block", itemstack1);
                     return ItemStack.EMPTY;

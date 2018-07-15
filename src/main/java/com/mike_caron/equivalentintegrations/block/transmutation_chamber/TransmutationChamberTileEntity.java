@@ -1,6 +1,7 @@
 package com.mike_caron.equivalentintegrations.block.transmutation_chamber;
 
 import com.mike_caron.equivalentintegrations.EquivalentIntegrationsMod;
+import com.mike_caron.equivalentintegrations.block.TransmutationTileEntityBase;
 import com.mike_caron.equivalentintegrations.item.SoulboundTalisman;
 import com.mike_caron.equivalentintegrations.storage.EMCItemHandler;
 import net.minecraft.block.state.IBlockState;
@@ -18,82 +19,48 @@ import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.ItemStackHandler;
 import scala.Int;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.UUID;
 
-public class TransmutationChamberTileEntity extends TileEntity implements ITickable
+public class TransmutationChamberTileEntity
+        extends TransmutationTileEntityBase
+        implements ITickable
 {
-    private UUID owner = null;
-
     private EMCItemHandler emcItemHandler;
 
     private int ticksSinceLastUpdate = 0;
 
-    private final TransmutationChamberItemStackHandler talismanInventory = new TransmutationChamberItemStackHandler()
+    @Nonnull
+    @Override
+    protected ItemStackHandler createInventory()
     {
-        @Override
-        protected void onContentsChanged(int slot)
+        return new TransmutationChamberItemStackHandler()
         {
-            if(world.isRemote)
-                return;
+            @Override
+            protected void onContentsChanged(int slot)
+            {
+                if(world.isRemote)
+                    return;
 
-            ItemStack stack = this.getStackInSlot(0);
-            UUID owner = SoulboundTalisman.getOwnerFromStack(stack);
+                ItemStack stack = this.getStackInSlot(0);
+                UUID owner = SoulboundTalisman.getOwnerFromStack(stack);
 
-            TransmutationChamberTileEntity.this.setOwner(owner);
-            TransmutationChamberTileEntity.this.markDirty();
+                TransmutationChamberTileEntity.this.setOwner(owner);
+                TransmutationChamberTileEntity.this.markDirty();
 
-            TransmutationChamberTileEntity.this.setTransmutationParameters();
-        }
-        /*
-        @Nonnull
-        @Override
-        public ItemStack insertItem(int slot, @Nonnull ItemStack stack, boolean simulate)
-        {
-            if (stack.isEmpty())
-                return ItemStack.EMPTY;
-
-            if (!SoulboundTalisman.isBound(stack))
-                return stack;
-
-            return super.insertItem(slot, stack, simulate);
-        }
-        */
-    };
-
-    public ItemStackHandler getTalismanInventory()
-    {
-        return talismanInventory;
+                TransmutationChamberTileEntity.this.setTransmutationParameters();
+            }
+        };
     }
 
-    public void setOwner(UUID newOwner)
+    @Override
+    protected void onNewOwner()
     {
-        if (newOwner != owner)
+        if (owner != null)
         {
-            this.owner = newOwner;
-            this.markDirty();
-            if(world != null)
-            {
-
-                if(!world.isRemote)
-                {
-                    if (emcItemHandler != null)
-                    {
-                        destroyEmcItemHandler();
-                    }
-
-                    if (newOwner != null)
-                    {
-                        createEmcItemHandler(newOwner);
-                        setTransmutationParameters();
-                    }
-                }
-
-                //world.markBlockRangeForRenderUpdate(getPos(), getPos());
-
-                IBlockState state = world.getBlockState(pos);
-                world.notifyBlockUpdate(getPos(), state, state, 3);
-            }
+            createEmcItemHandler(owner);
+            setTransmutationParameters();
         }
     }
 
@@ -105,9 +72,9 @@ public class TransmutationChamberTileEntity extends TileEntity implements ITicka
 
     private int getEfficiencyThreshold()
     {
-        ItemStack stack = talismanInventory.getStackInSlot(2);
+        ItemStack stack = inventory.getStackInSlot(2);
 
-        if(stack.getCount() > 3) return Int.MaxValue();
+        if(stack.getCount() > 3) return Integer.MAX_VALUE;
 
         int ret = (int)(10 * Math.pow(10, stack.getCount()));
 
@@ -118,7 +85,7 @@ public class TransmutationChamberTileEntity extends TileEntity implements ITicka
 
     private boolean getCanLearn()
     {
-        ItemStack stack = talismanInventory.getStackInSlot(1);
+        ItemStack stack = inventory.getStackInSlot(1);
 
         return !stack.isEmpty();
     }
@@ -137,86 +104,10 @@ public class TransmutationChamberTileEntity extends TileEntity implements ITicka
         emcItemHandler = null;
     }
 
-    public boolean hasOwner()
-    {
-        return owner != null;
-    }
-
-    @Nullable
-    @Override
-    public SPacketUpdateTileEntity getUpdatePacket()
-    {
-        NBTTagCompound nbt = new NBTTagCompound();
-        this.writeToNBT(nbt);
-        return new SPacketUpdateTileEntity(getPos(), 1, nbt);
-    }
-
-    @Override
-    public NBTTagCompound getUpdateTag()
-    {
-        return this.writeToNBT(new NBTTagCompound());
-    }
-
-    @Override
-    public void onDataPacket(NetworkManager net, SPacketUpdateTileEntity pkt)
-    {
-        this.readFromNBT(pkt.getNbtCompound());
-    }
-
-    @Override
-    public void readFromNBT(NBTTagCompound compound)
-    {
-        super.readFromNBT(compound);
-
-        if (compound.hasKey("owner"))
-        {
-            setOwner(UUID.fromString(compound.getString("owner")));
-        }
-        else
-        {
-            setOwner(null);
-        }
-
-        if (compound.hasKey("items"))
-        {
-            talismanInventory.deserializeNBT((NBTTagCompound) compound.getTag("items"));
-        }
-    }
-
-    @Override
-    public NBTTagCompound writeToNBT(NBTTagCompound compound)
-    {
-        super.writeToNBT(compound);
-
-        if (owner != null)
-        {
-            compound.setString("owner", owner.toString());
-        }
-        else
-        {
-            if (compound.hasKey("owner"))
-            {
-                compound.removeTag("owner");
-            }
-        }
-
-        compound.setTag("items", talismanInventory.serializeNBT());
-
-        //EquivalentIntegrationsMod.logger.info("Writing To NBT:");
-        //EquivalentIntegrationsMod.logger.info(compound.toString());
-
-        return compound;
-    }
-
-    public boolean canInteractWith(EntityPlayer playerIn)
-    {
-        return !isInvalid() && playerIn.getDistanceSq(pos.add(0.5D, 0.5D, 0.5D)) <= 64D; //8 blocks
-    }
-
     @Override
     public boolean hasCapability(Capability<?> capability, @Nullable EnumFacing facing)
     {
-        if (capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY)
+        if (capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY && facing != null)
         {
             return true;
         }
@@ -227,13 +118,8 @@ public class TransmutationChamberTileEntity extends TileEntity implements ITicka
     @Override
     public <T> T getCapability(Capability<T> capability, @Nullable EnumFacing facing)
     {
-        if (capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY)
+        if (capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY && facing != null)
         {
-            //only return the talismanInventory if the call is coming from inside the house
-            if (facing == null)
-            {
-                return CapabilityItemHandler.ITEM_HANDLER_CAPABILITY.cast(talismanInventory);
-            }
             //if the facing has an actual value, assume they mean the EMC inventory
             return CapabilityItemHandler.ITEM_HANDLER_CAPABILITY.cast(emcItemHandler);
         }

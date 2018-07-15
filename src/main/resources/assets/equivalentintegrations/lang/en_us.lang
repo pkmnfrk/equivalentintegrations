@@ -1,4 +1,5 @@
 tile.transmutation_chamber.name=Transmutation Chamber
+tile.transmutation_generator.name=Transmutation Generator
 
 item.soulbound_talisman.name=Soulbound Talisman
 item.soulbound_talisman.bound=Bound to %1$s
@@ -17,3 +18,4 @@ item.efficiency_catalyst.effect=Threshold: %2$s%1$d%3$s
 item.efficiency_catalyst.effect_inf=%2$sThreshold: %1$sUnlimited%2$s
 
 container.transmutation_chamber.title=Transmutation Chamber
+container.transmutation_generator.title=Transmutation Generator
