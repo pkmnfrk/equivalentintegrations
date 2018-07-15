@@ -5,8 +5,6 @@ import com.mike_caron.equivalentintegrations.block.transmutation_chamber.Transmu
 import com.mike_caron.equivalentintegrations.block.transmutation_chamber.TransmutationChamberTileEntity;
 import com.mike_caron.equivalentintegrations.block.transmutation_generator.TransmutationGenerator;
 import com.mike_caron.equivalentintegrations.block.transmutation_generator.TransmutationGeneratorTileEntity;
-import com.mike_caron.equivalentintegrations.item.ItemBase;
-import com.mike_caron.equivalentintegrations.item.ModItems;
 import net.minecraft.block.Block;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;

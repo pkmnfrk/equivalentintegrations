@@ -1,14 +1,14 @@
 package com.mike_caron.equivalentintegrations.block.transmutation_chamber;
 
+import com.mike_caron.equivalentintegrations.BetterItemStackHandler;
 import com.mike_caron.equivalentintegrations.item.ModItems;
 import com.mike_caron.equivalentintegrations.item.SoulboundTalisman;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraftforge.items.ItemStackHandler;
 
 import javax.annotation.Nonnull;
 
-public class TransmutationChamberItemStackHandler extends ItemStackHandler
+public class TransmutationChamberItemStackHandler extends BetterItemStackHandler
 {
     public static final int NUM_SLOTS = 3;
 

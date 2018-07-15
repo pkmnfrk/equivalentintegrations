@@ -1,27 +1,19 @@
 package com.mike_caron.equivalentintegrations.block.transmutation_generator;
 
+import com.mike_caron.equivalentintegrations.BetterItemStackHandler;
 import com.mike_caron.equivalentintegrations.item.ModItems;
 import com.mike_caron.equivalentintegrations.item.SoulboundTalisman;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraftforge.items.ItemStackHandler;
 
 import javax.annotation.Nonnull;
 
-public class TransmutationGeneratorStackHandler extends ItemStackHandler
+public class TransmutationGeneratorStackHandler extends BetterItemStackHandler
 {
     public static final int NUM_SLOTS = 2;
 
     public TransmutationGeneratorStackHandler()
     {
         super(NUM_SLOTS);
-    }
-
-    @Override
-    public void deserializeNBT(NBTTagCompound nbt)
-    {
-        super.deserializeNBT(nbt);
-        setSize(NUM_SLOTS);
     }
 
     @Override
