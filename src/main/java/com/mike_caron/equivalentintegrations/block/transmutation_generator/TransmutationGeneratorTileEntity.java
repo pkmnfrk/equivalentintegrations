@@ -21,8 +21,11 @@ import net.minecraftforge.items.ItemStackHandler;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class TransmutationGeneratorTileEntity
         extends TransmutationTileEntityBase
@@ -33,6 +36,25 @@ public class TransmutationGeneratorTileEntity
 
     int powerPerTick = 10;
     int buffer;
+    double internalEmcBuffer;
+
+    private final List<IEnergyStorage> validOutputs = new ArrayList<>(6);
+    private boolean neverUpdatedNeighbours = true;
+
+    int timer = 0;
+    int totalFrames;
+    long totalNanoseconds;
+
+    public static float getEfficiency(int num)
+    {
+        switch(num)
+        {
+            case 0: return 0.5f;
+            case 1: return 1f;
+            case 2: return 2f;
+            default: return 3f;
+        }
+    }
 
     @Override
     @Nonnull
@@ -57,16 +79,45 @@ public class TransmutationGeneratorTileEntity
         };
     }
 
+    public int getPowerPerTick()
+    {
+        return powerPerTick;
+    }
+
+    public void setPowerPerTick(int ppt)
+    {
+        if(ppt > 0 && ppt < 50000)
+        {
+            this.powerPerTick = ppt;
+            markDirty();
+            notifyUpdate();
+        }
+    }
+
     public boolean isGenerating()
     {
         return generatedLastTick;
     }
 
-    @Override
-    protected void onNewOwner()
+    public boolean getGenerating() {
+        return generating;
+    }
+
+    public void setGenerating(boolean generating)
     {
-        generating = owner != null;
-        if(!generating) generatedLastTick = false;
+        this.generating = generating;
+        markDirty();
+        notifyUpdate();
+    }
+
+    @Override
+    protected void onNewOwner(UUID oldOwner)
+    {
+        //if(!generating) generatedLastTick = false;
+        if(oldOwner != null && internalEmcBuffer > 0)
+        {
+            refundEmc(oldOwner);
+        }
     }
 
     @Nullable
@@ -96,17 +147,6 @@ public class TransmutationGeneratorTileEntity
         return getEfficiency(stack.getCount());
     }
 
-    public static float getEfficiency(int num)
-    {
-        switch(num)
-        {
-            case 0: return 0.5f;
-            case 1: return 1f;
-            case 2: return 2f;
-            default: return 3f;
-        }
-    }
-
     @Override
     public void readFromNBT(NBTTagCompound compound)
     {
@@ -116,18 +156,48 @@ public class TransmutationGeneratorTileEntity
         {
             generating = compound.getBoolean("generating");
         }
+        else
+        {
+            generating = false;
+        }
+
         if(compound.hasKey("buffer"))
         {
             buffer = compound.getInteger("buffer");
         }
+        else
+        {
+            buffer = 0;
+        }
+
         if(compound.hasKey("powerPerTick"))
         {
             powerPerTick = compound.getInteger("powerPerTick");
         }
+        else
+        {
+            powerPerTick = 10;
+        }
+
         if(compound.hasKey("generatedLastTick"))
         {
             generatedLastTick = compound.getBoolean("generatedLastTick");
         }
+        else
+        {
+            generatedLastTick = false;
+        }
+
+        if(compound.hasKey("internalEmc"))
+        {
+            internalEmcBuffer = compound.getDouble("internalEmc");
+        }
+        else
+        {
+            internalEmcBuffer = 0d;
+        }
+
+        markDirty();
     }
 
     @Nonnull
@@ -140,6 +210,7 @@ public class TransmutationGeneratorTileEntity
         ret.setBoolean("generating", generating);
         ret.setInteger("buffer", buffer);
         ret.setInteger("powerPerTick", powerPerTick);
+        ret.setDouble("internalEmc", internalEmcBuffer);
         return ret;
     }
 
@@ -157,23 +228,50 @@ public class TransmutationGeneratorTileEntity
 
         boolean needsUpdate;
 
+        if(neverUpdatedNeighbours)
+        {
+            updateNeighbours();
+            neverUpdatedNeighbours = false;
+        }
+
+
         needsUpdate = pushEnergy();
+
+        long startTime = System.nanoTime();
         needsUpdate = generateEnergy() || needsUpdate;
+        long delta = System.nanoTime() - startTime;
 
         if(needsUpdate)
         {
             EquivalentIntegrationsMod.logger.info("Requesting update for Generator");
-            IBlockState state = world.getBlockState(pos);
-            world.notifyBlockUpdate(pos, state, state, 3);
+            notifyUpdate();
         }
+
+
+
+        totalNanoseconds += delta;
+        totalFrames += 1;
+
+        timer++;
+
+        if(timer % 35 == 0)
+        {
+            EquivalentIntegrationsMod.logger.info("Avg update microsecond: {}", (totalNanoseconds / totalFrames) / 1000);
+            totalFrames = 0;
+            totalNanoseconds = 0;
+        }
+
+
     }
 
-    private boolean pushEnergy()
+    public void updateNeighbours()
     {
-        if(buffer <= 0)
-            return false;
+        determineOutputs();
+    }
 
-        List<IEnergyStorage> toSend = new ArrayList<>();
+    private void determineOutputs()
+    {
+        validOutputs.clear();
 
         for(EnumFacing facing : EnumFacing.VALUES)
         {
@@ -191,8 +289,23 @@ public class TransmutationGeneratorTileEntity
             if(!energyStorage.canReceive())
                 continue;
 
-            toSend.add(energyStorage);
+            validOutputs.add(energyStorage);
         }
+
+    }
+
+    private boolean pushEnergy()
+    {
+        if(buffer <= 0)
+            return false;
+
+        List<IEnergyStorage> toSend = validOutputs;
+        //for(IEnergyStorage energyStorage : validOutputs)
+        //{
+        //    if(energyStorage.canReceive()) toSend.add(energyStorage);
+        //}
+
+        boolean isDirty = false;
 
         if(toSend.size() > 0)
         {
@@ -208,9 +321,14 @@ public class TransmutationGeneratorTileEntity
                     perBuffer = buffer;
 
                 int sent = energyStorage.receiveEnergy(perBuffer, false);
+
+                if(sent > 0) isDirty = true;
+
                 buffer -= sent;
             }
         }
+
+        if(isDirty) markDirty();
 
         return false;
     }
@@ -221,6 +339,41 @@ public class TransmutationGeneratorTileEntity
 
         generatedLastTick = false;
 
+        if(generating)
+        {
+            float energyModifier = getEfficiency();
+
+            int energyToGet = getMaxEnergyStored() - buffer;
+            if (energyToGet > powerPerTick)
+            {
+                energyToGet = powerPerTick;
+            }
+
+            double emcToConsume = Math.floor(energyToGet / energyModifier);
+
+            if(internalEmcBuffer < emcToConsume)
+            {
+                fillEmcBuffer();
+            }
+
+            if(internalEmcBuffer < emcToConsume)
+            {
+                //we can't use it, so give it back
+                //refundEmc();
+            }
+            else
+            {
+                internalEmcBuffer -= emcToConsume;
+                buffer += energyToGet;
+                generatedLastTick = true;
+                markDirty();
+            }
+        }
+        else if(owner != null && internalEmcBuffer > 0)
+        {
+            refundEmc(owner);
+        }
+/*
         if(generating && owner != null)
         {
 
@@ -265,8 +418,33 @@ public class TransmutationGeneratorTileEntity
                 }
             }
         }
+        else if(!generating && owner != null && internalEmcBuffer > 0)
+        {
+            refundEmc(owner);
+        }
+*/
 
         return isGenerating() != prevGenerating;
+    }
+
+    private void refundEmc(UUID owner)
+    {
+        IEMCManager emcManager = world.getCapability(EMCManagerProvider.EMC_MANAGER_CAPABILITY, null);
+        emcManager.setEMC(owner, internalEmcBuffer + emcManager.getEMC(owner));
+        internalEmcBuffer = 0;
+    }
+
+    private void fillEmcBuffer()
+    {
+        if(owner == null) return;
+
+        float energyModifier = getEfficiency();
+        long emcToGet = (long)Math.ceil(powerPerTick * 20 / energyModifier);
+        IEMCManager emcManager = world.getCapability(EMCManagerProvider.EMC_MANAGER_CAPABILITY, null);
+
+        emcToGet = emcManager.withdrawEMC(owner, emcToGet);
+
+        internalEmcBuffer += emcToGet;
     }
 
     @Override
@@ -285,6 +463,7 @@ public class TransmutationGeneratorTileEntity
 
         if(!simulate) {
             buffer -= actualExtract;
+            markDirty();
         }
 
         return actualExtract;

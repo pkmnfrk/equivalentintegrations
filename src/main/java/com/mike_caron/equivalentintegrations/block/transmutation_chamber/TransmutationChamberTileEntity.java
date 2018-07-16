@@ -48,7 +48,7 @@ public class TransmutationChamberTileEntity
     }
 
     @Override
-    protected void onNewOwner()
+    protected void onNewOwner(UUID oldOwner)
     {
         if(world.isRemote) return;
 

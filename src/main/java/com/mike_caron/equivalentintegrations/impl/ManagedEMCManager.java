@@ -98,6 +98,66 @@ public class ManagedEMCManager implements IEMCManager
         }
     }
 
+    @Override
+    public long withdrawEMC(UUID owner, long amt)
+    {
+        double currentEmc = getEMC(owner);
+        if(amt > currentEmc)
+        {
+            amt = (long)currentEmc;
+        }
+
+        double newEmc = currentEmc - amt;
+
+        if(newEmc != currentEmc)
+        {
+            EntityPlayerMP player = getEntityPlayerMP(owner);
+
+            if (player != null)
+            {
+                IKnowledgeProvider knowledge = ProjectEAPI.getTransmutationProxy().getKnowledgeProviderFor(owner);
+                knowledge.setEmc(newEmc);
+                markDirty(owner);
+            }
+            else
+            {
+                OfflineEMCWorldData.get(world).setCachedEMC(owner, newEmc);
+            }
+
+            lastKnownEmc.put(owner, newEmc);
+            MinecraftForge.EVENT_BUS.post(new EMCChangedEvent(owner, newEmc));
+        }
+
+        return amt;
+    }
+
+    @Override
+    public void depositEMC(UUID owner, long amt)
+    {
+        double currentEmc = getEMC(owner);
+
+        double newEmc = currentEmc + amt;
+
+        if(newEmc != currentEmc)
+        {
+            EntityPlayerMP player = getEntityPlayerMP(owner);
+
+            if (player != null)
+            {
+                IKnowledgeProvider knowledge = ProjectEAPI.getTransmutationProxy().getKnowledgeProviderFor(owner);
+                knowledge.setEmc(newEmc);
+                markDirty(owner);
+            }
+            else
+            {
+                OfflineEMCWorldData.get(world).setCachedEMC(owner, newEmc);
+            }
+
+            lastKnownEmc.put(owner, newEmc);
+            MinecraftForge.EVENT_BUS.post(new EMCChangedEvent(owner, newEmc));
+        }
+    }
+
     public void tick()
     {
         Set<UUID> keys = dirtyPlayers.keySet();

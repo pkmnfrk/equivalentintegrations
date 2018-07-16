@@ -1,11 +1,16 @@
 package com.mike_caron.equivalentintegrations;
 
+import com.mike_caron.equivalentintegrations.network.CtoSMessage;
+import com.mike_caron.equivalentintegrations.network.PacketHandlerServer;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.SidedProxy;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import com.mike_caron.equivalentintegrations.proxy.CommonProxy;
+import net.minecraftforge.fml.common.network.NetworkRegistry;
+import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
+import net.minecraftforge.fml.relauncher.Side;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -35,6 +40,8 @@ public class EquivalentIntegrationsMod {
     )
     public static CommonProxy proxy;
 
+    public static SimpleNetworkWrapper networkWrapper;
+
     @Mod.EventHandler
     public  void preInit(FMLPreInitializationEvent event) {
         proxy.preInit(event);
@@ -48,6 +55,8 @@ public class EquivalentIntegrationsMod {
     @Mod.EventHandler
     public void postInit(FMLPostInitializationEvent event) {
         proxy.postInit(event);
+        networkWrapper = NetworkRegistry.INSTANCE.newSimpleChannel(modId);
+        networkWrapper.registerMessage(PacketHandlerServer.class, CtoSMessage.class, 2, Side.SERVER);
     }
 
 }

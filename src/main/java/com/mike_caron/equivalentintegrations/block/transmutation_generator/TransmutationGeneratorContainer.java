@@ -26,6 +26,12 @@ public class TransmutationGeneratorContainer extends Container
         addPlayerSlots(playerInventory);
     }
 
+    @Override
+    public void detectAndSendChanges()
+    {
+        super.detectAndSendChanges();
+    }
+
     private void addPlayerSlots(IInventory playerInventory)
     {
         // Slots for the main inventory
@@ -49,8 +55,8 @@ public class TransmutationGeneratorContainer extends Container
     {
         IItemHandler itemHandler = this.te.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null);
 
-        talismanSlot = addSlotToContainer(new SlotItemHandler(itemHandler, 0, 47, 27));
-        efficiencySlot = addSlotToContainer(new SlotItemHandler(itemHandler, 1, 119, 27));
+        talismanSlot = addSlotToContainer(new SlotItemHandler(itemHandler, 0, 29, 27));
+        efficiencySlot = addSlotToContainer(new SlotItemHandler(itemHandler, 1, 61, 27));
     }
 
     @Nonnull

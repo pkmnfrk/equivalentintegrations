@@ -62,12 +62,14 @@ public abstract class TransmutationTileEntityBase extends TileEntity
     {
         if (newOwner != owner)
         {
+            UUID oldOwner = owner;
+
             this.owner = newOwner;
             this.markDirty();
             if(world != null)
             {
 
-                onNewOwner();
+                onNewOwner(oldOwner);
 
                 IBlockState state = world.getBlockState(pos);
                 world.notifyBlockUpdate(getPos(), state, state, 3);
@@ -154,5 +156,11 @@ public abstract class TransmutationTileEntityBase extends TileEntity
         return super.getCapability(capability, facing);
     }
 
-    protected void onNewOwner() {}
+    protected void onNewOwner(UUID oldOwner) {}
+
+    protected void notifyUpdate()
+    {
+        IBlockState state = world.getBlockState(pos);
+        world.notifyBlockUpdate(pos, state, state, 3);
+    }
 }

@@ -88,7 +88,7 @@ public final class EMCItemHandler implements IItemHandlerModifiable
         }
 
         EquivalentIntegrationsMod.logger.trace("Transmutation Chamber: Success");
-        return cachedInventory.size() + 1;
+        return cachedInventory.size() + 64;
     }
 
     @Nonnull
@@ -104,7 +104,7 @@ public final class EMCItemHandler implements IItemHandlerModifiable
             return ItemStack.EMPTY;
         }
 
-        if(slot == cachedInventory.size())
+        if(slot >= cachedInventory.size())
         {
             return ItemStack.EMPTY;
         }
@@ -247,7 +247,7 @@ public final class EMCItemHandler implements IItemHandlerModifiable
 
     private boolean validateSlotIndex(int slot, boolean fatal)
     {
-        int size = cachedInventory.size() + 1;
+        int size = cachedInventory.size() + 64;
 
         if (slot < 0 || slot >= size)
         {

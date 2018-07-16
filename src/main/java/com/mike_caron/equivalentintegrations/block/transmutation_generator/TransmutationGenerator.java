@@ -2,6 +2,7 @@ package com.mike_caron.equivalentintegrations.block.transmutation_generator;
 
 import com.mike_caron.equivalentintegrations.EquivalentIntegrationsMod;
 import com.mike_caron.equivalentintegrations.block.TransmutationBlockBase;
+import net.minecraft.block.Block;
 import net.minecraft.block.properties.PropertyBool;
 import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
@@ -43,6 +44,26 @@ public class TransmutationGenerator
         return new TransmutationGeneratorTileEntity();
     }
 
+    @Override
+    public void observedNeighborChange(IBlockState observerState, World world, BlockPos observerPos, Block changedBlock, BlockPos changedBlockPos)
+    {
+        TransmutationGeneratorTileEntity te = getTE(world, observerPos);
+        if(te != null)
+        {
+            te.updateNeighbours();
+        }
+    }
+
+    @Override
+    public void onNeighborChange(IBlockAccess world, BlockPos pos, BlockPos neighbor)
+    {
+        TransmutationGeneratorTileEntity te = getTE(world, pos);
+        if(te != null)
+        {
+            te.updateNeighbours();
+        }
+    }
+
     @SuppressWarnings("deprecation")
     @Override
     @Deprecated
@@ -52,10 +73,10 @@ public class TransmutationGenerator
         TransmutationGeneratorTileEntity tileEntity = getTE(worldIn, pos);
         if(tileEntity == null) return getDefaultState();
 
-        if(Thread.currentThread().getName().equals("Client thread")) //HACK
-        {
-            EquivalentIntegrationsMod.logger.info("Returning actual block state (active={}, generating={})", tileEntity.hasOwner(), tileEntity.isGenerating());
-        }
+        //if(Thread.currentThread().getName().equals("Client thread")) //HACK
+        //{
+        //    EquivalentIntegrationsMod.logger.info("Returning actual block state (active={}, generating={})", tileEntity.hasOwner(), tileEntity.isGenerating());
+        //}
 
         return state
                 .withProperty(ACTIVE, tileEntity.hasOwner())
