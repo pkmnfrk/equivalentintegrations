@@ -78,6 +78,13 @@ public class TransmutationChamberTileEntity
         return ret;
     }
 
+    public static int getEfficiencyThreshold(int count)
+    {
+        if(count > 3) return Integer.MAX_VALUE;
+
+        return (int)(10 * Math.pow(10, count));
+    }
+
     private boolean getCanLearn()
     {
         ItemStack stack = inventory.getStackInSlot(1);

@@ -375,56 +375,6 @@ public class TransmutationGeneratorTileEntity
         {
             refundEmc(owner);
         }
-/*
-        if(generating && owner != null)
-        {
-
-            float energyModifier = getEfficiency();
-
-            int energyToGet = getMaxEnergyStored() - buffer;
-            if (energyToGet > powerPerTick)
-            {
-                energyToGet = powerPerTick;
-            }
-            if (energyToGet > 0)
-            {
-                long emcToConsume = (long) Math.ceil(energyToGet / energyModifier);
-                energyToGet = (int)Math.floor(emcToConsume * energyModifier);
-
-                //validate that we aren't wasting EMC
-                if(energyToGet + buffer <= getMaxEnergyStored())
-                {
-
-                    IEMCManager emcManager = world.getCapability(EMCManagerProvider.EMC_MANAGER_CAPABILITY, null);
-
-                    double emc = emcManager.getEMC(owner);
-
-                    if (emcToConsume > emc)
-                    {
-                        energyToGet = (int) Math.floor(emc * energyModifier);
-                        emcToConsume = (long) Math.ceil(energyToGet / energyModifier);
-                    }
-
-                    if (emcToConsume > 0)
-                    {
-
-                        emc -= emcToConsume;
-
-                        emcManager.setEMC(owner, emc);
-
-                        buffer += energyToGet;
-
-                        generatedLastTick = true;
-                        markDirty();
-                    }
-                }
-            }
-        }
-        else if(!generating && owner != null && internalEmcBuffer > 0)
-        {
-            refundEmc(owner);
-        }
-*/
 
         return isGenerating() != prevGenerating;
     }

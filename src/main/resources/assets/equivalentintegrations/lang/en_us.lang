@@ -3,19 +3,27 @@ tile.transmutation_generator.name=Transmutation Generator
 
 item.soulbound_talisman.name=Soulbound Talisman
 item.soulbound_talisman.bound=Bound to %1$s
-item.soulbound_talisman.desc1=Right click to bind to yourself.
-item.soulbound_talisman.desc2=Use in Equivalent Integrations machines.
+item.soulbound_talisman.desc1=Use in Equivalent Integrations machines to link to players.
+item.soulbound_talisman.desc2=Right click to bind to yourself.
 
 item.alchemical_algorithms.name=Alchemical Algorithms
 item.alchemical_algorithms.desc1=Allows Transmutation Chambers to learn new items.
-#in case you need more room or something
-item.alchemical_algorithms.desc2=
 
 item.efficiency_catalyst.name=Efficiency Catalyst
-item.efficiency_catalyst.desc1=Increases the transumtation cost threshold
-item.efficiency_catalyst.desc2=by a factor of 10 per catalyst, up to 4.
-item.efficiency_catalyst.effect=Threshold: %2$s%1$d%3$s
-item.efficiency_catalyst.effect_inf=%2$sThreshold: %1$sUnlimited%2$s
+item.efficiency_catalyst.desc1=Increases efficiency of Transmutation machines
 
 container.transmutation_chamber.title=Transmutation Chamber
+
+#trailing space!
+container.transmutation_chamber.efficiency=Threshold:
+container.transmutation_chamber.efficiency_inf=Unlimited
+
 container.transmutation_generator.title=Transmutation Generator
+container.transmutation_generator.mod1=CTRL - x 10
+container.transmutation_generator.mod2=SHIFT - x 5
+container.transmutation_generator.mod3=ALT - x 1/2
+container.transmutation_generator.poweron=Enable (currently disabled)
+container.transmutation_generator.poweroff=Disable (currently enabled)
+
+#make sure to include a trailing space!
+container.transmutation_generator.efficiency=EMC per FE:

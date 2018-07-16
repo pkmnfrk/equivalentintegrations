@@ -33,11 +33,5 @@ public class AlchemicalAlgorithms extends ItemBase
         {
             tooltip.add(TextFormatting.GRAY + "" + TextFormatting.ITALIC + tip);
         }
-
-        tip = I18n.format("item.alchemical_algorithms.desc2");
-        if(!tip.isEmpty())
-        {
-            tooltip.add(TextFormatting.GRAY + "" + TextFormatting.ITALIC + tip);
-        }
     }
 }

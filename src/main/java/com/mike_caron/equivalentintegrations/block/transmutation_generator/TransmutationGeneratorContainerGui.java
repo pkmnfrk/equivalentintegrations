@@ -2,14 +2,22 @@ package com.mike_caron.equivalentintegrations.block.transmutation_generator;
 
 
 import com.mike_caron.equivalentintegrations.EquivalentIntegrationsMod;
+import com.mike_caron.equivalentintegrations.item.EfficiencyCatalyst;
+import com.mike_caron.equivalentintegrations.item.ModItems;
 import com.mike_caron.equivalentintegrations.network.CtoSMessage;
+import moze_intel.projecte.playerData.Transmutation;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.inventory.Slot;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.TextComponentTranslation;
+import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.energy.IEnergyStorage;
+import net.minecraftforge.fml.client.config.HoverChecker;
+import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -17,6 +25,8 @@ import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.GL11;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class TransmutationGeneratorContainerGui extends GuiContainer
 {
@@ -175,6 +185,87 @@ public class TransmutationGeneratorContainerGui extends GuiContainer
                 }
                 break;
         }
+    }
+
+    @Override
+    public List<String> getItemToolTip(ItemStack stack)
+    {
+        List<String> ret = super.getItemToolTip(stack);
+
+        if(stack.getItem() == ModItems.efficiencyCatalyst)
+        {
+            String eff;
+            switch(stack.getCount())
+            {
+                case 0://???
+                    eff = "unknown";
+                    break;
+                case 1:
+                    eff = "1";
+                    break;
+                case 2:
+                    eff = "1/2";
+                    break;
+                case 3:
+                    eff = "1/3";
+                    break;
+                default:
+                    eff = "1/4";
+                    break;
+            }
+
+            int pos = 2;
+
+            ret.add(pos, TextFormatting.GOLD + new TextComponentTranslation("container.transmutation_generator.efficiency").getFormattedText() + TextFormatting.RESET + " " + eff);
+
+        }
+
+        return ret;
+    }
+
+    @Override
+    protected void renderHoveredToolTip(int mouseX, int mouseY)
+    {
+        if(inBounds(mouseX, mouseY, increaseButton) || inBounds(mouseX, mouseY, decreaseButton))
+        {
+            List<String> text = new ArrayList<>();
+            text.add(new TextComponentTranslation("container.transmutation_generator.mod1", new Object[0]).getFormattedText());
+            text.add(new TextComponentTranslation("container.transmutation_generator.mod2", new Object[0]).getFormattedText());
+            text.add(new TextComponentTranslation("container.transmutation_generator.mod3", new Object[0]).getFormattedText());
+            this.drawHoveringText(text, mouseX, mouseY, fontRenderer);
+        }
+        else if(inBounds(mouseX, mouseY, powerButton))
+        {
+            List<String> text = new ArrayList<>();
+            if(tileEntity.getGenerating())
+            {
+                text.add(new TextComponentTranslation("container.transmutation_generator.poweroff", new Object[0]).getFormattedText());
+            }
+            else
+            {
+                text.add(new TextComponentTranslation("container.transmutation_generator.poweron", new Object[0]).getFormattedText());
+            }
+            this.drawHoveringText(text, mouseX, mouseY, fontRenderer);
+        }
+        else
+        {
+            super.renderHoveredToolTip(mouseX, mouseY);
+        }
+    }
+
+    private boolean inBounds(int mouseX, int mouseY, GuiButton button)
+    {
+        return inBounds(mouseX, mouseY, button.x, button.y, button.width, button.height);
+    }
+
+    private boolean inBounds(int mouseX, int mouseY, int bx, int by, int bw, int bh)
+    {
+        if(mouseX >= bx && mouseX < bx + bw && mouseY >= by && mouseY < by + bh)
+        {
+            return true;
+        }
+
+        return false;
     }
 
     @Override

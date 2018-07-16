@@ -32,21 +32,5 @@ public class EfficiencyCatalyst extends ItemBase
         {
             tooltip.add(TextFormatting.GRAY + "" + TextFormatting.ITALIC + tip);
         }
-
-        tip = I18n.format("item.efficiency_catalyst.desc2");
-        if(!tip.isEmpty())
-        {
-            tooltip.add(TextFormatting.GRAY + "" + TextFormatting.ITALIC + tip);
-        }
-
-        if(stack.getCount() < 4)
-        {
-            int threshold = (int) (10 * Math.pow(10, stack.getCount()));
-            tooltip.add(I18n.format("item.efficiency_catalyst.effect", threshold, TextFormatting.GOLD, TextFormatting.WHITE));
-        }
-        else
-        {
-            tooltip.add(I18n.format("item.efficiency_catalyst.effect_inf", TextFormatting.GOLD, TextFormatting.WHITE));
-        }
     }
 }

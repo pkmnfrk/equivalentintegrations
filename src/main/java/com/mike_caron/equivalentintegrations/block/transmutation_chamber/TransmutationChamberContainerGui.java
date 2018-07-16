@@ -1,10 +1,16 @@
 package com.mike_caron.equivalentintegrations.block.transmutation_chamber;
 
 import com.mike_caron.equivalentintegrations.EquivalentIntegrationsMod;
+import com.mike_caron.equivalentintegrations.item.ModItems;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.TextComponentTranslation;
+import net.minecraft.util.text.TextFormatting;
+
+import javax.xml.soap.Text;
+import java.util.List;
 
 public class TransmutationChamberContainerGui extends GuiContainer
 {
@@ -40,5 +46,39 @@ public class TransmutationChamberContainerGui extends GuiContainer
         this.drawDefaultBackground();
         super.drawScreen(mouseX, mouseY, partialTicks);
         this.renderHoveredToolTip(mouseX, mouseY);
+    }
+
+    @Override
+    public List<String> getItemToolTip(ItemStack stack)
+    {
+        List<String> ret = super.getItemToolTip(stack);
+
+        if(stack.getItem() == ModItems.efficiencyCatalyst)
+        {
+            StringBuilder sb = new StringBuilder();
+
+            sb.append(TextFormatting.GOLD);
+            sb.append(new TextComponentTranslation("container.transmutation_chamber.efficiency").getFormattedText());
+            sb.append(TextFormatting.RESET);
+            sb.append(" ");
+
+            if(stack.getCount() < 4)
+            {
+                String eff;
+
+                eff = Integer.toString(TransmutationChamberTileEntity.getEfficiencyThreshold(stack.getCount()));
+
+                sb.append(eff);
+            }
+            else
+            {
+                sb.append(new TextComponentTranslation("container.transmutation_chamber.efficiency_inf").getFormattedText());
+            }
+
+            int pos = 2;
+            ret.add(pos, sb.toString());
+        }
+
+        return ret;
     }
 }

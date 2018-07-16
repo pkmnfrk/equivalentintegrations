@@ -73,11 +73,6 @@ public class TransmutationGenerator
         TransmutationGeneratorTileEntity tileEntity = getTE(worldIn, pos);
         if(tileEntity == null) return getDefaultState();
 
-        //if(Thread.currentThread().getName().equals("Client thread")) //HACK
-        //{
-        //    EquivalentIntegrationsMod.logger.info("Returning actual block state (active={}, generating={})", tileEntity.hasOwner(), tileEntity.isGenerating());
-        //}
-
         return state
                 .withProperty(ACTIVE, tileEntity.hasOwner())
                 .withProperty(GENERATING, tileEntity.isGenerating());
