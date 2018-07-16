@@ -30,6 +30,8 @@ public class EquivalentIntegrationsMod {
 
     public static final Logger logger = LogManager.getLogger(modId);
 
+    public static final CreativeTab creativeTab = new CreativeTab();
+
     @SuppressWarnings("unused")
     @Mod.Instance(modId)
     public static EquivalentIntegrationsMod instance;

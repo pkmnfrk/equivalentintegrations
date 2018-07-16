@@ -27,3 +27,5 @@ container.transmutation_generator.poweroff=Disable (currently enabled)
 
 #make sure to include a trailing space!
 container.transmutation_generator.efficiency=EMC per FE:
+
+itemGroup.equivalentintegrations=Equivalent Integrations
