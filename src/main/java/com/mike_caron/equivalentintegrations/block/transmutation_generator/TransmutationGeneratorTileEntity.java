@@ -52,7 +52,8 @@ public class TransmutationGeneratorTileEntity
             case 0: return 0.5f;
             case 1: return 1f;
             case 2: return 2f;
-            default: return 3f;
+            case 3: return 3f;
+            default: return 4f;
         }
     }
 
