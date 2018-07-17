@@ -167,7 +167,7 @@ public final class EMCItemHandler implements IItemHandlerModifiable
     {
         validateSlotIndex(slot, true);
 
-        if(slot == cachedInventory.size())
+        if(slot >= cachedInventory.size())
         {
             return ItemStack.EMPTY;
         }
