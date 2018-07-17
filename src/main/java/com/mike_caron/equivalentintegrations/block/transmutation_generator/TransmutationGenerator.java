@@ -2,25 +2,31 @@ package com.mike_caron.equivalentintegrations.block.transmutation_generator;
 
 import com.mike_caron.equivalentintegrations.EquivalentIntegrationsMod;
 import com.mike_caron.equivalentintegrations.block.TransmutationBlockBase;
+import com.mike_caron.equivalentintegrations.block.TransmutationTileEntityBase;
 import mcjty.theoneprobe.api.ElementAlignment;
 import mcjty.theoneprobe.api.IProbeHitData;
 import mcjty.theoneprobe.api.IProbeInfo;
 import mcjty.theoneprobe.api.ProbeMode;
 import mcjty.theoneprobe.apiimpl.styles.LayoutStyle;
+import mcp.mobius.waila.api.IWailaConfigHandler;
+import mcp.mobius.waila.api.IWailaDataAccessor;
 import net.minecraft.block.Block;
 import net.minecraft.block.properties.PropertyBool;
 import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.util.List;
 
 public class TransmutationGenerator
         extends TransmutationBlockBase
@@ -115,6 +121,27 @@ public class TransmutationGenerator
     }
 
     @Override
+    public List<String> getWailaBody(ItemStack itemStack, List<String> currenttip, IWailaDataAccessor accessor, IWailaConfigHandler config)
+    {
+        List<String> ret =  super.getWailaBody(itemStack, currenttip, accessor, config);
+
+        TileEntity te = accessor.getTileEntity();
+        TransmutationGeneratorTileEntity tileEntity = null;
+        if(te instanceof TransmutationTileEntityBase)
+        {
+            tileEntity = (TransmutationGeneratorTileEntity)te;
+        }
+
+        if(tileEntity != null)
+        {
+            ret.add(getProducesString(tileEntity));
+            ret.add(getConsumesString(tileEntity));
+        }
+
+        return ret;
+    }
+
+    @Override
     public void addProbeInfo(ProbeMode mode, IProbeInfo probeInfo, EntityPlayer player, World world, IBlockState blockState, IProbeHitData data)
     {
         super.addProbeInfo(mode, probeInfo, player, world, blockState, data);
@@ -125,9 +152,41 @@ public class TransmutationGenerator
 
         probeInfo
                 .vertical()
-                .text("Produces: " + te.getPowerPerTick() + " FE/t")
+                .text(getProducesString(te))
 //                .horizontal()
-                .text("Consumes: " + te.getEMCPerTick() + " EMC/t")
+                .text(getConsumesString(te))
                 ;
+    }
+
+    private String getProducesString(TransmutationGeneratorTileEntity tileEntity)
+    {
+        StringBuilder ret = new StringBuilder();
+
+        ret
+            .append(new TextComponentTranslation("term.equivalentintegrations.produces").getFormattedText())
+            .append(" ")
+            .append(tileEntity.getPowerPerTick())
+            .append(" ")
+            .append(new TextComponentTranslation("term.equivalentintegrations.fept").getFormattedText())
+        ;
+
+        return ret.toString();
+
+    }
+
+    private String getConsumesString(TransmutationGeneratorTileEntity tileEntity)
+    {
+        StringBuilder ret = new StringBuilder();
+
+        ret
+                .append(new TextComponentTranslation("term.equivalentintegrations.consumes").getFormattedText())
+                .append(" ")
+                .append(tileEntity.getEMCPerTick())
+                .append(" ")
+                .append(new TextComponentTranslation("term.equivalentintegrations.emcpt").getFormattedText())
+        ;
+
+        return ret.toString();
+
     }
 }

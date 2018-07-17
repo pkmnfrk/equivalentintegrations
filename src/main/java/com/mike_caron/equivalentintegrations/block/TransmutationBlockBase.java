@@ -1,13 +1,15 @@
 package com.mike_caron.equivalentintegrations.block;
 
-import com.mike_caron.equivalentintegrations.block.transmutation_chamber.TransmutationChamberTileEntity;
 import com.mike_caron.equivalentintegrations.integrations.ITOPInfoProvider;
+import com.mike_caron.equivalentintegrations.integrations.IWailaInfoProvider;
 import com.mike_caron.equivalentintegrations.item.ModItems;
 import mcjty.theoneprobe.api.ElementAlignment;
 import mcjty.theoneprobe.api.IProbeHitData;
 import mcjty.theoneprobe.api.IProbeInfo;
 import mcjty.theoneprobe.api.ProbeMode;
 import mcjty.theoneprobe.apiimpl.styles.LayoutStyle;
+import mcp.mobius.waila.api.IWailaConfigHandler;
+import mcp.mobius.waila.api.IWailaDataAccessor;
 import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
@@ -24,10 +26,11 @@ import net.minecraftforge.items.ItemStackHandler;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.util.List;
 
 public abstract class TransmutationBlockBase
         extends BlockBase
-        implements ITileEntityProvider, ITOPInfoProvider
+        implements ITileEntityProvider, ITOPInfoProvider, IWailaInfoProvider
 {
     public TransmutationBlockBase(String id)
     {
@@ -90,6 +93,27 @@ public abstract class TransmutationBlockBase
         TileEntity ret = worldIn.getTileEntity(pos);
         if(ret instanceof TransmutationTileEntityBase) return (TransmutationTileEntityBase)ret;
         return null;
+    }
+
+    @Override
+    public List<String> getWailaBody(ItemStack itemStack, List<String> currenttip, IWailaDataAccessor accessor, IWailaConfigHandler config)
+    {
+        TileEntity te = accessor.getTileEntity();
+        TransmutationTileEntityBase tileEntity = null;
+        if(te instanceof TransmutationTileEntityBase)
+        {
+            tileEntity = (TransmutationTileEntityBase)te;
+        }
+
+        if(tileEntity != null)
+        {
+            if(tileEntity.hasOwner())
+            {
+                currenttip.add(new TextComponentTranslation("item.soulbound_talisman.bound", tileEntity.getOwnerName()).getFormattedText());
+            }
+        }
+
+        return currenttip;
     }
 
     @Override

@@ -29,3 +29,8 @@ container.transmutation_generator.poweroff=Disable (currently enabled)
 container.transmutation_generator.efficiency=EMC per FE:
 
 itemGroup.equivalentintegrations=Equivalent Integrations
+
+term.equivalentintegrations.produces=Produces:
+term.equivalentintegrations.consumes=Consumes:
+term.equivalentintegrations.fept=FE/t
+term.equivalentintegrations.emcpt=EMC/t
