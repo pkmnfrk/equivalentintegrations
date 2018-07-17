@@ -119,4 +119,19 @@ public class SoulboundTalisman extends ItemBase
 
         return null;
     }
+
+    @Nullable
+    public static String getOwnerNameFromStack(ItemStack stack)
+    {
+        if(stack.hasTagCompound()) {
+            NBTTagCompound nbt = Objects.requireNonNull(stack.getTagCompound());
+
+            if(nbt.hasKey(OWNER_NAME))
+            {
+                return nbt.getString(OWNER_NAME);
+            }
+        }
+
+        return null;
+    }
 }

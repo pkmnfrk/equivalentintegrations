@@ -1,5 +1,6 @@
 package com.mike_caron.equivalentintegrations;
 
+import com.mike_caron.equivalentintegrations.integrations.MainCompatHandler;
 import com.mike_caron.equivalentintegrations.network.CtoSMessage;
 import com.mike_caron.equivalentintegrations.network.PacketHandlerServer;
 import net.minecraftforge.fml.common.Mod;
@@ -45,12 +46,16 @@ public class EquivalentIntegrationsMod {
     public static SimpleNetworkWrapper networkWrapper;
 
     @Mod.EventHandler
-    public  void preInit(FMLPreInitializationEvent event) {
+    public  void preInit(FMLPreInitializationEvent event)
+    {
         proxy.preInit(event);
+
+        MainCompatHandler.registerAll();
     }
 
     @Mod.EventHandler
-    public void init(FMLInitializationEvent event) {
+    public void init(FMLInitializationEvent event)
+    {
         proxy.init(event);
     }
 

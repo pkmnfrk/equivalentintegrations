@@ -38,6 +38,10 @@ repositories {
         name 'tterrag maven'
         url "http://maven.tterrag.com/"
     }
+    maven { // The repo from which to get waila
+        name "Mobius Repo"
+        url "http://tehnut.info/maven"
+    }
     ivy {
         name 'ProjectE'
         ivyPattern "https://maven.tterrag.com/[module]-[revision].[ext]"
@@ -47,6 +51,11 @@ repositories {
 
 dependencies {
     deobfCompile name: 'ProjectE', version: "${pe_version}", ext: 'jar'
+    deobfCompile "mcp.mobius.waila:Hwyla:${hwyla_version}"
+    deobfCompile ("mcjty.theoneprobe:TheOneProbe-1.12:${top_version}"){
+        transitive = false
+    }
+
     // you may put jars on which you depend on in ./libs
     // or you may define them like so..
     //compile "some.group:artifact:version:classifier"

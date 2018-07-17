@@ -1,7 +1,10 @@
 package com.mike_caron.equivalentintegrations.block;
 
+import com.mike_caron.equivalentintegrations.item.ModItems;
+import com.mike_caron.equivalentintegrations.item.SoulboundTalisman;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.network.play.server.SPacketUpdateTileEntity;
@@ -40,6 +43,23 @@ public abstract class TransmutationTileEntityBase extends TileEntity
     public boolean hasOwner()
     {
         return owner != null;
+    }
+
+    @Nullable
+    public String getOwnerName()
+    {
+        if(owner == null || inventory == null) return null;
+
+        for(int i = 0; i < inventory.getSlots(); i++)
+        {
+            ItemStack stack = inventory.getStackInSlot(i);
+            if(stack.getItem() == ModItems.soulboundTalisman)
+            {
+                return SoulboundTalisman.getOwnerNameFromStack(stack);
+            }
+        }
+
+        return null;
     }
 
     @Nonnull

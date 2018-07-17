@@ -2,6 +2,11 @@ package com.mike_caron.equivalentintegrations.block.transmutation_generator;
 
 import com.mike_caron.equivalentintegrations.EquivalentIntegrationsMod;
 import com.mike_caron.equivalentintegrations.block.TransmutationBlockBase;
+import mcjty.theoneprobe.api.ElementAlignment;
+import mcjty.theoneprobe.api.IProbeHitData;
+import mcjty.theoneprobe.api.IProbeInfo;
+import mcjty.theoneprobe.api.ProbeMode;
+import mcjty.theoneprobe.apiimpl.styles.LayoutStyle;
 import net.minecraft.block.Block;
 import net.minecraft.block.properties.PropertyBool;
 import net.minecraft.block.state.BlockStateContainer;
@@ -107,5 +112,22 @@ public class TransmutationGenerator
         playerIn.openGui(EquivalentIntegrationsMod.instance, GUI_ID, worldIn, pos.getX(), pos.getY(), pos.getZ());
 
         return true;
+    }
+
+    @Override
+    public void addProbeInfo(ProbeMode mode, IProbeInfo probeInfo, EntityPlayer player, World world, IBlockState blockState, IProbeHitData data)
+    {
+        super.addProbeInfo(mode, probeInfo, player, world, blockState, data);
+
+        TransmutationGeneratorTileEntity te = getTE(world, data.getPos());
+
+        if(te == null) return;
+
+        probeInfo
+                .vertical()
+                .text("Produces: " + te.getPowerPerTick() + " FE/t")
+//                .horizontal()
+                .text("Consumes: " + te.getEMCPerTick() + " EMC/t")
+                ;
     }
 }

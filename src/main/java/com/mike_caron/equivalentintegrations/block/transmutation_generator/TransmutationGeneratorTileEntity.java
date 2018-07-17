@@ -444,4 +444,9 @@ public class TransmutationGeneratorTileEntity
     {
         return false;
     }
+
+    public float getEMCPerTick()
+    {
+        return Math.round(powerPerTick / getEfficiency() * 100) / 100f;
+    }
 }

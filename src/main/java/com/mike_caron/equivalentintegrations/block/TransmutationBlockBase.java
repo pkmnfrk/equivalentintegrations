@@ -1,5 +1,13 @@
 package com.mike_caron.equivalentintegrations.block;
 
+import com.mike_caron.equivalentintegrations.block.transmutation_chamber.TransmutationChamberTileEntity;
+import com.mike_caron.equivalentintegrations.integrations.ITOPInfoProvider;
+import com.mike_caron.equivalentintegrations.item.ModItems;
+import mcjty.theoneprobe.api.ElementAlignment;
+import mcjty.theoneprobe.api.IProbeHitData;
+import mcjty.theoneprobe.api.IProbeInfo;
+import mcjty.theoneprobe.api.ProbeMode;
+import mcjty.theoneprobe.apiimpl.styles.LayoutStyle;
 import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
@@ -9,6 +17,7 @@ import net.minecraft.inventory.InventoryHelper;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.items.ItemStackHandler;
@@ -18,7 +27,7 @@ import javax.annotation.Nullable;
 
 public abstract class TransmutationBlockBase
         extends BlockBase
-        implements ITileEntityProvider
+        implements ITileEntityProvider, ITOPInfoProvider
 {
     public TransmutationBlockBase(String id)
     {
@@ -81,6 +90,24 @@ public abstract class TransmutationBlockBase
         TileEntity ret = worldIn.getTileEntity(pos);
         if(ret instanceof TransmutationTileEntityBase) return (TransmutationTileEntityBase)ret;
         return null;
+    }
+
+    @Override
+    public void addProbeInfo(ProbeMode mode, IProbeInfo probeInfo, EntityPlayer player, World world, IBlockState blockState, IProbeHitData data)
+    {
+        TransmutationTileEntityBase tileEntity = getTE(world, data.getPos());
+
+        if(tileEntity == null) return;
+
+        if(tileEntity.hasOwner())
+        {
+            probeInfo
+                    .horizontal(new LayoutStyle().alignment(ElementAlignment.ALIGN_CENTER))
+                    .item(new ItemStack(ModItems.soulboundTalisman))
+                    .text(new TextComponentTranslation("item.soulbound_talisman.bound", tileEntity.getOwnerName()).getFormattedText())
+            ;
+        }
+
     }
 
 }
