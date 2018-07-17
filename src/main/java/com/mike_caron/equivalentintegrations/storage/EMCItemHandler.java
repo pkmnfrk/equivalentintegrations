@@ -81,13 +81,13 @@ public final class EMCItemHandler implements IItemHandlerModifiable
     @Override
     public int getSlots()
     {
-        EquivalentIntegrationsMod.logger.trace("Transmutation Chamber: Getting slot count");
+        //EquivalentIntegrationsMod.logger.trace("Transmutation Chamber: Getting slot count");
 
         if(!refresh(false)) {
             return 0;
         }
 
-        EquivalentIntegrationsMod.logger.trace("Transmutation Chamber: Success");
+        //EquivalentIntegrationsMod.logger.trace("Transmutation Chamber: Success");
         return cachedInventory.size() + 64;
     }
 
@@ -203,10 +203,10 @@ public final class EMCItemHandler implements IItemHandlerModifiable
         //but, the efficiency cost may put it over
         desiredEMC += getEfficiencyCost(ret, desiredEMC);
 
-        EquivalentIntegrationsMod.logger.debug("Materializing {} x ({}) for {} EMC each, a total of {} (Simulation: {})", actualAmount, desired, emcCost, desiredEMC, simulate);
-        if(actualAmount < amount) {
-            EquivalentIntegrationsMod.logger.debug("Sadly, this was less than the {} that was asked for", amount);
-        }
+        //EquivalentIntegrationsMod.logger.debug("Materializing {} x ({}) for {} EMC each, a total of {} (Simulation: {})", actualAmount, desired, emcCost, desiredEMC, simulate);
+        //if(actualAmount < amount) {
+        //    EquivalentIntegrationsMod.logger.debug("Sadly, this was less than the {} that was asked for", amount);
+        //}
 
         //if that happens, rather than trying to solve this calculus, just round it off
         if(desiredEMC > emc)
@@ -261,53 +261,6 @@ public final class EMCItemHandler implements IItemHandlerModifiable
 
         return true;
     }
-
-    /*
-    private double getRealEMC(UUID owner)
-    {
-        EntityPlayerMP player = getEntityPlayerMP(owner);
-
-        if(player == null && OfflineEMCWorldData.get(world).hasCachedEMC(owner))
-        {
-            EquivalentIntegrationsMod.logger.debug("Retrieving cached EMC value for {}", owner);
-            return OfflineEMCWorldData.get(world).getCachedEMC(owner);
-        }
-
-        EquivalentIntegrationsMod.logger.debug("Retrieving live EMC value for {}", owner);
-        IKnowledgeProvider knowledge = ProjectEAPI.getTransmutationProxy().getKnowledgeProviderFor(owner);
-        return knowledge.getEmc();
-
-
-    }
-
-    @Nullable
-    private EntityPlayerMP getEntityPlayerMP(UUID owner)
-    {
-        EntityPlayerMP player = null;
-        MinecraftServer server = world.getMinecraftServer();
-        if (server != null)
-        {
-            player = server.getPlayerList().getPlayerByUUID(owner);
-        }
-        return player;
-    }
-
-    private void setRealEMC(UUID owner, double emc)
-    {
-        EntityPlayerMP player = getEntityPlayerMP(owner);
-
-        if (player != null)
-        {
-            IKnowledgeProvider knowledge = ProjectEAPI.getTransmutationProxy().getKnowledgeProviderFor(owner);
-            knowledge.setEmc(emc);
-            knowledge.sync(player);
-        }
-        else
-        {
-            OfflineEMCWorldData.get(world).setCachedEMC(owner, emc);
-        }
-    }
-    */
 
     private static int howManyCanWeMake(double emc, long cost)
     {

@@ -49,13 +49,13 @@ public class ManagedEMCManager implements IEMCManager
 
         if(player == null && OfflineEMCWorldData.get(world).hasCachedEMC(owner))
         {
-            EquivalentIntegrationsMod.logger.debug("Retrieving cached EMC value for {}", owner);
+            //EquivalentIntegrationsMod.logger.debug("Retrieving cached EMC value for {}", owner);
             ret = OfflineEMCWorldData.get(world).getCachedEMC(owner);
         }
 
         if(ret == -1D)
         {
-            EquivalentIntegrationsMod.logger.debug("Retrieving live EMC value for {}", owner);
+            //EquivalentIntegrationsMod.logger.debug("Retrieving live EMC value for {}", owner);
             IKnowledgeProvider knowledge = ProjectEAPI.getTransmutationProxy().getKnowledgeProviderFor(owner);
             ret = knowledge.getEmc();
         }
