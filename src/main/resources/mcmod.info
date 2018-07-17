@@ -1,0 +1,15 @@
+[
+{
+  "modid": "equivalentintegrations",
+  "name": "Equivalent Integrations",
+  "description": "An addon for ProjectE that brings greater automation",
+  "version": "${version}",
+  "mcversion": "${mcversion}",
+  "logoFile": "assets/equivalentintegrations/logo.png",
+  "url": "",
+  "updateUrl": "",
+  "authorList": [ "pkmnfrk" ],
+  "parent": "",
+  "screenshots": []
+}
+]
