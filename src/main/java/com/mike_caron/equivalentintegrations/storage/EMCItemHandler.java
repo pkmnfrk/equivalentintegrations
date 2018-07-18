@@ -10,6 +10,7 @@ import moze_intel.projecte.api.event.EMCRemapEvent;
 import moze_intel.projecte.api.event.PlayerAttemptLearnEvent;
 import moze_intel.projecte.api.event.PlayerKnowledgeChangeEvent;
 import moze_intel.projecte.api.proxy.IEMCProxy;
+import moze_intel.projecte.utils.EMCHelper;
 import moze_intel.projecte.utils.ItemHelper;
 import moze_intel.projecte.utils.NBTWhitelist;
 import net.minecraft.entity.player.EntityPlayer;
@@ -131,13 +132,13 @@ public final class EMCItemHandler implements IItemHandlerModifiable
 
             knowledge = ProjectEAPI.getTransmutationProxy().getKnowledgeProviderFor(owner);
 
-            if(knowledge.hasKnowledge(stack))
+            if(canLearn || knowledge.hasKnowledge(stack))
             {
                 IEMCManager emcManager = world.getCapability(EMCManagerProvider.EMC_MANAGER_CAPABILITY, null);
 
                 double emc = emcManager.getEMC(owner);
 
-                long singleValue = emcProxy.getValue(stack);
+                long singleValue = EMCHelper.getEmcSellValue(stack);
 
                 long emcValue = singleValue * stack.getCount();
 
