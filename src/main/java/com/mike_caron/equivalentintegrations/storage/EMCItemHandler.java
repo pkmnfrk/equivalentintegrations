@@ -7,7 +7,7 @@ import com.mike_caron.equivalentintegrations.impl.EMCManagerProvider;
 import moze_intel.projecte.api.ProjectEAPI;
 import moze_intel.projecte.api.capabilities.IKnowledgeProvider;
 import moze_intel.projecte.api.event.EMCRemapEvent;
-import moze_intel.projecte.api.event.PlayerAttemptLearnEvent;
+//import moze_intel.projecte.api.event.PlayerAttemptLearnEvent;
 import moze_intel.projecte.api.event.PlayerKnowledgeChangeEvent;
 import moze_intel.projecte.api.proxy.IEMCProxy;
 import moze_intel.projecte.utils.EMCHelper;
@@ -168,13 +168,14 @@ public final class EMCItemHandler implements IItemHandlerModifiable
                             stack.setTagCompound(null);
                         }
 
-                        EntityPlayer player = world.getPlayerEntityByUUID(owner);
-                        if (!MinecraftForge.EVENT_BUS.post(new PlayerAttemptLearnEvent(player, stack))) //Only show the "learned" text if the knowledge was added
-                        {
+                        //TODO: When 1.3.1 comes out, put this back in
+                        //EntityPlayer player = world.getPlayerEntityByUUID(owner);
+                        //if (!MinecraftForge.EVENT_BUS.post(new PlayerAttemptLearnEvent(player, stack))) //Only show the "learned" text if the knowledge was added
+                        //{
                             //note: this will not work if the user is offline. In this case, the later
                             //knowledge check will return false, thus rejecting the item
                             knowledge.addKnowledge(stack);
-                        }
+                        //}
 
                     }
 
@@ -361,13 +362,12 @@ public final class EMCItemHandler implements IItemHandlerModifiable
 
         if(updateInv)
         {
-            IEMCProxy emcProxy = ProjectEAPI.getEMCProxy();
             double emc = emcManager.getEMC(owner);
             cachedInventory = new ArrayList<>();
 
             for(ItemStack is : cachedKnowledge)
             {
-                int num = howManyCanWeMake(emc, emcProxy.getValue(is));
+                int num = howManyCanWeMake(emc, EMCHelper.getEmcValue(is));
 
                 if(num > 0) {
                     cachedInventory.add(new ItemStack(is.getItem(), num, is.getMetadata(), is.getTagCompound()));

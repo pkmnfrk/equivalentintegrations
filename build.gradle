@@ -36,7 +36,7 @@ minecraft {
 repositories {
     maven {
         name 'tterrag maven'
-        url "http://maven.tterrag.com/"
+        url "https://maven.tterrag.com/"
     }
     maven { // The repo from which to get waila
         name "Mobius Repo"
