@@ -13,7 +13,9 @@ import moze_intel.projecte.api.proxy.IEMCProxy;
 import moze_intel.projecte.utils.EMCHelper;
 import moze_intel.projecte.utils.ItemHelper;
 import moze_intel.projecte.utils.NBTWhitelist;
+import moze_intel.projecte.utils.PlayerHelper;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
@@ -401,4 +403,35 @@ public final class EMCItemHandler implements IItemHandlerModifiable
         refresh(true);
     }
 
+    public static void cleanupKnowledge(EntityPlayer player)
+    {
+        IKnowledgeProvider knowledge;
+
+        knowledge = ProjectEAPI.getTransmutationProxy().getKnowledgeProviderFor(player.getUniqueID());
+
+        List<ItemStack> oldKnowledge = new ArrayList<>(knowledge.getKnowledge());
+
+        knowledge.clearKnowledge();
+
+        for(ItemStack stack : oldKnowledge)
+        {
+            if(stack.isItemStackDamageable() && stack.isItemDamaged())
+            {
+                stack.setItemDamage(0);
+            }
+
+            if(stack.hasTagCompound() && !NBTWhitelist.shouldDupeWithNBT(stack))
+            {
+                stack.setTagCompound(null);
+            }
+
+            if(!knowledge.hasKnowledge(stack))
+            {
+                knowledge.addKnowledge(stack);
+            }
+        }
+
+        knowledge.sync((EntityPlayerMP)player);
+
+    }
 }

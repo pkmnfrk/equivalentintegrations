@@ -1,5 +1,6 @@
 package com.mike_caron.equivalentintegrations;
 
+import com.mike_caron.equivalentintegrations.command.CleanupCommand;
 import com.mike_caron.equivalentintegrations.integrations.MainCompatHandler;
 import com.mike_caron.equivalentintegrations.network.CtoSMessage;
 import com.mike_caron.equivalentintegrations.network.PacketHandlerServer;
@@ -9,6 +10,7 @@ import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import com.mike_caron.equivalentintegrations.proxy.CommonProxy;
+import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 import net.minecraftforge.fml.relauncher.Side;
@@ -66,4 +68,9 @@ public class EquivalentIntegrationsMod {
         networkWrapper.registerMessage(PacketHandlerServer.class, CtoSMessage.class, 2, Side.SERVER);
     }
 
+    @Mod.EventHandler
+    public void serverLoad(FMLServerStartingEvent evt)
+    {
+        evt.registerServerCommand(new CleanupCommand());
+    }
 }
