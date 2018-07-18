@@ -109,7 +109,7 @@ public class TransmutationChamberTileEntity
     @Override
     public boolean hasCapability(Capability<?> capability, @Nullable EnumFacing facing)
     {
-        if (capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY && facing != null)
+        if (capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY && facing != null && owner != null)
         {
             return true;
         }
@@ -120,7 +120,7 @@ public class TransmutationChamberTileEntity
     @Override
     public <T> T getCapability(Capability<T> capability, @Nullable EnumFacing facing)
     {
-        if (capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY && facing != null)
+        if (capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY && facing != null && owner != null)
         {
             //if the facing has an actual value, assume they mean the EMC inventory
             return CapabilityItemHandler.ITEM_HANDLER_CAPABILITY.cast(emcItemHandler);

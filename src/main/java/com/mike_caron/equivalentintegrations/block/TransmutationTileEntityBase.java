@@ -93,6 +93,7 @@ public abstract class TransmutationTileEntityBase extends TileEntity
 
                 IBlockState state = world.getBlockState(pos);
                 world.notifyBlockUpdate(getPos(), state, state, 3);
+                world.notifyNeighborsOfStateChange(getPos(), state.getBlock(), true);
             }
         }
     }
