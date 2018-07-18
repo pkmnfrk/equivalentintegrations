@@ -7,10 +7,15 @@ import com.mike_caron.equivalentintegrations.impl.EMCManagerProvider;
 import moze_intel.projecte.api.ProjectEAPI;
 import moze_intel.projecte.api.capabilities.IKnowledgeProvider;
 import moze_intel.projecte.api.event.EMCRemapEvent;
+import moze_intel.projecte.api.event.PlayerAttemptLearnEvent;
 import moze_intel.projecte.api.event.PlayerKnowledgeChangeEvent;
 import moze_intel.projecte.api.proxy.IEMCProxy;
+import moze_intel.projecte.utils.ItemHelper;
+import moze_intel.projecte.utils.NBTWhitelist;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.items.IItemHandlerModifiable;
 
@@ -126,13 +131,6 @@ public final class EMCItemHandler implements IItemHandlerModifiable
 
             knowledge = ProjectEAPI.getTransmutationProxy().getKnowledgeProviderFor(owner);
 
-            if(canLearn && !knowledge.hasKnowledge(stack))
-            {
-                //note: this will not work if the user is offline. In this case, the later
-                //knowledge check will return false, thus rejecting the item
-                knowledge.addKnowledge(stack);
-            }
-
             if(knowledge.hasKnowledge(stack))
             {
                 IEMCManager emcManager = world.getCapability(EMCManagerProvider.EMC_MANAGER_CAPABILITY, null);
@@ -151,7 +149,34 @@ public final class EMCItemHandler implements IItemHandlerModifiable
                 {
                     emcManager.setEMC(owner, emc + emcValue);
 
+                    //then, clean up the stack a bit
+                    if(ItemHelper.isDamageable(stack))
+                    {
+                        stack.setItemDamage(0);
+                    }
+
+                    stack.setCount(1);
+
+                    if(canLearn && !knowledge.hasKnowledge(stack))
+                    {
+
+                        if (stack.hasTagCompound() && !NBTWhitelist.shouldDupeWithNBT(stack))
+                        {
+                            stack.setTagCompound(null);
+                        }
+
+                        EntityPlayer player = world.getPlayerEntityByUUID(owner);
+                        if (!MinecraftForge.EVENT_BUS.post(new PlayerAttemptLearnEvent(player, stack))) //Only show the "learned" text if the knowledge was added
+                        {
+                            //note: this will not work if the user is offline. In this case, the later
+                            //knowledge check will return false, thus rejecting the item
+                            knowledge.addKnowledge(stack);
+                        }
+
+                    }
+
                     refreshCachedKnowledge(false);
+
                 }
 
                 return ItemStack.EMPTY;
