@@ -52,8 +52,13 @@ public class TransmutationChamber
     public IBlockState getActualState(IBlockState state, IBlockAccess worldIn, BlockPos pos)
     {
         TransmutationChamberTileEntity tileEntity = getTE(worldIn, pos);
-        if(tileEntity == null) return getDefaultState();
+        if(tileEntity == null)
+        {
+            EquivalentIntegrationsMod.logger.warn("getActualState: Tried to get tile entity, but it was null");
+            return getDefaultState();
+        }
 
+        EquivalentIntegrationsMod.logger.info("getActualState: Returning state {}", tileEntity.hasOwner());
         return state.withProperty(ACTIVE, tileEntity.hasOwner());
     }
 
