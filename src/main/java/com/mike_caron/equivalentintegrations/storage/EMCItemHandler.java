@@ -367,7 +367,13 @@ public final class EMCItemHandler implements IItemHandlerModifiable
 
             for(ItemStack is : cachedKnowledge)
             {
-                int num = howManyCanWeMake(emc, EMCHelper.getEmcValue(is));
+                long value = EMCHelper.getEmcValue(is);
+                if(value == 0)
+                {
+                    continue;
+                }
+
+                int num = howManyCanWeMake(emc, value);
 
                 if(num > 0) {
                     cachedInventory.add(new ItemStack(is.getItem(), num, is.getMetadata(), is.getTagCompound()));
