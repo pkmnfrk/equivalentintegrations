@@ -1,5 +1,7 @@
 package com.mike_caron.equivalentintegrations.api.capabilities;
 
+import net.minecraft.item.ItemStack;
+
 import java.util.UUID;
 
 public interface IEMCManager
@@ -13,4 +15,7 @@ public interface IEMCManager
     void tick();
 
     void playerLoggedIn(UUID owner);
+
+    long getEmcValue(ItemStack stack);
+    long getEmcSellValue(ItemStack stack);
 }

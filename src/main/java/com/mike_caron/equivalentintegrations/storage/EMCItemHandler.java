@@ -16,16 +16,18 @@ import moze_intel.projecte.utils.NBTWhitelist;
 import moze_intel.projecte.utils.PlayerHelper;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.fml.common.asm.transformers.ItemStackTransformer;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.items.IItemHandlerModifiable;
+import net.minecraftforge.items.ItemStackHandler;
+import org.lwjgl.Sys;
 
 import javax.annotation.Nonnull;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 public final class EMCItemHandler implements IItemHandlerModifiable
 {
@@ -40,13 +42,33 @@ public final class EMCItemHandler implements IItemHandlerModifiable
 
     private int efficiencyThreshold = 10;
     private boolean canLearn = false;
+    private boolean needsRefresh = false;
 
     private boolean needsFullRefresh = false;
+
+    private IEMCProxy emcProxy;
+    private IEMCManager emcManager;
+
+    private long timeInGetCount, numInGetCount;
+    private long timeInGetSlot, numInGetSlot;
+    private long timeInExtract, numInExtract;
+    private long timeInInsert, numInInsert;
+    private long timeInEmcProxy, numInEmcProxy;
+    private long timeInRefreshKnowledge, numInRefreshKnowledge;
+
+    private long profilingStartTime;
+
+    private final Map<Item, ItemStack> cachedStacks = new HashMap<>();
 
     public EMCItemHandler(@Nonnull UUID owner,@Nonnull World world)
     {
         this.owner = owner;
         this.world = world;
+
+        this.emcProxy = ProjectEAPI.getEMCProxy();
+        this.emcManager = world.getCapability(EMCManagerProvider.EMC_MANAGER_CAPABILITY, null);
+
+        profilingStartTime = System.nanoTime();
 
         refresh(true);
     }
@@ -89,45 +111,70 @@ public final class EMCItemHandler implements IItemHandlerModifiable
     @Override
     public int getSlots()
     {
+        long startTime = System.nanoTime();
+        numInGetCount ++;
         //EquivalentIntegrationsMod.logger.trace("Transmutation Chamber: Getting slot count");
 
-        if(!refresh(false)) {
-            return 0;
+        if(cachedKnowledge == null)
+        {
+            if (!refresh(false))
+            {
+                timeInGetCount += System.nanoTime() - startTime;
+                return 0;
+            }
         }
 
         //EquivalentIntegrationsMod.logger.trace("Transmutation Chamber: Success");
-        return cachedInventory.size() + 64;
+        int ret = cachedInventory.size() + 64;
+
+        timeInGetCount += System.nanoTime() - startTime;
+
+        return ret;
     }
 
     @Nonnull
     @Override
     public ItemStack getStackInSlot(int slot)
+{
+    long startTime = System.nanoTime();
+    numInGetSlot ++;
+
+    if(!validateSlotIndex(slot, false))
     {
-        if(!validateSlotIndex(slot, false))
-            return ItemStack.EMPTY;
-
-        //EquivalentIntegrationsMod.logger.info("Transmutation Chamber: Getting stack in slot " + slot);
-
-        if(!refresh(false)) {
-            return ItemStack.EMPTY;
-        }
-
-        if(slot >= cachedInventory.size())
-        {
-            return ItemStack.EMPTY;
-        }
-
-        return cachedInventory.get(slot);
+        //timeInGetSlot += System.nanoTime() - startTime;
+        return ItemStack.EMPTY;
     }
+
+    if(cachedInventory == null)
+    {
+        if (!refresh(false))
+        {
+            timeInGetSlot += System.nanoTime() - startTime;
+            return ItemStack.EMPTY;
+        }
+    }
+
+    if(slot >= cachedInventory.size())
+    {
+        //timeInGetSlot += System.nanoTime() - startTime;
+        return ItemStack.EMPTY;
+    }
+
+    timeInGetSlot += System.nanoTime() - startTime;
+    return cachedInventory.get(slot);
+}
 
     @Nonnull
     @Override
     public ItemStack insertItem(int slot, @Nonnull ItemStack stack, boolean simulate)
     {
+        long startTime = System.nanoTime();
+        numInInsert ++;
         if(!validateSlotIndex(slot, false))
+        {
+            timeInInsert += System.nanoTime() - startTime;
             return stack;
-
-        IEMCProxy emcProxy = ProjectEAPI.getEMCProxy();
+        }
 
         if(emcProxy.hasValue(stack)){
             IKnowledgeProvider knowledge;
@@ -136,11 +183,11 @@ public final class EMCItemHandler implements IItemHandlerModifiable
 
             if(canLearn || knowledge.hasKnowledge(stack))
             {
-                IEMCManager emcManager = world.getCapability(EMCManagerProvider.EMC_MANAGER_CAPABILITY, null);
+
 
                 double emc = emcManager.getEMC(owner);
 
-                long singleValue = EMCHelper.getEmcSellValue(stack);
+                long singleValue = emcManager.getEmcSellValue(stack);
 
                 long emcValue = singleValue * stack.getCount();
 
@@ -179,14 +226,15 @@ public final class EMCItemHandler implements IItemHandlerModifiable
 
                     }
 
-                    refreshCachedKnowledge(false);
-
+                    needsRefresh = true;
                 }
 
+                timeInInsert += System.nanoTime() - startTime;
                 return ItemStack.EMPTY;
             }
         }
 
+        timeInInsert += System.nanoTime() - startTime;
         return stack;
     }
 
@@ -194,22 +242,32 @@ public final class EMCItemHandler implements IItemHandlerModifiable
     @Override
     public ItemStack extractItem(int slot, int amount, boolean simulate)
     {
+        long startTime = System.nanoTime();
+        numInExtract ++;
+
         validateSlotIndex(slot, true);
 
         if(slot >= cachedInventory.size())
         {
+            timeInExtract += System.nanoTime() - startTime;
             return ItemStack.EMPTY;
         }
 
-        IEMCManager emcManager = world.getCapability(EMCManagerProvider.EMC_MANAGER_CAPABILITY, null);
+        //IEMCManager emcManager = world.getCapability(EMCManagerProvider.EMC_MANAGER_CAPABILITY, null);
 
         double emc = emcManager.getEMC(owner);
 
-        IEMCProxy emcProxy = ProjectEAPI.getEMCProxy();
+        //IEMCProxy emcProxy = ProjectEAPI.getEMCProxy();
 
         //first off, what's in this stack?
         ItemStack desired = cachedInventory.get(slot);
-        long emcCost = emcProxy.getValue(desired);
+        long emcCost = emcManager.getEmcValue(desired);
+
+        if(emcCost == 0)
+        {
+            timeInExtract += System.nanoTime() - startTime;
+            return ItemStack.EMPTY;
+        }
 
         int actualAmount = amount;
 
@@ -248,13 +306,14 @@ public final class EMCItemHandler implements IItemHandlerModifiable
             emc -= desiredEMC;
             emcManager.setEMC(owner, emc);
 
-            refreshCachedKnowledge(false);
+            //refreshCachedKnowledge(false);
         }
 
 
 
         //EquivalentIntegrationsMod.logger.info("Returning stack with id {}", System.identityHashCode(ret));
 
+        timeInExtract += System.nanoTime() - startTime;
         return ret;
     }
 
@@ -293,6 +352,7 @@ public final class EMCItemHandler implements IItemHandlerModifiable
 
     private static int howManyCanWeMake(double emc, long cost)
     {
+        if(cost == 0) return 0;
         long tmp = Math.floorDiv((long) emc, cost);
         if (tmp > Integer.MAX_VALUE)
         {
@@ -325,6 +385,8 @@ public final class EMCItemHandler implements IItemHandlerModifiable
         if(!ret && comprehensive) {
             needsFullRefresh = true;
         }
+
+        needsRefresh = !ret;
         return ret;
     }
 
@@ -333,7 +395,8 @@ public final class EMCItemHandler implements IItemHandlerModifiable
     {
         if(world.isRemote) return;
 
-        IEMCManager emcManager = world.getCapability(EMCManagerProvider.EMC_MANAGER_CAPABILITY, null);
+        long startTime = System.nanoTime();
+        numInRefreshKnowledge ++;
 
         if(needsFullRefresh)
         {
@@ -342,6 +405,19 @@ public final class EMCItemHandler implements IItemHandlerModifiable
 
         boolean updateInv = false;
 
+        refresh_part1(comprehensive);
+        refresh_part2();
+
+
+        needsFullRefresh = false;
+        //EquivalentIntegrationsMod.logger.info("Successfully refreshed cache");
+
+        timeInRefreshKnowledge = System.nanoTime() - startTime;
+    }
+
+    private void refresh_part1(boolean comprehensive)
+    {
+        boolean updateInv;
         if(comprehensive){
             IKnowledgeProvider knowledge;
             knowledge = ProjectEAPI.getTransmutationProxy().getKnowledgeProviderFor(owner);
@@ -359,31 +435,73 @@ public final class EMCItemHandler implements IItemHandlerModifiable
                 updateInv = true;
             }
         }
+    }
 
-        if(updateInv)
+    private void refresh_part2()
+    {
+        if(cachedInventory != null)
         {
-            double emc = emcManager.getEMC(owner);
+            //EquivalentIntegrationsMod.logger.info("Clearing array of size {}", cachedInventory.size());
+            //cachedInventory.clear();
+        }
+        else
+        {
             cachedInventory = new ArrayList<>();
+        }
 
-            for(ItemStack is : cachedKnowledge)
+        //cachedInventory = new ArrayList<>();
+
+
+        int ix = 0;
+        int addedNew = 0;
+        int overwrote = 0;
+        int updated = 0;
+
+        for(int jx = 0; jx < cachedKnowledge.size(); jx++)
+        {
+            ItemStack is = cachedKnowledge.get(jx);
+
+            long value = emcManager.getEmcValue(is);
+            if(value == 0)
             {
-                long value = EMCHelper.getEmcValue(is);
-                if(value == 0)
+                continue;
+            }
+
+            int num = howManyCanWeMake(cachedEmc, value);
+
+            if(num > 0)
+            {
+                if (ix < cachedInventory.size())
                 {
-                    continue;
+                    ItemStack cached = cachedInventory.get(ix);
+
+                    if (cached.getItem() == is.getItem())
+                    {
+                        cached.setCount(num);
+                        updated ++;
+                    }
+                    else
+                    {
+                        cachedInventory.set(ix, new ItemStack(is.getItem(), num, is.getMetadata(), is.getTagCompound()));
+                        overwrote ++;
+                    }
                 }
-
-                int num = howManyCanWeMake(emc, value);
-
-                if(num > 0) {
+                else
+                {
                     cachedInventory.add(new ItemStack(is.getItem(), num, is.getMetadata(), is.getTagCompound()));
+                    addedNew ++;
                 }
+
+                ix += 1;
             }
         }
 
-        needsFullRefresh = false;
-        //EquivalentIntegrationsMod.logger.info("Successfully refreshed cache");
+        //EquivalentIntegrationsMod.logger.info("Refreshed knowledge. Updated {}, Overwrote {}, Added {}, Trimmed {}", updated, overwrote, addedNew, cachedInventory.size() - ix);
 
+        while(cachedInventory.size() > ix)
+        {
+            cachedInventory.remove(ix);
+        }
     }
 
     @SuppressWarnings("unused")
@@ -400,13 +518,21 @@ public final class EMCItemHandler implements IItemHandlerModifiable
         if(event.getPlayerUUID().equals(owner))
         {
             EquivalentIntegrationsMod.logger.info("Refreshing cached knowledge due to knowledge change");
-            refreshCachedKnowledge(true);
+            refresh(true);
         }
     }
 
+    @SubscribeEvent
     public void onEmcChanged(EMCChangedEvent event)
     {
-        refresh(true);
+        //refresh(true);
+        if(event.player.equals(owner))
+        {
+            cachedEmc = event.newEmc;
+            needsRefresh = true;
+        }
+
+        outputProfilingData();
     }
 
     public static void cleanupKnowledge(EntityPlayer player)
@@ -439,5 +565,49 @@ public final class EMCItemHandler implements IItemHandlerModifiable
 
         knowledge.sync((EntityPlayerMP)player);
 
+    }
+
+    private void outputProfilingData()
+    {
+
+        long deltaTime = System.nanoTime() - profilingStartTime;
+        if (deltaTime > 1000000000)
+        {
+            if (false)
+            {
+                EquivalentIntegrationsMod.logger.warn("In the last {} us, we spent:", deltaTime);
+                EquivalentIntegrationsMod.logger.warn("Time in EMC Proxy: {} over {} calls", timeInEmcProxy / 1000000f, numInEmcProxy);
+                EquivalentIntegrationsMod.logger.warn("Time in getSlots(): {} over {} calls", timeInGetCount / 1000000f, numInGetCount);
+                EquivalentIntegrationsMod.logger.warn("Time in getStackInSlots(): {} over {} calls", timeInGetSlot / 1000000f, numInGetSlot);
+                EquivalentIntegrationsMod.logger.warn("Time in extractItem(): {} over {} calls", timeInInsert / 1000000f, numInInsert);
+                EquivalentIntegrationsMod.logger.warn("Time in insertItem(): {} over {} calls", timeInExtract / 1000000f, numInExtract);
+                EquivalentIntegrationsMod.logger.warn("Time in refreshKnowledge(): {} over {} calls", timeInRefreshKnowledge / 1000000f, numInRefreshKnowledge);
+            }
+            timeInEmcProxy = 0;
+            numInEmcProxy = 0;
+            timeInGetCount = 0;
+            numInGetCount = 0;
+            timeInGetSlot = 0;
+            numInGetSlot = 0;
+            timeInInsert = 0;
+            numInInsert = 0;
+            timeInExtract = 0;
+            numInExtract = 0;
+            timeInRefreshKnowledge = 0;
+            numInRefreshKnowledge = 0;
+
+            profilingStartTime = System.nanoTime();
+
+        }
+    }
+
+    public void tick()
+    {
+        if(needsRefresh)
+        {
+            refresh(true);
+        }
+
+        outputProfilingData();
     }
 }

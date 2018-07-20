@@ -6,7 +6,14 @@ import com.mike_caron.equivalentintegrations.api.capabilities.IEMCManager;
 import com.mike_caron.equivalentintegrations.api.events.EMCChangedEvent;
 import moze_intel.projecte.api.ProjectEAPI;
 import moze_intel.projecte.api.capabilities.IKnowledgeProvider;
+import moze_intel.projecte.api.event.EMCRemapEvent;
+import moze_intel.projecte.api.proxy.IEMCProxy;
+import moze_intel.projecte.api.proxy.ITransmutationProxy;
+import moze_intel.projecte.emc.EMCMapper;
+import moze_intel.projecte.utils.EMCHelper;
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
@@ -18,9 +25,12 @@ import net.minecraftforge.fml.common.gameevent.TickEvent;
 
 import javax.annotation.Nullable;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.Callable;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 @Mod.EventBusSubscriber
 public class ManagedEMCManager implements IEMCManager
@@ -32,12 +42,24 @@ public class ManagedEMCManager implements IEMCManager
 
     private HashMap<UUID, Integer> dirtyPlayers = new HashMap<>();
     private HashMap<UUID, Double> lastKnownEmc = new HashMap<>();
+    private HashMap<UUID, IKnowledgeProvider> knowledgeProviders = new HashMap<>();
+    private HashSet<UUID> updateEmc = new HashSet<>();
+
+    private static final HashMap<Item, Long> emcValues = new HashMap<>();
+    private static final Lock lock = new ReentrantLock();
+    private static final HashMap<Item, Boolean> cacheBlacklist = new HashMap<>();
+
+    private ITransmutationProxy transmutationProxy;
+    private IEMCProxy emcProxy;
 
     private int emcCheckTimer = 0;
 
     public ManagedEMCManager(World world)
     {
         this.world = world;
+
+        transmutationProxy = ProjectEAPI.getTransmutationProxy();
+        emcProxy = ProjectEAPI.getEMCProxy();
     }
 
     @Override
@@ -56,7 +78,7 @@ public class ManagedEMCManager implements IEMCManager
         if(ret == -1D)
         {
             //EquivalentIntegrationsMod.logger.debug("Retrieving live EMC value for {}", owner);
-            IKnowledgeProvider knowledge = ProjectEAPI.getTransmutationProxy().getKnowledgeProviderFor(owner);
+            IKnowledgeProvider knowledge = getKnowledgeProvider(owner);
             ret = knowledge.getEmc();
         }
 
@@ -68,10 +90,26 @@ public class ManagedEMCManager implements IEMCManager
         if(lastKnownEmc.get(owner) != ret)
         {
             lastKnownEmc.put(owner, ret);
-            MinecraftForge.EVENT_BUS.post(new EMCChangedEvent(owner, ret));
+            //MinecraftForge.EVENT_BUS.post(new EMCChangedEvent(owner, ret));
+            updateEmc.add(owner);
         }
 
         return ret;
+    }
+
+    private IKnowledgeProvider getKnowledgeProvider(UUID owner)
+    {
+        IKnowledgeProvider knowledge;
+        if(knowledgeProviders.containsKey(owner))
+        {
+            knowledge = knowledgeProviders.get(owner);
+        }
+        else
+        {
+            knowledge = transmutationProxy.getKnowledgeProviderFor(owner);
+            knowledgeProviders.put(owner, knowledge);
+        }
+        return knowledge;
     }
 
     @Override
@@ -84,7 +122,7 @@ public class ManagedEMCManager implements IEMCManager
 
             if (player != null)
             {
-                IKnowledgeProvider knowledge = ProjectEAPI.getTransmutationProxy().getKnowledgeProviderFor(owner);
+                IKnowledgeProvider knowledge = getKnowledgeProvider(owner);
                 knowledge.setEmc(emc);
                 markDirty(owner);
             }
@@ -94,7 +132,8 @@ public class ManagedEMCManager implements IEMCManager
             }
 
             lastKnownEmc.put(owner, emc);
-            MinecraftForge.EVENT_BUS.post(new EMCChangedEvent(owner, emc));
+            //MinecraftForge.EVENT_BUS.post(new EMCChangedEvent(owner, emc));
+            updateEmc.add(owner);
         }
     }
 
@@ -115,7 +154,7 @@ public class ManagedEMCManager implements IEMCManager
 
             if (player != null)
             {
-                IKnowledgeProvider knowledge = ProjectEAPI.getTransmutationProxy().getKnowledgeProviderFor(owner);
+                IKnowledgeProvider knowledge = getKnowledgeProvider(owner);
                 knowledge.setEmc(newEmc);
                 markDirty(owner);
             }
@@ -125,7 +164,8 @@ public class ManagedEMCManager implements IEMCManager
             }
 
             lastKnownEmc.put(owner, newEmc);
-            MinecraftForge.EVENT_BUS.post(new EMCChangedEvent(owner, newEmc));
+            //MinecraftForge.EVENT_BUS.post(new EMCChangedEvent(owner, newEmc));
+            updateEmc.add(owner);
         }
 
         return amt;
@@ -144,7 +184,7 @@ public class ManagedEMCManager implements IEMCManager
 
             if (player != null)
             {
-                IKnowledgeProvider knowledge = ProjectEAPI.getTransmutationProxy().getKnowledgeProviderFor(owner);
+                IKnowledgeProvider knowledge = getKnowledgeProvider(owner);
                 knowledge.setEmc(newEmc);
                 markDirty(owner);
             }
@@ -154,7 +194,8 @@ public class ManagedEMCManager implements IEMCManager
             }
 
             lastKnownEmc.put(owner, newEmc);
-            MinecraftForge.EVENT_BUS.post(new EMCChangedEvent(owner, newEmc));
+            //MinecraftForge.EVENT_BUS.post(new EMCChangedEvent(owner, newEmc));
+            updateEmc.add(owner);
         }
     }
 
@@ -178,7 +219,7 @@ public class ManagedEMCManager implements IEMCManager
                 }
                 else
                 {
-                    IKnowledgeProvider knowledge = ProjectEAPI.getTransmutationProxy().getKnowledgeProviderFor(player);
+                    IKnowledgeProvider knowledge = getKnowledgeProvider(player);
                     knowledge.sync(playermp);
                 }
             }
@@ -197,6 +238,13 @@ public class ManagedEMCManager implements IEMCManager
                 getEMC(player); //the event will be fired from within
             }
         }
+
+        for(UUID player : updateEmc)
+        {
+            double emc = lastKnownEmc.get(player);
+
+            MinecraftForge.EVENT_BUS.post(new EMCChangedEvent(player, emc));
+        }
     }
 
     @Override
@@ -212,6 +260,75 @@ public class ManagedEMCManager implements IEMCManager
             EntityPlayerMP player = getEntityPlayerMP(owner);
             knowledge.sync(player);
         }
+    }
+
+    @Override
+    public long getEmcValue(ItemStack stack)
+    {
+        //lock.lock();
+        if(!cacheBlacklist.containsKey(stack.getItem()))
+        {
+            cacheBlacklist.put(stack.getItem(), stack.getMaxDamage() > 0);
+        }
+
+        if(cacheBlacklist.get(stack.getItem()))
+        {
+            return EMCHelper.getEmcValue(stack);
+        }
+
+        try
+        {
+            if (!emcValues.containsKey(stack.getItem()))
+            {
+                long value = EMCHelper.getEmcValue(stack);
+                emcValues.put(stack.getItem(), value);
+            }
+            return emcValues.get(stack.getItem());
+        }
+        finally
+        {
+            //lock.unlock();
+        }
+    }
+
+    @Override
+    public long getEmcSellValue(ItemStack stack)
+    {
+        //lock.lock();
+
+        if(!cacheBlacklist.containsKey(stack.getItem()))
+        {
+            cacheBlacklist.put(stack.getItem(), stack.getMaxDamage() > 0);
+        }
+
+        if(cacheBlacklist.get(stack.getItem()))
+        {
+            return EMCHelper.getEmcSellValue(stack);
+        }
+
+        try
+        {
+            if (!emcValues.containsKey(stack.getItem()))
+            {
+                long value = EMCHelper.getEmcValue(stack);
+                emcValues.put(stack.getItem(), value);
+            }
+
+
+            return (long) (emcValues.get(stack.getItem()) * EMCMapper.covalenceLoss);
+        }
+        finally
+        {
+            //lock.unlock();
+        }
+    }
+
+    private static void bustCache()
+    {
+        //lock.lock();
+        cacheBlacklist.clear();
+        emcValues.clear();
+        //lock.unlock();
     }
 
     private void markDirty(UUID owner)
@@ -254,6 +371,12 @@ public class ManagedEMCManager implements IEMCManager
         {
             manager.playerLoggedIn(owner);
         }
+    }
+
+    @SubscribeEvent
+    public static void onEmcRemap(EMCRemapEvent event)
+    {
+        bustCache();
     }
 
     public static class Factory implements Callable<IEMCManager>
