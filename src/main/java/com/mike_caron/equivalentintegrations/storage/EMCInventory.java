@@ -10,6 +10,7 @@ import moze_intel.projecte.api.event.PlayerKnowledgeChangeEvent;
 import moze_intel.projecte.api.proxy.IEMCProxy;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.gameevent.TickEvent;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,7 +22,6 @@ public class EMCInventory
     private final UUID owner;
     private final ManagedEMCManager emcManager;
     private final IEMCProxy emcProxy;
-    private final IKnowledgeProvider knowledge;
 
     //private double cachedEmc;
 
@@ -35,7 +35,6 @@ public class EMCInventory
         this.owner = owner;
         this.emcManager = manager;
         this.emcProxy = ProjectEAPI.getEMCProxy();
-        this.knowledge = ProjectEAPI.getTransmutationProxy().getKnowledgeProviderFor(owner);
 
         refresh();
     }
@@ -79,7 +78,7 @@ public class EMCInventory
 
         try
         {
-            cachedKnowledge = knowledge.getKnowledge();
+            cachedKnowledge = ProjectEAPI.getTransmutationProxy().getKnowledgeProviderFor(owner).getKnowledge();
             calculateInventory();
             ret = true;
         }
@@ -124,7 +123,13 @@ public class EMCInventory
         }
     }
 
-    public void tick()
+    @SubscribeEvent
+    public void onTick(TickEvent.ServerTickEvent event)
+    {
+        tick();
+    }
+
+    private void tick()
     {
         if(needsRefresh)
         {

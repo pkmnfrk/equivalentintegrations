@@ -288,9 +288,4 @@ public final class EMCItemHandler implements IItemHandlerModifiable
         knowledge.sync((EntityPlayerMP)player);
 
     }
-
-    public void tick()
-    {
-        emcInventory.tick();
-    }
 }

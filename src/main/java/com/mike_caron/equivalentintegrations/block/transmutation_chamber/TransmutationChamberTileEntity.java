@@ -158,8 +158,6 @@ public class TransmutationChamberTileEntity
 
         if(emcItemHandler != null)
         {
-            emcItemHandler.tick();
-
             ticksSinceLastUpdate += 1;
             if (ticksSinceLastUpdate >= 20)
             {
