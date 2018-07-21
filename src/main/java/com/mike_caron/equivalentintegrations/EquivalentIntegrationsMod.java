@@ -77,6 +77,7 @@ public class EquivalentIntegrationsMod {
         evt.registerServerCommand(new CleanupCommand());
         emcManager = new ManagedEMCManager(evt.getServer().getEntityWorld());
         MinecraftForge.EVENT_BUS.register(emcManager);
+        logger.info("Created EMC Manager");
     }
 
     @Mod.EventHandler

@@ -75,33 +75,24 @@ public class TransmutationChamberContainer
 
             if (index < TransmutationChamberItemStackHandler.NUM_SLOTS)
             { //transferring from block -> player
-                EquivalentIntegrationsMod.logger.info("Transferring {} into the player", itemstack1);
                 if (!this.mergeItemStack(itemstack1, TransmutationChamberItemStackHandler.NUM_SLOTS, this.inventorySlots.size(), true)) {
-                    EquivalentIntegrationsMod.logger.info("Transferred {} into the player", itemstack1);
                     return ItemStack.EMPTY;
                 }
             }
             else
             {
-                EquivalentIntegrationsMod.logger.info("Transferring {} into the block", itemstack1);
                 if (!this.mergeItemStack(itemstack1, 0, TransmutationChamberItemStackHandler.NUM_SLOTS, false))
                 { //transferring from player -> block
-                    EquivalentIntegrationsMod.logger.info("Transferred {} into the block", itemstack1);
                     return ItemStack.EMPTY;
                 }
             }
 
-            EquivalentIntegrationsMod.logger.info("Itemstack1: {}", itemstack1);
             if (itemstack1.isEmpty()) {
 
                 slot.putStack(ItemStack.EMPTY);
             } else {
                 slot.onSlotChanged();
             }
-        }
-        else
-        {
-            EquivalentIntegrationsMod.logger.info("Did nothing");
         }
 
         return itemstack;

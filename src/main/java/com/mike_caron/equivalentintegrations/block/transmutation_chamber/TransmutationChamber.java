@@ -58,7 +58,6 @@ public class TransmutationChamber
             return getDefaultState();
         }
 
-        EquivalentIntegrationsMod.logger.info("getActualState: Returning state {}", tileEntity.hasOwner());
         return state.withProperty(ACTIVE, tileEntity.hasOwner());
     }
 

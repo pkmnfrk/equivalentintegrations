@@ -4,9 +4,11 @@ import com.mike_caron.equivalentintegrations.EquivalentIntegrationsMod;
 import com.mike_caron.equivalentintegrations.block.TransmutationTileEntityBase;
 import com.mike_caron.equivalentintegrations.item.SoulboundTalisman;
 import com.mike_caron.equivalentintegrations.storage.EMCItemHandler;
+import com.mike_caron.equivalentintegrations.storage.EmptyItemHandler;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ITickable;
+import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.items.CapabilityItemHandler;
@@ -24,6 +26,8 @@ public class TransmutationChamberTileEntity
     private EMCItemHandler emcItemHandler;
 
     private int ticksSinceLastUpdate = 0;
+
+    private static final EmptyItemHandler emptyInventory = new EmptyItemHandler();
 
     @Nonnull
     @Override
@@ -51,15 +55,18 @@ public class TransmutationChamberTileEntity
     @Override
     protected void onNewOwner(UUID oldOwner)
     {
-        if(world.isRemote) return;
+        if(world == null || world.isRemote) return;
 
-        createEmcItemHandler(owner);
+        createEmcItemHandler(owner, world);
         setTransmutationParameters();
     }
 
-    private void createEmcItemHandler(UUID newOwner)
+    private void createEmcItemHandler(UUID newOwner, World world)
     {
-        if(EquivalentIntegrationsMod.emcManager == null) return;
+        if(EquivalentIntegrationsMod.emcManager == null) {
+            //EquivalentIntegrationsMod.logger.error("EMCManager is null when trying to create item handler!");
+            return;
+        }
 
         if(emcItemHandler != null)
         {
@@ -112,7 +119,7 @@ public class TransmutationChamberTileEntity
     @Override
     public boolean hasCapability(Capability<?> capability, @Nullable EnumFacing facing)
     {
-        if (capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY && facing != null && owner != null)
+        if (capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY && facing != null)
         {
             return true;
         }
@@ -123,9 +130,15 @@ public class TransmutationChamberTileEntity
     @Override
     public <T> T getCapability(Capability<T> capability, @Nullable EnumFacing facing)
     {
-        if (capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY && facing != null && owner != null)
+        //if the facing has an actual value, assume they mean the EMC inventory
+        if (capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY && facing != null)
         {
-            //if the facing has an actual value, assume they mean the EMC inventory
+            //things are weird at world load, it takes a little bit for this to get created
+            if(emcItemHandler == null)
+            {
+                return CapabilityItemHandler.ITEM_HANDLER_CAPABILITY.cast(emptyInventory);
+            }
+
             return CapabilityItemHandler.ITEM_HANDLER_CAPABILITY.cast(emcItemHandler);
         }
         return super.getCapability(capability, facing);
@@ -139,7 +152,8 @@ public class TransmutationChamberTileEntity
         if(emcItemHandler == null && owner != null)
         {
             //things can get weird right at world load, so this is a fallback just in case
-            createEmcItemHandler(owner);
+            createEmcItemHandler(owner, world);
+            notifyUpdate();
         }
 
         if(emcItemHandler != null)

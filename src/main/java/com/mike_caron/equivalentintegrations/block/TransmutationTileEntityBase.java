@@ -10,6 +10,7 @@ import net.minecraft.network.NetworkManager;
 import net.minecraft.network.play.server.SPacketUpdateTileEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.world.World;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.ItemStackHandler;
@@ -85,17 +86,20 @@ public abstract class TransmutationTileEntityBase extends TileEntity
             UUID oldOwner = owner;
 
             this.owner = newOwner;
-            this.markDirty();
+
+            onNewOwner(oldOwner);
+
             if(world != null)
             {
-
-                onNewOwner(oldOwner);
+                this.markDirty();
 
                 IBlockState state = world.getBlockState(pos);
                 world.notifyBlockUpdate(getPos(), state, state, 3);
                 world.notifyNeighborsOfStateChange(getPos(), state.getBlock(), true);
             }
         }
+
+        //initialized = true;
     }
 
     @Override
@@ -110,7 +114,7 @@ public abstract class TransmutationTileEntityBase extends TileEntity
         super.readFromNBT(compound);
 
         if (compound.hasKey("owner"))
-        {
+            {
             setOwner(UUID.fromString(compound.getString("owner")));
         }
         else
@@ -184,4 +188,6 @@ public abstract class TransmutationTileEntityBase extends TileEntity
         IBlockState state = world.getBlockState(pos);
         world.notifyBlockUpdate(pos, state, state, 3);
     }
+
+
 }
