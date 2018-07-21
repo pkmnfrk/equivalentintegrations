@@ -11,6 +11,7 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.ItemStackHandler;
+import scala.collection.parallel.ParIterableLike;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -52,17 +53,25 @@ public class TransmutationChamberTileEntity
     {
         if(world.isRemote) return;
 
-        if (owner != null)
-        {
-            createEmcItemHandler(owner);
-            setTransmutationParameters();
-        }
+        createEmcItemHandler(owner);
+        setTransmutationParameters();
     }
 
     private void createEmcItemHandler(UUID newOwner)
     {
-        emcItemHandler = new EMCItemHandler(newOwner, world);
-        MinecraftForge.EVENT_BUS.register(emcItemHandler);
+        if(EquivalentIntegrationsMod.emcManager == null) return;
+
+        if(emcItemHandler != null)
+        {
+            MinecraftForge.EVENT_BUS.unregister(emcItemHandler);
+            emcItemHandler = null;
+        }
+
+        if(newOwner != null)
+        {
+            emcItemHandler = new EMCItemHandler(newOwner, world);
+            MinecraftForge.EVENT_BUS.register(emcItemHandler);
+        }
     }
 
     private int getEfficiencyThreshold()
@@ -98,12 +107,6 @@ public class TransmutationChamberTileEntity
 
         emcItemHandler.setCanLearn(getCanLearn());
         emcItemHandler.setEfficiencyThreshold(getEfficiencyThreshold());
-    }
-
-    private void destroyEmcItemHandler()
-    {
-        MinecraftForge.EVENT_BUS.unregister(emcItemHandler);
-        emcItemHandler = null;
     }
 
     @Override

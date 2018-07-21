@@ -1,9 +1,7 @@
 package com.mike_caron.equivalentintegrations.block.transmutation_generator;
 
 import com.mike_caron.equivalentintegrations.EquivalentIntegrationsMod;
-import com.mike_caron.equivalentintegrations.api.capabilities.IEMCManager;
 import com.mike_caron.equivalentintegrations.block.TransmutationTileEntityBase;
-import com.mike_caron.equivalentintegrations.impl.EMCManagerProvider;
 import com.mike_caron.equivalentintegrations.item.SoulboundTalisman;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.item.ItemStack;
@@ -381,9 +379,11 @@ public class TransmutationGeneratorTileEntity
 
     private void refundEmc(UUID owner)
     {
-        IEMCManager emcManager = world.getCapability(EMCManagerProvider.EMC_MANAGER_CAPABILITY, null);
-        emcManager.setEMC(owner, internalEmcBuffer + emcManager.getEMC(owner));
-        internalEmcBuffer = 0;
+        if(EquivalentIntegrationsMod.emcManager != null)
+        {
+            EquivalentIntegrationsMod.emcManager.depositEMC(owner, (long)internalEmcBuffer);
+            internalEmcBuffer = 0;
+        }
     }
 
     private void fillEmcBuffer()
@@ -392,9 +392,8 @@ public class TransmutationGeneratorTileEntity
 
         float energyModifier = getEfficiency();
         long emcToGet = (long)Math.ceil(powerPerTick * 20 / energyModifier);
-        IEMCManager emcManager = world.getCapability(EMCManagerProvider.EMC_MANAGER_CAPABILITY, null);
 
-        emcToGet = emcManager.withdrawEMC(owner, emcToGet);
+        emcToGet = EquivalentIntegrationsMod.emcManager.withdrawEMC(owner, emcToGet);
 
         internalEmcBuffer += emcToGet;
     }

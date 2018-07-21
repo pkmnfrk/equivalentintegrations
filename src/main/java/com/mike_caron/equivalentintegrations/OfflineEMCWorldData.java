@@ -2,6 +2,7 @@ package com.mike_caron.equivalentintegrations;
 
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.world.World;
+import net.minecraft.world.storage.SaveDataMemoryStorage;
 import net.minecraft.world.storage.WorldSavedData;
 
 import java.util.HashMap;

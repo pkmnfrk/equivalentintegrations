@@ -2,8 +2,8 @@ package com.mike_caron.equivalentintegrations.impl;
 
 import com.mike_caron.equivalentintegrations.EquivalentIntegrationsMod;
 import com.mike_caron.equivalentintegrations.OfflineEMCWorldData;
-import com.mike_caron.equivalentintegrations.api.capabilities.IEMCManager;
 import com.mike_caron.equivalentintegrations.api.events.EMCChangedEvent;
+import com.mike_caron.equivalentintegrations.storage.EMCInventory;
 import moze_intel.projecte.api.ProjectEAPI;
 import moze_intel.projecte.api.capabilities.IKnowledgeProvider;
 import moze_intel.projecte.api.event.EMCRemapEvent;
@@ -33,21 +33,23 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 @Mod.EventBusSubscriber
-public class ManagedEMCManager implements IEMCManager
+public class ManagedEMCManager
 {
     private static int TICK_DELAY = 60;
     private static int EMC_CHECK_DELAY = 5;
 
     private World world;
 
+    private final HashMap<UUID, EMCInventory> emcInventories = new HashMap<>();
+
     private HashMap<UUID, Integer> dirtyPlayers = new HashMap<>();
     private HashMap<UUID, Double> lastKnownEmc = new HashMap<>();
     private HashMap<UUID, IKnowledgeProvider> knowledgeProviders = new HashMap<>();
     private HashSet<UUID> updateEmc = new HashSet<>();
 
-    private static final HashMap<Item, Long> emcValues = new HashMap<>();
-    private static final Lock lock = new ReentrantLock();
-    private static final HashMap<Item, Boolean> cacheBlacklist = new HashMap<>();
+    private final HashMap<Item, Long> emcValues = new HashMap<>();
+    private final Lock lock = new ReentrantLock();
+    private final HashMap<Item, Boolean> cacheBlacklist = new HashMap<>();
 
     private ITransmutationProxy transmutationProxy;
     private IEMCProxy emcProxy;
@@ -62,7 +64,6 @@ public class ManagedEMCManager implements IEMCManager
         emcProxy = ProjectEAPI.getEMCProxy();
     }
 
-    @Override
     public double getEMC(UUID owner)
     {
         double ret = -1D;
@@ -112,7 +113,6 @@ public class ManagedEMCManager implements IEMCManager
         return knowledge;
     }
 
-    @Override
     public void setEMC(UUID owner, double emc)
     {
         double currentEmc = getEMC(owner);
@@ -137,7 +137,6 @@ public class ManagedEMCManager implements IEMCManager
         }
     }
 
-    @Override
     public long withdrawEMC(UUID owner, long amt)
     {
         double currentEmc = getEMC(owner);
@@ -171,7 +170,6 @@ public class ManagedEMCManager implements IEMCManager
         return amt;
     }
 
-    @Override
     public void depositEMC(UUID owner, long amt)
     {
         double currentEmc = getEMC(owner);
@@ -245,9 +243,10 @@ public class ManagedEMCManager implements IEMCManager
 
             MinecraftForge.EVENT_BUS.post(new EMCChangedEvent(player, emc));
         }
+
+        updateEmc.clear();
     }
 
-    @Override
     public void playerLoggedIn(UUID owner)
     {
         OfflineEMCWorldData data = OfflineEMCWorldData.get(FMLCommonHandler.instance().getMinecraftServerInstance().getEntityWorld());
@@ -260,9 +259,9 @@ public class ManagedEMCManager implements IEMCManager
             EntityPlayerMP player = getEntityPlayerMP(owner);
             knowledge.sync(player);
         }
+        knowledgeProviders.remove(owner);
     }
 
-    @Override
     public long getEmcValue(ItemStack stack)
     {
         //lock.lock();
@@ -291,7 +290,6 @@ public class ManagedEMCManager implements IEMCManager
         }
     }
 
-    @Override
     public long getEmcSellValue(ItemStack stack)
     {
         //lock.lock();
@@ -323,7 +321,18 @@ public class ManagedEMCManager implements IEMCManager
         }
     }
 
-    private static void bustCache()
+    public EMCInventory getEMCInventory(UUID owner)
+    {
+        if(!emcInventories.containsKey(owner))
+        {
+            EMCInventory inv = new EMCInventory(owner, this);
+            MinecraftForge.EVENT_BUS.register(inv);
+            emcInventories.put(owner, inv);
+        }
+        return emcInventories.get(owner);
+    }
+
+    private void bustCache()
     {
         //lock.lock();
         cacheBlacklist.clear();
@@ -352,44 +361,30 @@ public class ManagedEMCManager implements IEMCManager
     }
 
     @SubscribeEvent
-    public static void onWorldTick(TickEvent.WorldTickEvent event)
+    public void onWorldTick(TickEvent.WorldTickEvent event)
     {
-        IEMCManager manager = event.world.getCapability(EMCManagerProvider.EMC_MANAGER_CAPABILITY, null);
-
-        if(manager != null) {
-            manager.tick();
-        }
+        tick();
     }
 
     @SubscribeEvent
-    public static void onPlayerLogin(PlayerEvent.PlayerLoggedInEvent event)
+    public void onPlayerLogin(PlayerEvent.PlayerLoggedInEvent event)
     {
         UUID owner = event.player.getUniqueID();
-        IEMCManager manager = event.player.world.getCapability(EMCManagerProvider.EMC_MANAGER_CAPABILITY, null);
 
-        if(manager != null)
-        {
-            manager.playerLoggedIn(owner);
-        }
+        playerLoggedIn(owner);
     }
 
-    @SubscribeEvent
-    public static void onEmcRemap(EMCRemapEvent event)
+    public void onEmcRemap(EMCRemapEvent event)
     {
         bustCache();
     }
 
-    public static class Factory implements Callable<IEMCManager>
+    public void unload()
     {
-
-        @Override
-        public IEMCManager call() throws Exception
+        for(EMCInventory inv : emcInventories.values())
         {
-            MinecraftServer server = FMLCommonHandler.instance().getMinecraftServerInstance();
-            if(server == null)
-                return null;
-
-            return new ManagedEMCManager(server.getEntityWorld());
+            MinecraftForge.EVENT_BUS.unregister(inv);
         }
     }
+
 }

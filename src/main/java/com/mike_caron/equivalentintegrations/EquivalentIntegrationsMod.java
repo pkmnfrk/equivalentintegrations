@@ -1,16 +1,17 @@
 package com.mike_caron.equivalentintegrations;
 
 import com.mike_caron.equivalentintegrations.command.CleanupCommand;
+import com.mike_caron.equivalentintegrations.impl.ManagedEMCManager;
 import com.mike_caron.equivalentintegrations.integrations.MainCompatHandler;
 import com.mike_caron.equivalentintegrations.network.CtoSMessage;
 import com.mike_caron.equivalentintegrations.network.PacketHandlerServer;
+import com.mike_caron.equivalentintegrations.proxy.IModProxy;
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.SidedProxy;
-import net.minecraftforge.fml.common.event.FMLInitializationEvent;
-import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
-import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
-import com.mike_caron.equivalentintegrations.proxy.CommonProxy;
-import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
+import net.minecraftforge.fml.common.event.*;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 import net.minecraftforge.fml.relauncher.Side;
@@ -43,9 +44,11 @@ public class EquivalentIntegrationsMod {
             serverSide = "com.mike_caron.equivalentintegrations.proxy.CommonProxy",
             clientSide = "com.mike_caron.equivalentintegrations.proxy.ClientProxy"
     )
-    public static CommonProxy proxy;
+    public static IModProxy proxy;
 
     public static SimpleNetworkWrapper networkWrapper;
+
+    public static ManagedEMCManager emcManager;
 
     @Mod.EventHandler
     public  void preInit(FMLPreInitializationEvent event)
@@ -72,5 +75,16 @@ public class EquivalentIntegrationsMod {
     public void serverLoad(FMLServerStartingEvent evt)
     {
         evt.registerServerCommand(new CleanupCommand());
+        emcManager = new ManagedEMCManager(evt.getServer().getEntityWorld());
+        MinecraftForge.EVENT_BUS.register(emcManager);
     }
+
+    @Mod.EventHandler
+    public void serverUnload(FMLServerStoppingEvent evt)
+    {
+        MinecraftForge.EVENT_BUS.unregister(emcManager);
+        emcManager.unload();
+        emcManager = null;
+    }
+
 }
