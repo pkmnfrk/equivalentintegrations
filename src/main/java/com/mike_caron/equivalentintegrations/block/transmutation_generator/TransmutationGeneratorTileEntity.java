@@ -113,7 +113,8 @@ public class TransmutationGeneratorTileEntity
     @Override
     protected void onNewOwner(UUID oldOwner)
     {
-        if(world.isRemote) return;
+        if(world == null || world.isRemote) return;
+
         //if(!generating) generatedLastTick = false;
         if(oldOwner != null && internalEmcBuffer > 0)
         {
