@@ -1,30 +1,25 @@
 package com.mike_caron.equivalentintegrations.block.transmutation_generator;
 
+import com.mike_caron.equivalentintegrations.ModConfig;
 import com.mike_caron.equivalentintegrations.EquivalentIntegrationsMod;
 import com.mike_caron.equivalentintegrations.block.TransmutationTileEntityBase;
 import com.mike_caron.equivalentintegrations.item.SoulboundTalisman;
-import net.minecraft.block.state.IBlockState;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ITickable;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.energy.CapabilityEnergy;
-import net.minecraftforge.energy.EnergyStorage;
 import net.minecraftforge.energy.IEnergyStorage;
 import net.minecraftforge.items.ItemStackHandler;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class TransmutationGeneratorTileEntity
         extends TransmutationTileEntityBase
@@ -44,7 +39,7 @@ public class TransmutationGeneratorTileEntity
     int totalFrames;
     long totalNanoseconds;
 
-    public static float getEfficiency(int num)
+    public static float getEfficiencyRaw(int num)
     {
         switch(num)
         {
@@ -146,7 +141,13 @@ public class TransmutationGeneratorTileEntity
     {
         ItemStack stack = inventory.getStackInSlot(1);
 
-        return getEfficiency(stack.getCount());
+        double mult = ModConfig.generatorEMCMultiplier;
+        if(mult <= 0)
+        {
+            mult = 0.01;
+        }
+
+        return (float)(getEfficiencyRaw(stack.getCount()) / mult);
     }
 
     @Override
@@ -351,7 +352,7 @@ public class TransmutationGeneratorTileEntity
                 energyToGet = powerPerTick;
             }
 
-            double emcToConsume = Math.floor(energyToGet / energyModifier);
+            double emcToConsume = energyToGet / energyModifier;
 
             if(internalEmcBuffer < emcToConsume)
             {

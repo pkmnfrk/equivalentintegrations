@@ -34,3 +34,6 @@ term.equivalentintegrations.produces=Produces:
 term.equivalentintegrations.consumes=Consumes:
 term.equivalentintegrations.fept=FE/t
 term.equivalentintegrations.emcpt=EMC/t
+
+equivalentintegrations.config.title=Config
+equivalentintegrations.config.generatoremcmultiplier=Generator EMC Multiplier
