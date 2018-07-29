@@ -44,7 +44,7 @@ public class ManagedEMCManager
 
     private HashMap<UUID, Integer> dirtyPlayers = new HashMap<>();
     private HashMap<UUID, Double> lastKnownEmc = new HashMap<>();
-    private HashMap<UUID, IKnowledgeProvider> knowledgeProviders = new HashMap<>();
+    //private HashMap<UUID, IKnowledgeProvider> knowledgeProviders = new HashMap<>();
     private HashSet<UUID> updateEmc = new HashSet<>();
 
     private final HashMap<Item, Long> emcValues = new HashMap<>();
@@ -101,15 +101,15 @@ public class ManagedEMCManager
     private IKnowledgeProvider getKnowledgeProvider(UUID owner)
     {
         IKnowledgeProvider knowledge;
-        if(knowledgeProviders.containsKey(owner))
-        {
-            knowledge = knowledgeProviders.get(owner);
-        }
-        else
-        {
+        //if(knowledgeProviders.containsKey(owner))
+        //{
+        //    knowledge = knowledgeProviders.get(owner);
+        //}
+        //else
+        //{
             knowledge = transmutationProxy.getKnowledgeProviderFor(owner);
-            knowledgeProviders.put(owner, knowledge);
-        }
+        //    knowledgeProviders.put(owner, knowledge);
+        //}
         return knowledge;
     }
 
@@ -259,7 +259,7 @@ public class ManagedEMCManager
             EntityPlayerMP player = getEntityPlayerMP(owner);
             knowledge.sync(player);
         }
-        knowledgeProviders.remove(owner);
+        //knowledgeProviders.remove(owner);
     }
 
     public long getEmcValue(ItemStack stack)
