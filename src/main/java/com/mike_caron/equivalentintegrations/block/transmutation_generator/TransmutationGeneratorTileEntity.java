@@ -220,7 +220,7 @@ public class TransmutationGeneratorTileEntity
     @Override
     public void handleUpdateTag(NBTTagCompound tag)
     {
-        EquivalentIntegrationsMod.logger.info("Handling updating tag: {}", tag);
+        //EquivalentIntegrationsMod.logger.info("Handling updating tag: {}", tag);
         super.handleUpdateTag(tag);
     }
 
@@ -246,7 +246,7 @@ public class TransmutationGeneratorTileEntity
 
         if(needsUpdate)
         {
-            EquivalentIntegrationsMod.logger.info("Requesting update for Generator");
+            //EquivalentIntegrationsMod.logger.info("Requesting update for Generator");
             notifyUpdate();
         }
 
@@ -259,7 +259,7 @@ public class TransmutationGeneratorTileEntity
 
         if(timer % 35 == 0)
         {
-            EquivalentIntegrationsMod.logger.info("Avg update microsecond: {}", (totalNanoseconds / totalFrames) / 1000);
+            //EquivalentIntegrationsMod.logger.info("Avg update microsecond: {}", (totalNanoseconds / totalFrames) / 1000);
             totalFrames = 0;
             totalNanoseconds = 0;
         }
