@@ -67,7 +67,7 @@ public class EquivalentIntegrationsMod {
     @Mod.EventHandler
     public void postInit(FMLPostInitializationEvent event) {
         proxy.postInit(event);
-        networkWrapper = NetworkRegistry.INSTANCE.newSimpleChannel(modId);
+        networkWrapper = NetworkRegistry.INSTANCE.newSimpleChannel(modId.substring(0, 20));
         networkWrapper.registerMessage(PacketHandlerServer.class, CtoSMessage.class, 2, Side.SERVER);
     }
 
