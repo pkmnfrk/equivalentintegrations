@@ -24,10 +24,7 @@ import net.minecraftforge.fml.common.gameevent.PlayerEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 
 import javax.annotation.Nullable;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -227,15 +224,16 @@ public class ManagedEMCManager
 
         try
         {
-            Set<UUID> keys = dirtyPlayers.keySet();
-            for (UUID player : keys)
+            Iterator<UUID> keys = dirtyPlayers.keySet().iterator();
+            while(keys.hasNext())
             {
+                UUID player = keys.next();
                 int ticks = dirtyPlayers.get(player);
                 ticks--;
 
                 if (ticks <= 0)
                 {
-                    dirtyPlayers.remove(player);
+                    keys.remove();
 
                     EntityPlayerMP playermp = getEntityPlayerMP(player);
 
