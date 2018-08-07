@@ -115,168 +115,209 @@ public class ManagedEMCManager
 
     public void setEMC(UUID owner, double emc)
     {
-        double currentEmc = getEMC(owner);
-        if(emc != currentEmc)
+        lock.lock();
+        try
         {
-            EntityPlayerMP player = getEntityPlayerMP(owner);
-
-            if (player != null)
+            double currentEmc = getEMC(owner);
+            if (emc != currentEmc)
             {
-                IKnowledgeProvider knowledge = getKnowledgeProvider(owner);
-                knowledge.setEmc(emc);
-                markDirty(owner);
-            }
-            else
-            {
-                OfflineEMCWorldData.get(world).setCachedEMC(owner, emc);
-            }
+                EntityPlayerMP player = getEntityPlayerMP(owner);
 
-            lastKnownEmc.put(owner, emc);
-            //MinecraftForge.EVENT_BUS.post(new EMCChangedEvent(owner, emc));
-            updateEmc.add(owner);
+                if (player != null)
+                {
+                    IKnowledgeProvider knowledge = getKnowledgeProvider(owner);
+                    knowledge.setEmc(emc);
+                    markDirty(owner);
+                }
+                else
+                {
+                    OfflineEMCWorldData.get(world).setCachedEMC(owner, emc);
+                }
+
+                lastKnownEmc.put(owner, emc);
+                //MinecraftForge.EVENT_BUS.post(new EMCChangedEvent(owner, emc));
+                updateEmc.add(owner);
+            }
+        }
+        finally
+        {
+            lock.unlock();
         }
     }
 
     public long withdrawEMC(UUID owner, long amt)
     {
-        double currentEmc = getEMC(owner);
-        if(amt > currentEmc)
+        lock.lock();
+        try
         {
-            amt = (long)currentEmc;
-        }
-
-        double newEmc = currentEmc - amt;
-
-        if(newEmc != currentEmc)
-        {
-            EntityPlayerMP player = getEntityPlayerMP(owner);
-
-            if (player != null)
+            double currentEmc = getEMC(owner);
+            if (amt > currentEmc)
             {
-                IKnowledgeProvider knowledge = getKnowledgeProvider(owner);
-                knowledge.setEmc(newEmc);
-                markDirty(owner);
-            }
-            else
-            {
-                OfflineEMCWorldData.get(world).setCachedEMC(owner, newEmc);
+                amt = (long) currentEmc;
             }
 
-            lastKnownEmc.put(owner, newEmc);
-            //MinecraftForge.EVENT_BUS.post(new EMCChangedEvent(owner, newEmc));
-            updateEmc.add(owner);
-        }
+            double newEmc = currentEmc - amt;
 
-        return amt;
+            if (newEmc != currentEmc)
+            {
+                EntityPlayerMP player = getEntityPlayerMP(owner);
+
+                if (player != null)
+                {
+                    IKnowledgeProvider knowledge = getKnowledgeProvider(owner);
+                    knowledge.setEmc(newEmc);
+                    markDirty(owner);
+                }
+                else
+                {
+                    OfflineEMCWorldData.get(world).setCachedEMC(owner, newEmc);
+                }
+
+                lastKnownEmc.put(owner, newEmc);
+                //MinecraftForge.EVENT_BUS.post(new EMCChangedEvent(owner, newEmc));
+                updateEmc.add(owner);
+            }
+
+            return amt;
+        }
+        finally
+        {
+            lock.unlock();
+        }
     }
 
     public void depositEMC(UUID owner, long amt)
     {
-        double currentEmc = getEMC(owner);
-
-        double newEmc = currentEmc + amt;
-
-        if(newEmc != currentEmc)
+        lock.lock();
+        try
         {
-            EntityPlayerMP player = getEntityPlayerMP(owner);
+            double currentEmc = getEMC(owner);
 
-            if (player != null)
-            {
-                IKnowledgeProvider knowledge = getKnowledgeProvider(owner);
-                knowledge.setEmc(newEmc);
-                markDirty(owner);
-            }
-            else
-            {
-                OfflineEMCWorldData.get(world).setCachedEMC(owner, newEmc);
-            }
+            double newEmc = currentEmc + amt;
 
-            lastKnownEmc.put(owner, newEmc);
-            //MinecraftForge.EVENT_BUS.post(new EMCChangedEvent(owner, newEmc));
-            updateEmc.add(owner);
+            if (newEmc != currentEmc)
+            {
+                EntityPlayerMP player = getEntityPlayerMP(owner);
+
+                if (player != null)
+                {
+                    IKnowledgeProvider knowledge = getKnowledgeProvider(owner);
+                    knowledge.setEmc(newEmc);
+                    markDirty(owner);
+                }
+                else
+                {
+                    OfflineEMCWorldData.get(world).setCachedEMC(owner, newEmc);
+                }
+
+                lastKnownEmc.put(owner, newEmc);
+                //MinecraftForge.EVENT_BUS.post(new EMCChangedEvent(owner, newEmc));
+                updateEmc.add(owner);
+            }
+        }
+        finally
+        {
+            lock.unlock();
         }
     }
 
     public void tick()
     {
-        Set<UUID> keys = dirtyPlayers.keySet();
-        for(UUID player : keys)
+        lock.lock();
+
+        try
         {
-            int ticks = dirtyPlayers.get(player);
-            ticks--;
-
-            if (ticks <= 0)
+            Set<UUID> keys = dirtyPlayers.keySet();
+            for (UUID player : keys)
             {
-                dirtyPlayers.remove(player);
+                int ticks = dirtyPlayers.get(player);
+                ticks--;
 
-                EntityPlayerMP playermp = getEntityPlayerMP(player);
-
-                if (playermp == null)
+                if (ticks <= 0)
                 {
-                    //they went offline... no problem
+                    dirtyPlayers.remove(player);
+
+                    EntityPlayerMP playermp = getEntityPlayerMP(player);
+
+                    if (playermp == null)
+                    {
+                        //they went offline... no problem
+                    }
+                    else
+                    {
+                        IKnowledgeProvider knowledge = getKnowledgeProvider(player);
+                        knowledge.sync(playermp);
+                    }
                 }
                 else
                 {
-                    IKnowledgeProvider knowledge = getKnowledgeProvider(player);
-                    knowledge.sync(playermp);
+                    dirtyPlayers.put(player, ticks);
                 }
             }
-            else
+
+            if (--emcCheckTimer <= 0)
             {
-                dirtyPlayers.put(player, ticks);
+                emcCheckTimer = EMC_CHECK_DELAY;
+
+                for (UUID player : lastKnownEmc.keySet())
+                {
+                    getEMC(player); //the event will be fired from within
+                }
             }
-        }
 
-        if(--emcCheckTimer <= 0)
-        {
-            emcCheckTimer = EMC_CHECK_DELAY;
-
-            for(UUID player : lastKnownEmc.keySet())
+            for (UUID player : updateEmc)
             {
-                getEMC(player); //the event will be fired from within
+                double emc = lastKnownEmc.get(player);
+
+                MinecraftForge.EVENT_BUS.post(new EMCChangedEvent(player, emc));
             }
-        }
 
-        for(UUID player : updateEmc)
+            updateEmc.clear();
+        }
+        finally
         {
-            double emc = lastKnownEmc.get(player);
-
-            MinecraftForge.EVENT_BUS.post(new EMCChangedEvent(player, emc));
+            lock.unlock();
         }
-
-        updateEmc.clear();
     }
 
     public void playerLoggedIn(UUID owner)
     {
-        OfflineEMCWorldData data = OfflineEMCWorldData.get(FMLCommonHandler.instance().getMinecraftServerInstance().getEntityWorld());
-        if(data.hasCachedEMC(owner))
+        lock.lock();
+        try
         {
-            IKnowledgeProvider knowledge = ProjectEAPI.getTransmutationProxy().getKnowledgeProviderFor(owner);
-            knowledge.setEmc(data.getCachedEMC(owner));
-            data.clearCachedEMC(owner);
+            OfflineEMCWorldData data = OfflineEMCWorldData.get(FMLCommonHandler.instance().getMinecraftServerInstance().getEntityWorld());
+            if (data.hasCachedEMC(owner))
+            {
+                IKnowledgeProvider knowledge = ProjectEAPI.getTransmutationProxy().getKnowledgeProviderFor(owner);
+                knowledge.setEmc(data.getCachedEMC(owner));
+                data.clearCachedEMC(owner);
 
-            EntityPlayerMP player = getEntityPlayerMP(owner);
-            knowledge.sync(player);
+                EntityPlayerMP player = getEntityPlayerMP(owner);
+                knowledge.sync(player);
+            }
+            //knowledgeProviders.remove(owner);
         }
-        //knowledgeProviders.remove(owner);
+        finally
+        {
+            lock.lock();
+        }
     }
 
     public long getEmcValue(ItemStack stack)
     {
-        //lock.lock();
-        if(!cacheBlacklist.containsKey(stack.getItem()))
-        {
-            cacheBlacklist.put(stack.getItem(), stack.getMaxDamage() > 0);
-        }
-
-        if(cacheBlacklist.get(stack.getItem()))
-        {
-            return EMCHelper.getEmcValue(stack);
-        }
-
+        lock.lock();
         try
         {
+            if(!cacheBlacklist.containsKey(stack.getItem()))
+            {
+                cacheBlacklist.put(stack.getItem(), stack.getMaxDamage() > 0);
+            }
+
+            if(cacheBlacklist.get(stack.getItem()))
+            {
+                return EMCHelper.getEmcValue(stack);
+            }
+
             if (!emcValues.containsKey(stack.getItem()))
             {
                 long value = EMCHelper.getEmcValue(stack);
@@ -286,26 +327,26 @@ public class ManagedEMCManager
         }
         finally
         {
-            //lock.unlock();
+            lock.unlock();
         }
     }
 
     public long getEmcSellValue(ItemStack stack)
     {
-        //lock.lock();
-
-        if(!cacheBlacklist.containsKey(stack.getItem()))
-        {
-            cacheBlacklist.put(stack.getItem(), stack.getMaxDamage() > 0);
-        }
-
-        if(cacheBlacklist.get(stack.getItem()))
-        {
-            return EMCHelper.getEmcSellValue(stack);
-        }
+        lock.lock();
 
         try
         {
+            if(!cacheBlacklist.containsKey(stack.getItem()))
+            {
+                cacheBlacklist.put(stack.getItem(), stack.getMaxDamage() > 0);
+            }
+
+            if(cacheBlacklist.get(stack.getItem()))
+            {
+                return EMCHelper.getEmcSellValue(stack);
+            }
+
             if (!emcValues.containsKey(stack.getItem()))
             {
                 long value = EMCHelper.getEmcValue(stack);
@@ -317,27 +358,41 @@ public class ManagedEMCManager
         }
         finally
         {
-            //lock.unlock();
+            lock.unlock();
         }
     }
 
     public EMCInventory getEMCInventory(UUID owner)
     {
-        if(!emcInventories.containsKey(owner))
+        lock.lock();
+        try
         {
-            EMCInventory inv = new EMCInventory(owner, this);
-            MinecraftForge.EVENT_BUS.register(inv);
-            emcInventories.put(owner, inv);
+            if (!emcInventories.containsKey(owner))
+            {
+                EMCInventory inv = new EMCInventory(owner, this);
+                MinecraftForge.EVENT_BUS.register(inv);
+                emcInventories.put(owner, inv);
+            }
+            return emcInventories.get(owner);
         }
-        return emcInventories.get(owner);
+        finally
+        {
+            lock.unlock();
+        }
     }
 
     private void bustCache()
     {
-        //lock.lock();
-        cacheBlacklist.clear();
-        emcValues.clear();
-        //lock.unlock();
+        lock.lock();
+        try
+        {
+            cacheBlacklist.clear();
+            emcValues.clear();
+        }
+        finally
+        {
+            lock.unlock();
+        }
     }
 
     private void markDirty(UUID owner)
@@ -381,9 +436,17 @@ public class ManagedEMCManager
 
     public void unload()
     {
-        for(EMCInventory inv : emcInventories.values())
+        lock.lock();
+        try
         {
-            MinecraftForge.EVENT_BUS.unregister(inv);
+            for (EMCInventory inv : emcInventories.values())
+            {
+                MinecraftForge.EVENT_BUS.unregister(inv);
+            }
+        }
+        finally
+        {
+            lock.unlock();
         }
     }
 
