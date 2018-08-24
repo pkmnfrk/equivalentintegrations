@@ -44,9 +44,9 @@ public class ManagedEMCManager
     //private HashMap<UUID, IKnowledgeProvider> knowledgeProviders = new HashMap<>();
     private HashSet<UUID> updateEmc = new HashSet<>();
 
-    private final HashMap<Item, Long> emcValues = new HashMap<>();
+    //private final HashMap<ItemStack, Long> emcValues = new HashMap<>();
     private final Lock lock = new ReentrantLock();
-    private final HashMap<Item, Boolean> cacheBlacklist = new HashMap<>();
+    //private final HashMap<ItemStack, Boolean> cacheBlacklist = new HashMap<>();
 
     private ITransmutationProxy transmutationProxy;
     private IEMCProxy emcProxy;
@@ -303,6 +303,8 @@ public class ManagedEMCManager
 
     public long getEmcValue(ItemStack stack)
     {
+        return EMCHelper.getEmcValue(stack);
+        /*
         lock.lock();
         try
         {
@@ -327,37 +329,40 @@ public class ManagedEMCManager
         {
             lock.unlock();
         }
+        */
     }
 
     public long getEmcSellValue(ItemStack stack)
     {
+        return EMCHelper.getEmcSellValue(stack);
+        /*ItemStack idealStack = getIdeal(stack);
         lock.lock();
 
         try
         {
-            if(!cacheBlacklist.containsKey(stack.getItem()))
+            if(!cacheBlacklist.containsKey(idealStack))
             {
-                cacheBlacklist.put(stack.getItem(), stack.getMaxDamage() > 0);
+                cacheBlacklist.put(idealStack, idealStack.getMaxDamage() > 0);
             }
 
-            if(cacheBlacklist.get(stack.getItem()))
+            if(cacheBlacklist.get(idealStack))
             {
                 return EMCHelper.getEmcSellValue(stack);
             }
 
-            if (!emcValues.containsKey(stack.getItem()))
+            if (!emcValues.containsKey(idealStack))
             {
-                long value = EMCHelper.getEmcValue(stack);
-                emcValues.put(stack.getItem(), value);
+                long value = EMCHelper.getEmcValue(idealStack);
+                emcValues.put(idealStack, value);
             }
 
 
-            return (long) (emcValues.get(stack.getItem()) * EMCMapper.covalenceLoss);
+            return (long) (emcValues.get(stack) * EMCMapper.covalenceLoss);
         }
         finally
         {
             lock.unlock();
-        }
+        }*/
     }
 
     public EMCInventory getEMCInventory(UUID owner)
@@ -381,16 +386,18 @@ public class ManagedEMCManager
 
     private void bustCache()
     {
+        /*
         lock.lock();
         try
         {
-            cacheBlacklist.clear();
-            emcValues.clear();
+            //cacheBlacklist.clear();
+            //emcValues.clear();
         }
         finally
         {
             lock.unlock();
         }
+        */
     }
 
     private void markDirty(UUID owner)
@@ -446,6 +453,18 @@ public class ManagedEMCManager
         {
             lock.unlock();
         }
+    }
+
+    private ItemStack getIdeal(ItemStack stack)
+    {
+        ItemStack idealStack = stack;
+        if(idealStack.getCount() != 1 || idealStack.getItemDamage() != 0)
+        {
+            idealStack = idealStack.copy();
+            idealStack.setItemDamage(0);
+            idealStack.setCount(1);
+        }
+        return idealStack;
     }
 
 }
