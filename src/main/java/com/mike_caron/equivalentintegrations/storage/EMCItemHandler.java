@@ -110,7 +110,7 @@ public final class EMCItemHandler implements IItemHandlerModifiable
     {
         long startTime = System.nanoTime();
 
-        if(slot < 0 || slot >= emcInventory.realSize())
+        if(slot < 0 || slot >= emcInventory.getSlots())
         {
             return stack;
         }
