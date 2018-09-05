@@ -28,7 +28,8 @@ import org.lwjgl.Sys;
 import javax.annotation.Nonnull;
 import java.util.*;
 
-public final class EMCItemHandler implements IItemHandlerModifiable
+public final class EMCItemHandler
+    implements IItemHandlerModifiable, IEMCInventory
 {
     @Nonnull
     private final UUID owner;
@@ -174,19 +175,10 @@ public final class EMCItemHandler implements IItemHandlerModifiable
         return stack;
     }
 
-    @Nonnull
-    @Override
-    public ItemStack extractItem(int slot, int amount, boolean simulate)
+    public ItemStack extractItem(ItemStack desired, boolean simulate)
     {
-        if(slot < 0 || slot >= emcInventory.realSize())
-        {
-            return ItemStack.EMPTY;
-        }
-
         double emc = emcManager.getEMC(owner);
 
-        //first off, what's in this stack?
-        ItemStack desired = emcInventory.getStackInSlot(slot);
         long emcCost = emcManager.getEmcValue(desired);
 
         if(emcCost == 0)
@@ -194,7 +186,7 @@ public final class EMCItemHandler implements IItemHandlerModifiable
             return ItemStack.EMPTY;
         }
 
-        int actualAmount = amount;
+        int actualAmount = desired.getCount();
 
         //are we even capable of servicing this request?
         long desiredEMC = actualAmount * emcCost;
@@ -227,6 +219,21 @@ public final class EMCItemHandler implements IItemHandlerModifiable
         }
 
         return ret;
+    }
+
+    @Nonnull
+    @Override
+    public ItemStack extractItem(int slot, int amount, boolean simulate)
+    {
+        if(slot < 0 || slot >= emcInventory.realSize())
+        {
+            return ItemStack.EMPTY;
+        }
+
+        //first off, what's in this stack?
+        ItemStack desired = emcInventory.getStackInSlot(slot);
+
+        return extractItem(desired, simulate);
     }
 
     private int getEfficiencyCost(ItemStack stack, long emcCost)
@@ -287,5 +294,10 @@ public final class EMCItemHandler implements IItemHandlerModifiable
 
         knowledge.sync((EntityPlayerMP)player);
 
+    }
+
+    public Collection<ItemStack> getCachedInventory()
+    {
+        return emcInventory.getCachedInventory();
     }
 }

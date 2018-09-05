@@ -13,6 +13,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
@@ -219,5 +220,10 @@ public class EMCInventory
         {
             return (int) tmp;
         }
+    }
+
+    public Collection<ItemStack> getCachedInventory()
+    {
+        return cachedInventory;
     }
 }

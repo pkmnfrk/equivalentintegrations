@@ -4,8 +4,10 @@ import net.minecraft.item.ItemStack;
 import net.minecraftforge.items.IItemHandler;
 
 import javax.annotation.Nonnull;
+import java.util.Collection;
+import java.util.Collections;
 
-public class EmptyItemHandler implements IItemHandler
+public class EmptyItemHandler implements IItemHandler, IEMCInventory
 {
     @Override
     public int getSlots()
@@ -38,5 +40,11 @@ public class EmptyItemHandler implements IItemHandler
     public int getSlotLimit(int slot)
     {
         return 0;
+    }
+
+    @Override
+    public Collection<ItemStack> getCachedInventory()
+    {
+        return Collections.emptySet();
     }
 }
