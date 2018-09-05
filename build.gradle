@@ -42,11 +42,16 @@ repositories {
         name "Mobius Repo"
         url "http://tehnut.info/maven"
     }
+    maven {
+        name "RefinedStorage Repo"
+        url "https://repo.raoulvdberge.com/"
+    }
     ivy {
         name 'ProjectE'
         ivyPattern "https://maven.tterrag.com/[module]-[revision].[ext]"
         artifactPattern "http://media.forgecdn.net/files/${pe_cf}/[module]-[revision].[ext]"
     }
+
 }
 
 dependencies {
@@ -55,6 +60,8 @@ dependencies {
     deobfCompile ("mcjty.theoneprobe:TheOneProbe-1.12:${top_version}"){
         transitive = false
     }
+
+    provided "refinedstorage:refinedstorage:${rs_version}:api"
 
     // you may put jars on which you depend on in ./libs
     // or you may define them like so..
