@@ -1,5 +1,6 @@
 package com.mike_caron.equivalentintegrations.integrations;
 
+import com.mike_caron.equivalentintegrations.integrations.refinedstorage.RefinedStorageCompatibility;
 import net.minecraftforge.fml.common.Loader;
 
 public class MainCompatHandler
@@ -8,6 +9,12 @@ public class MainCompatHandler
     {
         registerTOP();
         registerWaila();
+
+    }
+
+    public static void registerAllLate()
+    {
+        registerRefinedStorage();
     }
 
     public static void registerTOP()
@@ -23,6 +30,14 @@ public class MainCompatHandler
         if(Loader.isModLoaded("waila"))
         {
             WailaCompatibility.register();
+        }
+    }
+
+    public static void registerRefinedStorage()
+    {
+        if(Loader.isModLoaded("refinedstorage"))
+        {
+            RefinedStorageCompatibility.register();
         }
     }
 }

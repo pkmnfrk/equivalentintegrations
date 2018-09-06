@@ -24,7 +24,7 @@ import org.apache.logging.log4j.Logger;
         name = EquivalentIntegrationsMod.name,
         version = EquivalentIntegrationsMod.version,
         acceptedMinecraftVersions = "[1.12.2]",
-        dependencies = "required-after:projecte@[1.12-PE1.3.1,)"
+        dependencies = "required-after:projecte@[1.12-PE1.3.1,);before:refinedstorage"
 )
 @Mod.EventBusSubscriber
 public class EquivalentIntegrationsMod {
@@ -67,6 +67,9 @@ public class EquivalentIntegrationsMod {
     @Mod.EventHandler
     public void postInit(FMLPostInitializationEvent event) {
         proxy.postInit(event);
+
+        MainCompatHandler.registerAllLate();
+
         networkWrapper = NetworkRegistry.INSTANCE.newSimpleChannel(modId.substring(0, 20));
         networkWrapper.registerMessage(PacketHandlerServer.class, CtoSMessage.class, 2, Side.SERVER);
     }
