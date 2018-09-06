@@ -18,7 +18,7 @@ public class AlchemicalAlgorithms extends ItemBase
     public AlchemicalAlgorithms()
     {
         setRegistryName(id);
-        setUnlocalizedName(id);
+        setTranslationKey(id);
         setMaxStackSize(1);
     }
 

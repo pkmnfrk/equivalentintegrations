@@ -27,7 +27,7 @@ public class SoulboundTalisman extends ItemBase
     public SoulboundTalisman()
     {
         setRegistryName(id);
-        setUnlocalizedName(id);
+        setTranslationKey(id);
     }
 
     @Override

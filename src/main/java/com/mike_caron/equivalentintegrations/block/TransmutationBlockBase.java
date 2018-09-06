@@ -37,7 +37,7 @@ public abstract class TransmutationBlockBase
         super(Material.IRON);
         setHardness(4);
         setRegistryName(id);
-        setUnlocalizedName(id);
+        setTranslationKey(id);
         setHarvestLevel("pickaxe", 1);
 
 

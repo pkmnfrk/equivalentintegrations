@@ -18,7 +18,7 @@ public class EfficiencyCatalyst extends ItemBase
     public EfficiencyCatalyst()
     {
         setRegistryName(id);
-        setUnlocalizedName(id);
+        setTranslationKey(id);
         setMaxStackSize(4);
     }
 
