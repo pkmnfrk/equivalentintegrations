@@ -22,6 +22,7 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.asm.transformers.ItemStackTransformer;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.items.IItemHandlerModifiable;
+import net.minecraftforge.items.ItemHandlerHelper;
 import net.minecraftforge.items.ItemStackHandler;
 import org.lwjgl.Sys;
 
@@ -232,6 +233,11 @@ public final class EMCItemHandler
 
         //first off, what's in this stack?
         ItemStack desired = emcInventory.getStackInSlot(slot);
+
+        if(desired.getCount() != amount)
+        {
+            desired = ItemHandlerHelper.copyStackWithSize(desired, amount);
+        }
 
         return extractItem(desired, simulate);
     }
