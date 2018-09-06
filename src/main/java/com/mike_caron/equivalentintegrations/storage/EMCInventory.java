@@ -1,6 +1,7 @@
 package com.mike_caron.equivalentintegrations.storage;
 
 import com.mike_caron.equivalentintegrations.EquivalentIntegrationsMod;
+import com.mike_caron.equivalentintegrations.ModConfig;
 import com.mike_caron.equivalentintegrations.api.events.EMCChangedEvent;
 import com.mike_caron.equivalentintegrations.impl.ManagedEMCManager;
 import moze_intel.projecte.api.ProjectEAPI;
@@ -19,7 +20,6 @@ import java.util.UUID;
 
 public class EMCInventory
 {
-
     private final UUID owner;
     private final ManagedEMCManager emcManager;
     private final IEMCProxy emcProxy;
@@ -209,12 +209,14 @@ public class EMCInventory
 
     private static int howManyCanWeMake(double emc, long cost)
     {
+        int cap = ModConfig.maximumExposedStackSize;
+
         if(cost == 0) return 0;
         long tmp = Math.floorDiv((long) emc, cost);
-        if (tmp > Integer.MAX_VALUE)
+        if (tmp > cap)
         {
             // er, let's cap it at that, shall we?
-            return Integer.MAX_VALUE;
+            return cap;
         }
         else
         {

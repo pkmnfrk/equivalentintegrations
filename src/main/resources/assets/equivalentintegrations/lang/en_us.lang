@@ -37,3 +37,4 @@ term.equivalentintegrations.emcpt=EMC/t
 
 equivalentintegrations.config.title=Config
 equivalentintegrations.config.generatoremcmultiplier=Generator EMC Multiplier
+equivalentintegrations.config.maximumexposedstacksize=Maximum Exposed Stack Size

@@ -19,6 +19,11 @@ public class ModConfig
     @Config.LangKey("equivalentintegrations.config.generatoremcmultiplier")
     public static double generatorEMCMultiplier = 1.0;
 
+    @Config.Comment("The maximum amount of a single item to expose, even if you have enough EMC to make more.")
+    @Config.RangeInt(min = 64)
+    @Config.LangKey("equivalentintegrations.config.maximumexposedstacksize")
+    public static int maximumExposedStackSize = 1000000;
+
     @Mod.EventBusSubscriber(modid = EquivalentIntegrationsMod.modId)
     private static class EventHandler
     {
