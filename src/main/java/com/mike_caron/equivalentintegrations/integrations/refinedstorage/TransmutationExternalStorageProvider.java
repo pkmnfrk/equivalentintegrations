@@ -1,5 +1,6 @@
 package com.mike_caron.equivalentintegrations.integrations.refinedstorage;
 
+import com.mike_caron.equivalentintegrations.EquivalentIntegrationsMod;
 import com.mike_caron.equivalentintegrations.block.transmutation_chamber.TransmutationChamberTileEntity;
 import com.mike_caron.equivalentintegrations.storage.EMCInventory;
 import com.mike_caron.equivalentintegrations.storage.EMCItemHandler;
@@ -17,17 +18,25 @@ import net.minecraft.util.EnumFacing;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemHandlerHelper;
+import org.lwjgl.Sys;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.*;
 import java.util.function.BinaryOperator;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 public class TransmutationExternalStorageProvider
     implements IExternalStorageProvider<ItemStack>
 {
     Map<TileEntity, IStorageExternal<ItemStack>> providers = new HashMap<>();
+
+    @Override
+    public int getPriority()
+    {
+        return 10;
+    }
 
     @Override
     public boolean canProvide(TileEntity tileEntity, EnumFacing enumFacing)
@@ -57,6 +66,9 @@ public class TransmutationExternalStorageProvider
         private IExternalStorageContext context;
         private List<ItemStack> cache;
 
+        private long updateTime, flushTime;
+        private int updateCount, changedCount;
+
         public Implementation(IExternalStorageContext context, TransmutationChamberTileEntity te)
         {
             this.context = context;
@@ -82,9 +94,12 @@ public class TransmutationExternalStorageProvider
                 return;
             }
 
-
+            long updateStart = System.nanoTime();
 
             List<ItemStack> newStacks = new ArrayList<>(getStacks());
+            //List<ItemStack> newStacks = getStacks().stream().map(ItemStack::copy).collect(Collectors.toList());
+
+            int changed = 0;
 
             for(int i = 0; i < newStacks.size(); i++)
             {
@@ -95,6 +110,7 @@ public class TransmutationExternalStorageProvider
                     if(!actual.isEmpty())
                     {
                         iNetwork.getItemStorageCache().add(actual, actual.getCount(), false, true);
+                        changed += 1;
                     }
 
                     continue;
@@ -105,20 +121,23 @@ public class TransmutationExternalStorageProvider
                 if(!cached.isEmpty() && actual.isEmpty())
                 {
                     iNetwork.getItemStorageCache().remove(cached, cached.getCount(), true);
+                    changed += 1;
                 }
                 else if(cached.isEmpty() && !actual.isEmpty())
                 {
                     iNetwork.getItemStorageCache().add(actual, actual.getCount(), false, true);
+                    changed += 1;
                 }
                 else //noinspection StatementWithEmptyBody
                     if (cached.isEmpty() && actual.isEmpty())
                 {
                     // this space left blank
                 }
-                else if(!ItemStack.areItemStacksEqual(actual, cached))
+                else if(!ItemStack.areItemsEqual(actual, cached))
                 {
                     iNetwork.getItemStorageCache().remove(cached, cached.getCount(), true);
                     iNetwork.getItemStorageCache().add(actual, actual.getCount(), false, true);
+                    changed += 2;
                 }
                 else if(cached.getCount() != actual.getCount())
                 {
@@ -127,10 +146,12 @@ public class TransmutationExternalStorageProvider
                     if(delta > 0)
                     {
                         iNetwork.getItemStorageCache().add(actual, delta, false, true);
+                        changed += 1;
                     }
                     else
                     {
                         iNetwork.getItemStorageCache().remove(actual, -delta, true);
+                        changed += 1;
                     }
                 }
             }
@@ -140,14 +161,34 @@ public class TransmutationExternalStorageProvider
                 for (int i = newStacks.size(); i < cache.size(); ++i) {
                     if (!cache.get(i).isEmpty()) {
                         iNetwork.getItemStorageCache().remove(cache.get(i), cache.get(i).getCount(), true);
+                        changed += 1;
                     }
                 }
             }
 
             this.cache = newStacks;
 
+            long updateEnd = System.nanoTime();
+
             iNetwork.getItemStorageCache().flush();
 
+            long flushEnd = System.nanoTime();
+
+            updateTime += (updateEnd - updateStart);
+            flushTime += (flushEnd - updateEnd);
+            changedCount += changed;
+
+            updateCount += 1;
+
+            if(updateCount >= 20)
+            {
+                updateCount = 0;
+                EquivalentIntegrationsMod.logger.info("Update: {}, Flush: {}, Change Count: {}", updateTime / 20000, flushTime / 20000, changedCount);
+
+                changedCount = 0;
+                updateTime = 0;
+                flushTime = 0;
+            }
 
         }
 
@@ -187,7 +228,12 @@ public class TransmutationExternalStorageProvider
                     itemStack = ItemHandlerHelper.copyStackWithSize(itemStack, size);
                 }
 
-                return itemHandler.insertItem(0, itemStack, action == Action.SIMULATE);
+                ItemStack ret = itemHandler.insertItem(0, itemStack, action == Action.SIMULATE);
+
+                if(ret.isEmpty())
+                {
+                    return null;
+                }
             }
 
             return itemStack;

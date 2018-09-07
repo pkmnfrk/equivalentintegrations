@@ -176,18 +176,18 @@ public class EMCInventory
             {
                 if (ix < cachedInventory.size())
                 {
-                    ItemStack cached = cachedInventory.get(ix);
+                    //ItemStack cached = cachedInventory.get(ix);
 
-                    if (cached.getItem() == is.getItem())
-                    {
-                        cached.setCount(num);
-                        updated ++;
-                    }
-                    else
-                    {
+                    //if (cached.getItem() == is.getItem())
+                    //{
+                    //    cached.setCount(num);
+                    //    updated ++;
+                    //}
+                    //else
+                    //{
                         cachedInventory.set(ix, new ItemStack(is.getItem(), num, is.getMetadata(), is.getTagCompound()));
                         overwrote ++;
-                    }
+                    //}
                 }
                 else
                 {
