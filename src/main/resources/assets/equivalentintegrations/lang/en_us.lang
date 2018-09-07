@@ -17,6 +17,8 @@ container.transmutation_chamber.title=Transmutation Chamber
 #trailing space!
 container.transmutation_chamber.efficiency=Threshold:
 container.transmutation_chamber.efficiency_inf=Unlimited
+container.transmutation_chamber.forbidnbt=If forbidden, items with extra data (NBT) attached will not be allowed to be inserted.
+container.transmutation_chamber.forbiddamaged=If forbidden, items with damage will not be allowed to be inserted.
 
 container.transmutation_generator.title=Transmutation Generator
 container.transmutation_generator.mod1=CTRL - x 10

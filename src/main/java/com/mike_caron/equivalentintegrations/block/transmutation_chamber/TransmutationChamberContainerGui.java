@@ -55,6 +55,24 @@ public class TransmutationChamberContainerGui extends GuiContainer
     }
 
     @Override
+    protected void renderHoveredToolTip(int mouseX, int mouseY)
+    {
+        super.renderHoveredToolTip(mouseX, mouseY);
+
+        if(mouseX - guiLeft >= 148 && mouseX - guiLeft < 166)
+        {
+            if(mouseY - guiTop >= 21 && mouseY - guiTop < 39)
+            {
+                this.drawHoveringText(new TextComponentTranslation("container.transmutation_chamber.forbidnbt").getFormattedText(), mouseX, mouseY);
+            }
+            else if(mouseY - guiTop >= 41 && mouseY - guiTop < 59)
+            {
+                this.drawHoveringText(new TextComponentTranslation("container.transmutation_chamber.forbiddamaged").getFormattedText(), mouseX, mouseY);
+            }
+        }
+    }
+
+    @Override
     public void drawScreen(int mouseX, int mouseY, float partialTicks)
     {
         this.drawDefaultBackground();
