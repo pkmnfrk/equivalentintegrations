@@ -30,7 +30,7 @@ import org.apache.logging.log4j.Logger;
 public class EquivalentIntegrationsMod {
     public static final String modId = "equivalentintegrations";
     public static final String name = "Equivalent Integrations";
-    public static final String version = "0.1.6";
+    public static final String version = "0.1.7";
 
     public static final Logger logger = LogManager.getLogger(modId);
 
