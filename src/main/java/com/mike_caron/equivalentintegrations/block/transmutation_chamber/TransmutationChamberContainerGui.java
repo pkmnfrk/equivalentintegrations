@@ -19,11 +19,15 @@ public class TransmutationChamberContainerGui extends GuiContainer
 
     private static final ResourceLocation background = new ResourceLocation(EquivalentIntegrationsMod.modId, "textures/gui/transmutation_chamber_gui.png");
 
+    TransmutationChamberTileEntity te;
+
     public TransmutationChamberContainerGui(TransmutationChamberTileEntity tileEntity, TransmutationChamberContainer container) {
         super(container);
 
         xSize = WIDTH;
         ySize = HEIGHT;
+
+        this.te = tileEntity;
     }
 
     @Override
@@ -38,6 +42,16 @@ public class TransmutationChamberContainerGui extends GuiContainer
     protected void drawGuiContainerForegroundLayer(int mouseX, int mouseY)
     {
         this.fontRenderer.drawString(new TextComponentTranslation("container.transmutation_chamber.title", new Object[0]).getUnformattedText(), 8, 6, 4210752);
+
+        if(te.getForbidNbt())
+        {
+            drawTexturedModalRect(148, 21, 201, 0, 18, 18);
+        }
+
+        if(te.getForbidDamage())
+        {
+            drawTexturedModalRect(148, 41, 201, 19, 18, 18);
+        }
     }
 
     @Override

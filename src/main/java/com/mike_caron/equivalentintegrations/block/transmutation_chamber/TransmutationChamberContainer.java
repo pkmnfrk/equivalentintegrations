@@ -58,9 +58,9 @@ public class TransmutationChamberContainer
     {
         IItemHandler itemHandler = this.te.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null);
 
-        talismanSlot = addSlotToContainer(new SoulboundTalismanSlot(itemHandler, 0, 47, 27));
-        algorithmsSlot = addSlotToContainer(new SlotItemHandler(itemHandler, 1, 101, 27));
-        efficiencySlot = addSlotToContainer(new SlotItemHandler(itemHandler, 2, 119, 27));
+        talismanSlot = addSlotToContainer(new SoulboundTalismanSlot(itemHandler, 0, 47, 32));
+        algorithmsSlot = addSlotToContainer(new SlotItemHandler(itemHandler, 1, 101, 32));
+        efficiencySlot = addSlotToContainer(new SlotItemHandler(itemHandler, 2, 119, 32));
     }
 
     @Nonnull
