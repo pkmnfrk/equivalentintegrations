@@ -61,7 +61,7 @@ dependencies {
         transitive = false
     }
 
-    deobfProvided "refinedstorage:refinedstorage:${rs_version}:deobf"
+    // deobfProvided "refinedstorage:refinedstorage:${rs_version}:deobf"
 
     // you may put jars on which you depend on in ./libs
     // or you may define them like so..
