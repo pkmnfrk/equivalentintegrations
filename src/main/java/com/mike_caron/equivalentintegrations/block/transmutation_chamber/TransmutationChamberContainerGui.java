@@ -2,14 +2,17 @@ package com.mike_caron.equivalentintegrations.block.transmutation_chamber;
 
 import com.mike_caron.equivalentintegrations.EquivalentIntegrationsMod;
 import com.mike_caron.equivalentintegrations.item.ModItems;
+import com.mike_caron.equivalentintegrations.network.CtoSMessage;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.util.text.TextFormatting;
+import org.lwjgl.opengl.GL11;
 
 import javax.xml.soap.Text;
+import java.io.IOException;
 import java.util.List;
 
 public class TransmutationChamberContainerGui extends GuiContainer
@@ -42,15 +45,41 @@ public class TransmutationChamberContainerGui extends GuiContainer
     protected void drawGuiContainerForegroundLayer(int mouseX, int mouseY)
     {
         this.fontRenderer.drawString(new TextComponentTranslation("container.transmutation_chamber.title", new Object[0]).getUnformattedText(), 8, 6, 4210752);
-
-        if(te.getForbidNbt())
+        if(te.getForbidDamage() || te.getForbidNbt())
         {
-            drawTexturedModalRect(148, 21, 201, 0, 18, 18);
+            mc.getTextureManager().bindTexture(background);
+            GlStateManager.color(1, 1, 1, 1);
+            if (te.getForbidNbt())
+            {
+                drawTexturedModalRect(148, 21, 182, 0, 18, 18);
+            }
+
+            if (te.getForbidDamage())
+            {
+                drawTexturedModalRect(148, 41, 182, 20, 18, 18);
+            }
         }
+    }
 
-        if(te.getForbidDamage())
+    @Override
+    protected void mouseClicked(int mouseX, int mouseY, int mouseButton) throws IOException
+    {
+        super.mouseClicked(mouseX, mouseY, mouseButton);
+
+        if(mouseX - guiLeft >= 148 && mouseX - guiLeft < 166)
         {
-            drawTexturedModalRect(148, 41, 201, 19, 18, 18);
+            if(mouseY - guiTop >= 21 && mouseY - guiTop < 39)
+            {
+                boolean n = !te.getForbidNbt();
+                CtoSMessage msg = new CtoSMessage(0, te.getPos(), CtoSMessage.KindEnum.ToggleForbidNbt, n);
+                EquivalentIntegrationsMod.networkWrapper.sendToServer(msg);
+            }
+            else if(mouseY - guiTop >= 41 && mouseY - guiTop < 59)
+            {
+                boolean n = !te.getForbidDamage();
+                CtoSMessage msg = new CtoSMessage(0, te.getPos(), CtoSMessage.KindEnum.ToggleForbidDamage, n);
+                EquivalentIntegrationsMod.networkWrapper.sendToServer(msg);
+            }
         }
     }
 

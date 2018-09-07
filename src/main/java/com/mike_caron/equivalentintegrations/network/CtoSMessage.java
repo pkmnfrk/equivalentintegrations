@@ -24,12 +24,12 @@ public class CtoSMessage implements IMessage
         this.powerDelta = powerDelta;
     }
 
-    public CtoSMessage(int dim, BlockPos pos, boolean onOff)
+    public CtoSMessage(int dim, BlockPos pos, KindEnum type, boolean onOff)
     {
         this.dim = dim;
         this.pos = pos;
 
-        this.kind = KindEnum.OnOff;
+        this.kind = type;
         this.onOff = onOff;
     }
 
@@ -43,6 +43,8 @@ public class CtoSMessage implements IMessage
         switch(kind)
         {
             case OnOff:
+            case ToggleForbidNbt:
+            case ToggleForbidDamage:
                 onOff = buf.readBoolean();
                 break;
             case PowerDelta:
@@ -69,6 +71,12 @@ public class CtoSMessage implements IMessage
             case PowerDelta:
                 buf.writeInt(powerDelta);
                 break;
+            case ToggleForbidNbt:
+                buf.writeBoolean(onOff);
+                break;
+            case ToggleForbidDamage:
+                buf.writeBoolean(onOff);
+                break;
             default:
                 throw new RuntimeException("What the? What kind of kind is " + kind);
         }
@@ -84,6 +92,8 @@ public class CtoSMessage implements IMessage
 
     public enum KindEnum {
         OnOff,
-        PowerDelta
+        PowerDelta,
+        ToggleForbidNbt,
+        ToggleForbidDamage
     }
 }

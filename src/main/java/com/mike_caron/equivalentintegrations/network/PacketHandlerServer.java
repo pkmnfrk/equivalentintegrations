@@ -1,6 +1,7 @@
 package com.mike_caron.equivalentintegrations.network;
 
 import com.mike_caron.equivalentintegrations.EquivalentIntegrationsMod;
+import com.mike_caron.equivalentintegrations.block.transmutation_chamber.TransmutationChamberTileEntity;
 import com.mike_caron.equivalentintegrations.block.transmutation_generator.TransmutationGeneratorTileEntity;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.tileentity.TileEntity;
@@ -43,6 +44,18 @@ public class PacketHandlerServer implements IMessageHandler<CtoSMessage, IMessag
                             if(te instanceof TransmutationGeneratorTileEntity)
                             {
                                 ((TransmutationGeneratorTileEntity)te).setGenerating(message.getOnOff());
+                            }
+                            break;
+                        case ToggleForbidNbt:
+                            if(te instanceof TransmutationChamberTileEntity)
+                            {
+                                ((TransmutationChamberTileEntity)te).setForbidNbt(message.getOnOff());
+                            }
+                            break;
+                        case ToggleForbidDamage:
+                            if(te instanceof TransmutationChamberTileEntity)
+                            {
+                                ((TransmutationChamberTileEntity)te).setForbidDamaged(message.getOnOff());
                             }
                             break;
                     }

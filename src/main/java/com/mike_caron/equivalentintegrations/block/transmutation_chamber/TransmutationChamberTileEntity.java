@@ -187,12 +187,16 @@ public class TransmutationChamberTileEntity
     {
         forbidNbt = forbid;
         setTransmutationParameters();
+        markDirty();
+        this.notifyUpdate();
     }
 
     public void setForbidDamaged(boolean forbid)
     {
         forbidDamaged = forbid;
         setTransmutationParameters();
+        markDirty();
+        this.notifyUpdate();
     }
 
     @Override

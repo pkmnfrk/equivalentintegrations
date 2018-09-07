@@ -180,7 +180,7 @@ public class TransmutationGeneratorContainerGui extends GuiContainer
             case POWER_ID:
                 {
                     boolean onOff = !tileEntity.getGenerating();
-                    IMessage msg = new CtoSMessage(tileEntity.getWorld().provider.getDimension(), tileEntity.getPos(), onOff);
+                    IMessage msg = new CtoSMessage(tileEntity.getWorld().provider.getDimension(), tileEntity.getPos(), CtoSMessage.KindEnum.OnOff, onOff);
                     EquivalentIntegrationsMod.networkWrapper.sendToServer(msg);
                 }
                 break;
