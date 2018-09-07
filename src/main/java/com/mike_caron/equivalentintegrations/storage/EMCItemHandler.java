@@ -40,6 +40,9 @@ public final class EMCItemHandler
     private int efficiencyThreshold = 10;
     private boolean canLearn = false;
 
+    private boolean forbidNbt = false;
+    private boolean forbidDamaged = false;
+
     private IEMCProxy emcProxy;
     private ManagedEMCManager emcManager;
 
@@ -305,5 +308,25 @@ public final class EMCItemHandler
     public Collection<ItemStack> getCachedInventory()
     {
         return emcInventory.getCachedInventory();
+    }
+
+    public boolean getForbidNbt()
+    {
+        return forbidNbt;
+    }
+
+    public void setForbidNbt(boolean forbidNbt)
+    {
+        this.forbidNbt = forbidNbt;
+    }
+
+    public boolean getForbidDamaged()
+    {
+        return forbidDamaged;
+    }
+
+    public void setForbidDamaged(boolean forbidDamaged)
+    {
+        this.forbidDamaged = forbidDamaged;
     }
 }

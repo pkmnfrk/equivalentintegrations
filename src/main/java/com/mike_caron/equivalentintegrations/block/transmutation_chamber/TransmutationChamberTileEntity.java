@@ -6,6 +6,7 @@ import com.mike_caron.equivalentintegrations.item.SoulboundTalisman;
 import com.mike_caron.equivalentintegrations.storage.EMCItemHandler;
 import com.mike_caron.equivalentintegrations.storage.EmptyItemHandler;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ITickable;
 import net.minecraft.world.World;
@@ -26,6 +27,9 @@ public class TransmutationChamberTileEntity
     private EMCItemHandler emcItemHandler;
 
     private int ticksSinceLastUpdate = 0;
+
+    private boolean forbidNbt = false;
+    private boolean forbidDamaged = false;
 
     private static final EmptyItemHandler emptyInventory = new EmptyItemHandler();
 
@@ -114,6 +118,8 @@ public class TransmutationChamberTileEntity
 
         emcItemHandler.setCanLearn(getCanLearn());
         emcItemHandler.setEfficiencyThreshold(getEfficiencyThreshold());
+        emcItemHandler.setForbidDamaged(forbidDamaged);
+        emcItemHandler.setForbidNbt(forbidNbt);
     }
 
     @Override
@@ -165,5 +171,63 @@ public class TransmutationChamberTileEntity
                 ticksSinceLastUpdate = 0;
             }
         }
+    }
+
+    public boolean getForbidNbt()
+    {
+        return forbidNbt;
+    }
+
+    public boolean getForbidDamage()
+    {
+        return forbidDamaged;
+    }
+
+    public void setForbidNbt(boolean forbid)
+    {
+        forbidNbt = forbid;
+        setTransmutationParameters();
+    }
+
+    public void setForbidDamaged(boolean forbid)
+    {
+        forbidDamaged = forbid;
+        setTransmutationParameters();
+    }
+
+    @Override
+    public void readFromNBT(NBTTagCompound compound)
+    {
+        super.readFromNBT(compound);
+
+        if(compound.hasKey("forbidNbt"))
+        {
+            forbidNbt = compound.getBoolean("forbidNbt");
+        }
+        else
+        {
+            forbidNbt = false;
+        }
+
+        if(compound.hasKey("forbidDamaged"))
+        {
+            forbidDamaged = compound.getBoolean("forbidDamaged");
+        }
+        else
+        {
+            forbidDamaged = false;
+        }
+    }
+
+    @Nonnull
+    @Override
+    public NBTTagCompound writeToNBT(NBTTagCompound compound)
+    {
+        NBTTagCompound ret = super.writeToNBT(compound);
+
+        ret.setBoolean("forbidDamaged", forbidDamaged);
+        ret.setBoolean("forbidNbt", forbidNbt);
+
+        return ret;
     }
 }
