@@ -125,7 +125,7 @@ public final class EMCItemHandler
 
             knowledge = ProjectEAPI.getTransmutationProxy().getKnowledgeProviderFor(owner);
 
-            if(forbidNbt && stack.hasTagCompound())
+            if(forbidNbt && stack.hasTagCompound() && !(stack.getTagCompound().toString().length() < 4))
             {
                 return stack;
             }
