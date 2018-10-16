@@ -4,6 +4,10 @@ Equivalent Integrations is an addon for the mod ProjectE. This mod focuses on ad
 to access EMC and transmutation directly without having to worry about what that means, or integrate with ProjectE
 directly.
 
+Join our Discord! 
+
+[![Discord](https://img.shields.io/discord/501821606062981121.svg?style=plastic&logo=discord)](https://discord.gg/S254Nuh)
+
 ## Issues
 
 Please report issues to this repository's issue tracks: https://github.com/pkmnfrk/equivalentintegrations/issues

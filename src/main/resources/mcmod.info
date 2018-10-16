@@ -6,7 +6,7 @@
   "version": "${version}",
   "mcversion": "${mcversion}",
   "logoFile": "assets/equivalentintegrations/logo.png",
-  "url": "",
+  "url": "https://minecraft.curseforge.com/projects/equivalent-integrations",
   "updateUrl": "",
   "authorList": [ "pkmnfrk" ],
   "parent": "",
