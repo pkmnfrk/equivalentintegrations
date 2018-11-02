@@ -1,0 +1,31 @@
+language: java
+install: ./gradlew setupDecompWorkspace
+script:
+  - ./gradlew check
+  - ./gradlew build
+#after_script: ./publish_build.sh
+before_cache:
+  - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
+  - rm -fr $HOME/.gradle/caches/*/plugin-resolution/
+  - rm -f  $HOME/.gradle/caches/minecraft/deobfedDeps/compileDummy.jar
+  - rm -f  $HOME/.gradle/caches/minecraft/deobfedDeps/providedDummy.jar
+cache:
+  directories:
+    - $HOME/.gradle/caches/
+    - $HOME/.gradle/wrapper/
+deploy:
+  - provider: releases
+    api_key:
+      secure: "BLt80/Z4PLl1XxjuiiVLopxdf76lT4kHBs+Kj5epnKLuGw6WkzU/3x2IiGEZzhVf7Pp2ZUFD9sK4RtwBFdMLVhjPsuZoNQaEaXdI2faFfp63kC3yXNTrJy7qbUKpH5MqvJwgC6sTaBDmPpKiW125CGnM3n43qlEiAOor3UL3pDZZFEnf8A35/mD9LmyfGS5gel70z1S0JriNwcXAzXxwulZ4XSzWdXZGvjU9OgfthxLq5WuuS+F6WEOeUn58pZv9cpgaTJqzk9BWAOxPG6ubDCXG0OFzs5eiQp9o0wu0kJhb80PvYgLCzB2MuVFlW0oy1hBlarY/mIqAQx0OgUbOaPp5q0oCXbdgU+V9KbiaR3vwKS2cuEmjg1oTUlWO9UfDQMqgjsSlM6Rx3Tvoma7fbdQ85+lcXRr138xuiMkam7WoybqHa7b9tfRDILVoeEg84lSHASdvdrn24MUsISa5St8hIqz3w1Lh9GskzS29q5j74UA7NoMOI7CCpiJZyHQvaRLYewvhjK9yqcLpplJL8vPWZIg1bawo3HjldE3iftBWV3ZwknwrpG57PHqdzd8wjfKFr8KGNP7kIpTnXVmf8bVVRNSWaAnA7JHMRC4bD0Fm/8dznOF1ToVb0TlALBWwUv/RQBUopcRq8sCWFvfnt4f7UZDBdmXpLOPe3nr8C7c="
+    file_glob: true
+    file: "build/libs/*.jar"
+    skip_cleanup: true
+    on:
+      tags: true
+    draft: true
+addons:
+  artifacts:
+    working_dir: build/libs
+    paths:
+      - $(ls build/libs/*.jar | tr "\n" ":")
+    permissions: public-read
