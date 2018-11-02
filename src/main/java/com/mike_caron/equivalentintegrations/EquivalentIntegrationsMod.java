@@ -1,6 +1,7 @@
 package com.mike_caron.equivalentintegrations;
 
 import com.mike_caron.equivalentintegrations.command.CleanupCommand;
+import com.mike_caron.equivalentintegrations.command.DumpCacheCommand;
 import com.mike_caron.equivalentintegrations.impl.ManagedEMCManager;
 import com.mike_caron.equivalentintegrations.integrations.MainCompatHandler;
 import com.mike_caron.equivalentintegrations.network.CtoSMessage;
@@ -75,6 +76,7 @@ public class EquivalentIntegrationsMod {
     public void serverLoad(FMLServerStartingEvent evt)
     {
         evt.registerServerCommand(new CleanupCommand());
+        evt.registerServerCommand(new DumpCacheCommand());
         emcManager = new ManagedEMCManager(evt.getServer().getEntityWorld());
         MinecraftForge.EVENT_BUS.register(emcManager);
         logger.info("Created EMC Manager");
