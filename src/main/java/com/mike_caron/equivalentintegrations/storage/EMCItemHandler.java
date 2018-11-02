@@ -147,7 +147,7 @@ public final class EMCItemHandler
 
                 emcValue -= getEfficiencyCost(stack, emcValue);
 
-                //EquivalentIntegrationsMod.logger.info("Burning a stack ({}, {}) for {} EMC each, a total of {} (Simulation: {})", stack, System.identityHashCode(stack) , singleValue, emcValue, simulate);
+                //EquivalentIntegrationsMod.logger.info("Burning a stack ({}) for {} EMC each, a total of {} (Simulation: {})", stack, singleValue, emcValue, simulate);
 
                 if(!simulate)
                 {
@@ -181,6 +181,8 @@ public final class EMCItemHandler
                     }
 
                 }
+
+                //EquivalentIntegrationsMod.logger.info("Done burning said stack");
 
                 return ItemStack.EMPTY;
             }
@@ -217,6 +219,8 @@ public final class EMCItemHandler
 
         ItemStack ret = new ItemStack(desired.getItem(), actualAmount, desired.getMetadata(), desired.getTagCompound());
 
+        //EquivalentIntegrationsMod.logger.info("Materializing a stack ({}) for {} EMC each, a total of {} (Simulation: {})", ret, emcCost, desiredEMC, simulate);
+
         //before this point, desiredEMC is guaranteed to be < emc
         //but, the efficiency cost may put it over
         desiredEMC += getEfficiencyCost(ret, desiredEMC);
@@ -231,6 +235,8 @@ public final class EMCItemHandler
         {
             emcManager.withdrawEMC(owner, desiredEMC);
         }
+
+        //EquivalentIntegrationsMod.logger.info("Done materializing said stack");
 
         return ret;
     }
