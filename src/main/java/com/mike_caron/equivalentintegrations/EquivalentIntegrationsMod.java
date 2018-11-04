@@ -31,7 +31,7 @@ import org.apache.logging.log4j.Logger;
 public class EquivalentIntegrationsMod {
     public static final String modId = "equivalentintegrations";
     public static final String name = "Equivalent Integrations";
-    public static final String version = "0.1.8";
+    public static final String version = "0.1.9";
 
     public static final Logger logger = LogManager.getLogger(modId);
 
