@@ -178,7 +178,7 @@ public class EMCInventory
                 {
                     ItemStack cached = cachedInventory.get(ix);
 
-                    if (cached.getItem() == is.getItem())
+                    if (cached.isItemEqualIgnoreDurability(is))
                     {
                         cached.setCount(num);
                         updated ++;
