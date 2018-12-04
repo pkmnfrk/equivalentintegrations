@@ -297,7 +297,7 @@ public class ManagedEMCManager
         }
         finally
         {
-            lock.lock();
+            lock.unlock();
         }
     }
 
