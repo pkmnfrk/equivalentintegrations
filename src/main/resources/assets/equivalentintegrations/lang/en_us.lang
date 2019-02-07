@@ -9,6 +9,9 @@ item.soulbound_talisman.desc2=Right click to bind to yourself.
 item.alchemical_algorithms.name=Alchemical Algorithms
 item.alchemical_algorithms.desc1=Allows Transmutation Chambers to learn new items.
 
+item.conjuration_assembler.name=Conjuration Assembler
+item.conjuration_assembler.desc1=Remotely converts EMC into blocks that you can place.
+
 item.efficiency_catalyst.name=Efficiency Catalyst
 item.efficiency_catalyst.desc1=Increases efficiency of Transmutation machines
 
