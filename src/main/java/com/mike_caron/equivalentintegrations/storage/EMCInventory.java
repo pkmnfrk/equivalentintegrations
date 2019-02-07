@@ -13,10 +13,12 @@ import net.minecraft.item.ItemStack;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 public class EMCInventory
 {
@@ -26,6 +28,9 @@ public class EMCInventory
 
     //private double cachedEmc;
 
+    @Nullable
+    private ItemStack filter = null;
+
     private boolean needsRefresh = false;
 
     private List<ItemStack> cachedInventory = null;
@@ -33,21 +38,33 @@ public class EMCInventory
 
     public EMCInventory(UUID owner, ManagedEMCManager manager)
     {
+        this(owner, manager, null);
+    }
+
+    public EMCInventory(UUID owner, ManagedEMCManager manager, @Nullable ItemStack filter)
+    {
         this.owner = owner;
         this.emcManager = manager;
         this.emcProxy = ProjectEAPI.getEMCProxy();
+        this.filter = filter;
 
         refresh();
     }
 
+
     public int getSlots()
     {
+        if(filter != null)
+            return 1;
+
         return cachedInventory.size() + 64;
     }
 
     public ItemStack getStackInSlot(int slot)
     {
-        if (slot < 0 || slot >= cachedInventory.size())
+        int size = filter != null ? 1 : cachedInventory.size();
+
+        if (slot < 0 || slot >= size)
         {
             return ItemStack.EMPTY;
         }
@@ -57,6 +74,8 @@ public class EMCInventory
 
     public int getSlotLimit(int slot)
     {
+        int size = filter != null ? 1 : cachedInventory.size();
+
         if(slot < 0 || slot >= cachedInventory.size())
             return 0;
 
@@ -79,7 +98,15 @@ public class EMCInventory
 
         try
         {
-            cachedKnowledge = ProjectEAPI.getTransmutationProxy().getKnowledgeProviderFor(owner).getKnowledge();
+            List<ItemStack> newKnowledge = ProjectEAPI.getTransmutationProxy().getKnowledgeProviderFor(owner).getKnowledge();
+            if(filter != null)
+            {
+                cachedKnowledge = newKnowledge.stream().filter(is -> is.isItemEqualIgnoreDurability(filter)).collect(Collectors.toList());
+            }
+            else
+            {
+                cachedKnowledge = newKnowledge;
+            }
             calculateInventory();
             ret = true;
         }
