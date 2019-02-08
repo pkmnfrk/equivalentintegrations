@@ -2,6 +2,7 @@ package com.mike_caron.equivalentintegrations.item;
 
 import com.mike_caron.equivalentintegrations.EquivalentIntegrationsMod;
 import com.mike_caron.equivalentintegrations.client.renderer.item.ConjurationAssemblerModel;
+import com.mike_caron.equivalentintegrations.inventory.ItemInventory;
 import com.mike_caron.equivalentintegrations.inventory.PlayerItemInventory;
 import com.mike_caron.equivalentintegrations.storage.EMCItemHandler;
 import com.mike_caron.equivalentintegrations.util.MappedModelLoader;
@@ -157,14 +158,8 @@ public class ConjurationAssembler extends ItemBase
         if(container.isEmpty())
             return ItemStack.EMPTY;
 
-        NBTTagCompound compound = container.getTagCompound();
-
-        if(compound == null || !compound.hasKey(PlayerItemInventory.TAG_INVENTORY))
-            return ItemStack.EMPTY;
-
-        NBTTagCompound inv = compound.getCompoundTag(PlayerItemInventory.TAG_INVENTORY);
-
-        return new ItemStack(inv);
+        ItemInventory inv = new ItemInventory(container, 1);
+        return inv.getStackInSlot(0);
     }
 
     @Nullable
@@ -227,33 +222,34 @@ public class ConjurationAssembler extends ItemBase
             tag.setString("player", owner.toString());
         }
 
-        if(filter.isEmpty())
-        {
-            filter = new ItemStack(Blocks.COBBLESTONE, 1);
-        }
-
         if(!filter.isEmpty())
         {
-            tag.setTag("filter", filter.serializeNBT());
+            tag.setTag(ItemInventory.TAG_INVENTORY, filter.serializeNBT());
         }
 
 
         ItemStack ret =  new ItemStack(ModItems.conjurationAssembler, 1);
         ret.setTagCompound(tag);
+
+        ItemInventory inv = new ItemInventory(ret, 1);
+        inv.setInventorySlotContents(0, filter);
+
         return ret;
     }
 
     public static class Inventory
         extends PlayerItemInventory
     {
-        public Inventory(EntityPlayer player, int size)
+        public Inventory(EntityPlayer player)
         {
-            super(player, size);
+            super(player, 1);
         }
 
-        public Inventory(EntityPlayer player, int size, int inventorySlot)
+        public Inventory(EntityPlayer player, int inventorySlot)
         {
-            super(player, size, inventorySlot);
+            super(player, 1, inventorySlot);
         }
+
+
     }
 }

@@ -2,6 +2,7 @@ package com.mike_caron.equivalentintegrations.item;
 
 import com.mike_caron.equivalentintegrations.inventory.GhostSlot;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.ClickType;
 import net.minecraft.inventory.Container;
 import net.minecraft.inventory.IInventory;
@@ -13,7 +14,7 @@ import javax.annotation.Nonnull;
 public class ConjurationAssemblerContainer
         extends Container
 {
-    private final IInventory playerInventory;
+    private final InventoryPlayer playerInventory;
     private final IInventory containerInventory;
     private Slot filterSlot;
 
@@ -24,7 +25,7 @@ public class ConjurationAssemblerContainer
 
     public ConjurationAssemblerContainer(IInventory playerInventory, IInventory containerInventory, int protectedIndex)
     {
-        this.playerInventory = playerInventory;
+        this.playerInventory = (InventoryPlayer)playerInventory;
         this.containerInventory = containerInventory;
 
         addOwnSlots();
@@ -123,6 +124,13 @@ public class ConjurationAssemblerContainer
             return ItemStack.EMPTY;
         if(clickType == ClickType.SWAP && dragType == protectedSlot)
             return ItemStack.EMPTY;
+        if(clickType == ClickType.PICKUP && slotId == 0)
+        {
+            ItemStack held = playerInventory.getItemStack().copy();
+            super.slotClick(slotId, dragType, clickType, player);
+            playerInventory.setItemStack(held);
+            return held;
+        }
 
         return super.slotClick(slotId, dragType, clickType, player);
     }
