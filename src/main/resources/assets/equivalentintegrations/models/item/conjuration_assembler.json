@@ -2,5 +2,8 @@
   "parent":"item/generated",
   "textures": {
     "layer0":"equivalentintegrations:items/conjuration_assembler"
-  }
+  },
+  "overrides": [
+    {"predicate": { "active": 1 }, "model": "equivalentintegrations:item/conjuration_assembler_active"}
+  ]
 }

@@ -1,0 +1,25 @@
+{
+  "forge_marker" : 1,
+  "variants" : {
+    "inventory" : [{
+      "model": "equivalentintegrations:magic-conjuration_assembler",
+      "custom": {
+        "gui": {
+          "scale": 0.875,
+          "normal": "equivalentintegrations:conjuration_assembler#normal_2d"
+        },
+        "world": {
+          "scale": 0.875,
+          "normal": "equivalentintegrations:conjuration_assembler#normal_3d"
+        }
+      },
+      "textures": {
+        "particle": "equivalentintegrations:items/conjuration_assembler"
+      }
+    }],
+
+    "normal_2d": [{ "model": "equivalentintegrations:conjuration_assembler_2d", "transform": "forge:default-item" }],
+
+    "normal_3d": [{ "model": "equivalentintegrations:conjuration_assembler_3d", "transform": "forge:default-block" }]
+  }
+}

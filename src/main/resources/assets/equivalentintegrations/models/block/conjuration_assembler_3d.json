@@ -1,0 +1,6 @@
+{
+  "parent": "equivalentintegrations:block/conjuration_assembler_3d_base",
+  "textures": {
+    "all": "equivalentintegrations:items/conjuration_assembler"
+  }
+}

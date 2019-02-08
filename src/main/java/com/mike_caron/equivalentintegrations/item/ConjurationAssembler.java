@@ -1,20 +1,25 @@
 package com.mike_caron.equivalentintegrations.item;
 
 import com.mike_caron.equivalentintegrations.EquivalentIntegrationsMod;
+import com.mike_caron.equivalentintegrations.client.renderer.item.ConjurationAssemblerModel;
 import com.mike_caron.equivalentintegrations.storage.EMCItemHandler;
+import com.mike_caron.equivalentintegrations.util.MappedModelLoader;
 import net.minecraft.client.resources.I18n;
+import net.minecraft.client.resources.IResourceManager;
 import net.minecraft.client.util.ITooltipFlag;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
+import net.minecraft.item.IItemPropertyGetter;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.EnumActionResult;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.EnumHand;
+import net.minecraft.util.*;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
+import net.minecraftforge.client.model.ICustomModelLoader;
+import net.minecraftforge.client.model.IModel;
+import net.minecraftforge.client.model.ModelLoaderRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -27,11 +32,31 @@ public class ConjurationAssembler extends ItemBase
 {
     public static final String id = "conjuration_assembler";
 
+    public static int STACK_LIMIT = 1;
+    public static final int NESTED_ITEM_TINT_DELTA = 1;
+
     public ConjurationAssembler()
     {
         setRegistryName(id);
         setTranslationKey(id);
         setMaxStackSize(1);
+
+        this.addPropertyOverride(new ResourceLocation("active"), new IItemPropertyGetter()
+        {
+            @Override
+            public float apply(ItemStack stack, @Nullable World worldIn, @Nullable EntityLivingBase entityIn)
+            {
+                boolean isActive = getPlayerUUID(stack) != null && !getFilter(stack).isEmpty();
+                return isActive ? 1F : 0F;
+            }
+        });
+    }
+
+    @Override
+    public void initModel(MappedModelLoader.Builder models)
+    {
+        //models.put("magic-" + id, ConjurationAssemblerModel.INSTANCE);
+        super.initModel(models);
     }
 
     @Override
@@ -86,23 +111,26 @@ public class ConjurationAssembler extends ItemBase
                 EMCItemHandler handler = getItemHandler(playerUuid, worldIn, filter);
 
                 ItemStack actualStack = handler.getStackInSlot(0).copy();
-                if(actualStack.getCount() > 64)
-                    actualStack.setCount(64);
-
-                player.setHeldItem(hand, actualStack.copy());
-                EnumActionResult result = actualStack.onItemUse(player, worldIn, pos, hand, facing, hitX, hitY, hitZ);
-                final ItemStack newActualStack = player.getHeldItem(hand);
-                player.setHeldItem(hand, containerStack);
-
-                ItemStack delta = getDelta(actualStack, newActualStack);
-
-                if(!delta.isEmpty())
+                if(!actualStack.isEmpty())
                 {
-                    ItemStack extractResult = handler.extractItem(delta, false);
+                    if (actualStack.getCount() > 64)
+                        actualStack.setCount(64);
 
-                    if(extractResult.isEmpty())
+                    player.setHeldItem(hand, actualStack.copy());
+                    EnumActionResult result = actualStack.onItemUse(player, worldIn, pos, hand, facing, hitX, hitY, hitZ);
+                    final ItemStack newActualStack = player.getHeldItem(hand);
+                    player.setHeldItem(hand, containerStack);
+
+                    ItemStack delta = getDelta(actualStack, newActualStack);
+
+                    if (!delta.isEmpty())
                     {
-                        EquivalentIntegrationsMod.logger.warn("Just leaked {}", delta);
+                        ItemStack extractResult = handler.extractItem(delta, false);
+
+                        if (extractResult.isEmpty())
+                        {
+                            EquivalentIntegrationsMod.logger.warn("Just leaked {}", delta);
+                        }
                     }
                 }
             }
@@ -122,7 +150,7 @@ public class ConjurationAssembler extends ItemBase
         return handler;
     }
 
-    private static ItemStack getFilter(final @Nonnull ItemStack container)
+    public static ItemStack getFilter(final @Nonnull ItemStack container)
     {
         if(container.isEmpty())
             return ItemStack.EMPTY;

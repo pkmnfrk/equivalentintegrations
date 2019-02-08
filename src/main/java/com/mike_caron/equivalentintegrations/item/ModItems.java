@@ -1,7 +1,9 @@
 package com.mike_caron.equivalentintegrations.item;
 
 import com.mike_caron.equivalentintegrations.EquivalentIntegrationsMod;
+import com.mike_caron.equivalentintegrations.util.MappedModelLoader;
 import net.minecraft.item.Item;
+import net.minecraftforge.client.model.ModelLoaderRegistry;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -43,6 +45,7 @@ public class ModItems
     @SideOnly(Side.CLIENT)
     public static void initModels()
     {
+        MappedModelLoader.Builder models = MappedModelLoader.builder();
         try
         {
             for (Field field : ModItems.class.getDeclaredFields())
@@ -51,7 +54,7 @@ public class ModItems
                 {
                     ItemBase item = (ItemBase) field.get(null);
 
-                    item.initModel();
+                    item.initModel(models);
                 }
             }
         }
@@ -60,5 +63,7 @@ public class ModItems
             throw new RuntimeException("Unable to reflect upon myelf??");
         }
         //soulboundTalisman.initModel();
+
+        ModelLoaderRegistry.registerLoader(models.build(EquivalentIntegrationsMod.modId));
     }
 }

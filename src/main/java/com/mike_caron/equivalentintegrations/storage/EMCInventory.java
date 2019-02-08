@@ -55,14 +55,14 @@ public class EMCInventory
     public int getSlots()
     {
         if(filter != null)
-            return 1;
+            return Math.min(1, cachedInventory.size());
 
         return cachedInventory.size() + 64;
     }
 
     public ItemStack getStackInSlot(int slot)
     {
-        int size = filter != null ? 1 : cachedInventory.size();
+        int size = cachedInventory.size();
 
         if (slot < 0 || slot >= size)
         {
@@ -74,9 +74,9 @@ public class EMCInventory
 
     public int getSlotLimit(int slot)
     {
-        int size = filter != null ? 1 : cachedInventory.size();
+        int size = cachedInventory.size();
 
-        if(slot < 0 || slot >= cachedInventory.size())
+        if(slot < 0 || slot >= size)
             return 0;
 
         return Integer.MAX_VALUE;

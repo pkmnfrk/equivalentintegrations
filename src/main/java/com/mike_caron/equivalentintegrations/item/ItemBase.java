@@ -1,6 +1,7 @@
 package com.mike_caron.equivalentintegrations.item;
 
 import com.mike_caron.equivalentintegrations.EquivalentIntegrationsMod;
+import com.mike_caron.equivalentintegrations.util.MappedModelLoader;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.item.Item;
 import net.minecraftforge.client.model.ModelLoader;
@@ -15,7 +16,7 @@ public abstract class ItemBase extends Item
     }
     @SuppressWarnings("ConstantConditions")
     @SideOnly(Side.CLIENT)
-    public void initModel() {
+    public void initModel(MappedModelLoader.Builder modelLoader) {
         ModelLoader.setCustomModelResourceLocation(this, 0, new ModelResourceLocation(getRegistryName(), "inventory"));
     }
 }
