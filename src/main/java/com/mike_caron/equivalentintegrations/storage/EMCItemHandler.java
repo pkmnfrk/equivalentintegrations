@@ -27,6 +27,7 @@ import net.minecraftforge.items.ItemStackHandler;
 import org.lwjgl.Sys;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.*;
 
 public final class EMCItemHandler
@@ -50,13 +51,23 @@ public final class EMCItemHandler
 
     public EMCItemHandler(@Nonnull UUID owner, @Nonnull World world)
     {
+        this(owner, world, null);
+    }
+
+    public EMCItemHandler(@Nonnull UUID owner, @Nonnull World world, @Nullable ItemStack filter)
+    {
         this.owner = owner;
         this.world = world;
 
         this.emcProxy = ProjectEAPI.getEMCProxy();
 
         this.emcManager = EquivalentIntegrationsMod.emcManager;
-        this.emcInventory = this.emcManager.getEMCInventory(owner);
+
+        EMCInventory inv = this.emcManager.getEMCInventory(owner);
+        if(filter != null)
+            inv = inv.withFilter(filter);
+
+        this.emcInventory = inv;
     }
 
     @Nonnull

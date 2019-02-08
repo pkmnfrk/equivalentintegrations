@@ -41,7 +41,7 @@ public class EMCInventory
         this(owner, manager, null);
     }
 
-    public EMCInventory(UUID owner, ManagedEMCManager manager, @Nullable ItemStack filter)
+    private EMCInventory(UUID owner, ManagedEMCManager manager, @Nullable ItemStack filter)
     {
         this.owner = owner;
         this.emcManager = manager;
@@ -254,5 +254,10 @@ public class EMCInventory
     public Collection<ItemStack> getCachedInventory()
     {
         return cachedInventory;
+    }
+
+    public EMCInventory withFilter(ItemStack filter)
+    {
+        return new EMCInventory(owner, emcManager, filter);
     }
 }
