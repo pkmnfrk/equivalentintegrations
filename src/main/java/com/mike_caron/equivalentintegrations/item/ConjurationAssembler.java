@@ -23,6 +23,8 @@ import net.minecraft.world.World;
 import net.minecraftforge.client.model.ICustomModelLoader;
 import net.minecraftforge.client.model.IModel;
 import net.minecraftforge.client.model.ModelLoaderRegistry;
+import net.minecraftforge.event.entity.player.EntityItemPickupEvent;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -235,6 +237,40 @@ public class ConjurationAssembler extends ItemBase
         inv.setInventorySlotContents(0, filter);
 
         return ret;
+    }
+
+    @SubscribeEvent
+    public void onItemPickUp(EntityItemPickupEvent evt) {
+
+        final EntityPlayer player = evt.getEntityPlayer();
+        final ItemStack pickedStack = evt.getItem().getItem();
+
+        if (pickedStack.isEmpty() || player == null) return;
+
+        boolean foundMatchingContainer = false;
+
+        for (int i = 0; i < player.inventory.getSizeInventory(); i++) {
+            final ItemStack stack = player.inventory.getStackInSlot(i);
+
+            if (stack.getItem() == this) {
+                final ItemStack containedStack = getFilter(stack);
+                final UUID playerUuid = getPlayerUUID(stack);
+                if (!containedStack.isEmpty()) {
+                    final boolean isMatching = containedStack.isItemEqualIgnoreDurability(pickedStack);
+                    if (isMatching) {
+
+                        EMCItemHandler handler = getItemHandler(playerUuid, evt.getItem().world, containedStack);
+                        ItemStack result = handler.insertItem(0, pickedStack, false);
+                        if(result.getCount() != pickedStack.getCount())
+                        {
+                            if(pickedStack.getCount() > 0)
+                                pickedStack.setCount(0);
+                            return;
+                        }
+                    }
+                }
+            }
+        }
     }
 
     public static class Inventory

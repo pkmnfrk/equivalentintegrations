@@ -4,6 +4,7 @@ import com.mike_caron.equivalentintegrations.EquivalentIntegrationsMod;
 import com.mike_caron.equivalentintegrations.util.MappedModelLoader;
 import net.minecraft.item.Item;
 import net.minecraftforge.client.model.ModelLoaderRegistry;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -40,6 +41,11 @@ public class ModItems
         registry.register(new AlchemicalAlgorithms());
         registry.register(new EfficiencyCatalyst());
         registry.register(new ConjurationAssembler());
+    }
+
+    public static void registerEvents()
+    {
+        MinecraftForge.EVENT_BUS.register(conjurationAssembler);
     }
 
     @SideOnly(Side.CLIENT)

@@ -54,9 +54,6 @@ public class EMCInventory
 
     public int getSlots()
     {
-        if(filter != null)
-            return Math.min(1, cachedInventory.size());
-
         return cachedInventory.size() + 64;
     }
 
