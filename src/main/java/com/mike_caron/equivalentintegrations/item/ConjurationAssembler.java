@@ -2,6 +2,7 @@ package com.mike_caron.equivalentintegrations.item;
 
 import com.mike_caron.equivalentintegrations.EquivalentIntegrationsMod;
 import com.mike_caron.equivalentintegrations.client.renderer.item.ConjurationAssemblerModel;
+import com.mike_caron.equivalentintegrations.inventory.PlayerItemInventory;
 import com.mike_caron.equivalentintegrations.storage.EMCItemHandler;
 import com.mike_caron.equivalentintegrations.util.MappedModelLoader;
 import net.minecraft.client.resources.I18n;
@@ -10,6 +11,7 @@ import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
+import net.minecraft.inventory.IInventory;
 import net.minecraft.item.IItemPropertyGetter;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -91,7 +93,7 @@ public class ConjurationAssembler extends ItemBase
                 player.setHeldItem(hand, stack);
             }
 
-            //todo: open GUI
+            player.openGui(EquivalentIntegrationsMod.instance, ConjurationAssemblerContainer.GUI_ID, world, player.inventory.currentItem, 0, 0);
         }
 
         return ActionResult.newResult(EnumActionResult.SUCCESS, stack);
@@ -157,10 +159,10 @@ public class ConjurationAssembler extends ItemBase
 
         NBTTagCompound compound = container.getTagCompound();
 
-        if(compound == null || !compound.hasKey("filter"))
+        if(compound == null || !compound.hasKey(PlayerItemInventory.TAG_INVENTORY))
             return ItemStack.EMPTY;
 
-        NBTTagCompound inv = compound.getCompoundTag("filter");
+        NBTTagCompound inv = compound.getCompoundTag(PlayerItemInventory.TAG_INVENTORY);
 
         return new ItemStack(inv);
     }
@@ -239,5 +241,19 @@ public class ConjurationAssembler extends ItemBase
         ItemStack ret =  new ItemStack(ModItems.conjurationAssembler, 1);
         ret.setTagCompound(tag);
         return ret;
+    }
+
+    public static class Inventory
+        extends PlayerItemInventory
+    {
+        public Inventory(EntityPlayer player, int size)
+        {
+            super(player, size);
+        }
+
+        public Inventory(EntityPlayer player, int size, int inventorySlot)
+        {
+            super(player, size, inventorySlot);
+        }
     }
 }
