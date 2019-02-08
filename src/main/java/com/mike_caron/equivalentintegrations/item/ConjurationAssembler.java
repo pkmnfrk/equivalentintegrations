@@ -1,12 +1,11 @@
 package com.mike_caron.equivalentintegrations.item;
 
 import com.mike_caron.equivalentintegrations.EquivalentIntegrationsMod;
-import com.mike_caron.equivalentintegrations.impl.ManagedEMCManager;
-import com.mike_caron.equivalentintegrations.storage.EMCInventory;
 import com.mike_caron.equivalentintegrations.storage.EMCItemHandler;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ActionResult;
@@ -16,10 +15,8 @@ import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
-import net.minecraftforge.fml.common.asm.transformers.ItemStackTransformer;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import scala.tools.nsc.transform.patmat.Logic;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -54,7 +51,7 @@ public class ConjurationAssembler extends ItemBase
     @Nonnull
     public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer player, @Nonnull EnumHand hand)
     {
-        final ItemStack stack = player.getHeldItem(hand);
+        ItemStack stack = player.getHeldItem(hand);
 
         if(hand != EnumHand.MAIN_HAND)
         {
@@ -63,6 +60,12 @@ public class ConjurationAssembler extends ItemBase
 
         if(!world.isRemote && (player.isSneaking()))
         {
+            if(!player.getUniqueID().equals(getPlayerUUID(stack)))
+            {
+                stack = withOwner(stack, player.getUniqueID());
+                player.setHeldItem(hand, stack);
+            }
+
             //todo: open GUI
         }
 
@@ -75,18 +78,18 @@ public class ConjurationAssembler extends ItemBase
         if(!worldIn.isRemote)
         {
             final ItemStack containerStack = player.getHeldItem(EnumHand.MAIN_HAND);
-            final ItemStack contained = getContainedStack(containerStack);
+            final ItemStack filter = getFilter(containerStack);
             final UUID playerUuid = getPlayerUUID(containerStack);
 
-            if (playerUuid != null && !contained.isEmpty())
+            if (playerUuid != null && !filter.isEmpty())
             {
-                EMCItemHandler handler = getItemHandler(playerUuid, worldIn, contained);
+                EMCItemHandler handler = getItemHandler(playerUuid, worldIn, filter);
 
-                ItemStack actualStack = handler.getStackInSlot(0);
+                ItemStack actualStack = handler.getStackInSlot(0).copy();
+                if(actualStack.getCount() > 64)
+                    actualStack.setCount(64);
 
-                actualStack.setCount(64);
-
-                player.setHeldItem(hand, actualStack);
+                player.setHeldItem(hand, actualStack.copy());
                 EnumActionResult result = actualStack.onItemUse(player, worldIn, pos, hand, facing, hitX, hitY, hitZ);
                 final ItemStack newActualStack = player.getHeldItem(hand);
                 player.setHeldItem(hand, containerStack);
@@ -95,9 +98,9 @@ public class ConjurationAssembler extends ItemBase
 
                 if(!delta.isEmpty())
                 {
-                    delta = handler.extractItem(delta, false);
+                    ItemStack extractResult = handler.extractItem(delta, false);
 
-                    if(!delta.isEmpty())
+                    if(extractResult.isEmpty())
                     {
                         EquivalentIntegrationsMod.logger.warn("Just leaked {}", delta);
                     }
@@ -119,17 +122,17 @@ public class ConjurationAssembler extends ItemBase
         return handler;
     }
 
-    private static ItemStack getContainedStack(final @Nonnull ItemStack container)
+    private static ItemStack getFilter(final @Nonnull ItemStack container)
     {
         if(container.isEmpty())
             return ItemStack.EMPTY;
 
         NBTTagCompound compound = container.getTagCompound();
 
-        if(compound == null || !compound.hasKey("item"))
+        if(compound == null || !compound.hasKey("filter"))
             return ItemStack.EMPTY;
 
-        NBTTagCompound inv = compound.getCompoundTag("item");
+        NBTTagCompound inv = compound.getCompoundTag("filter");
 
         return new ItemStack(inv);
     }
@@ -162,5 +165,51 @@ public class ConjurationAssembler extends ItemBase
             throw new IllegalArgumentException("before doesn't match after");
 
         return new ItemStack(before.getItem(), before.getCount() - after.getCount(), before.getMetadata(), before.getTagCompound());
+    }
+
+    @Nonnull
+    public static ItemStack withOwner(@Nonnull UUID owner)
+    {
+        return withOwnerAndFilter(owner, ItemStack.EMPTY);
+    }
+
+    @Nonnull
+    public static ItemStack withOwner(@Nonnull ItemStack original, @Nonnull UUID owner)
+    {
+        ItemStack filter = getFilter(original);
+        return withOwnerAndFilter(owner, filter);
+    }
+
+    @Nonnull
+    public static ItemStack withFilter(@Nonnull ItemStack original, @Nonnull ItemStack filter)
+    {
+        UUID owner = getPlayerUUID(original);
+        return withOwnerAndFilter(owner, filter);
+    }
+
+    @Nonnull
+    public static ItemStack withOwnerAndFilter(@Nullable UUID owner, @Nonnull ItemStack filter)
+    {
+        NBTTagCompound tag = new NBTTagCompound();
+
+        if(owner != null)
+        {
+            tag.setString("player", owner.toString());
+        }
+
+        if(filter.isEmpty())
+        {
+            filter = new ItemStack(Blocks.COBBLESTONE, 1);
+        }
+
+        if(!filter.isEmpty())
+        {
+            tag.setTag("filter", filter.serializeNBT());
+        }
+
+
+        ItemStack ret =  new ItemStack(ModItems.conjurationAssembler, 1);
+        ret.setTagCompound(tag);
+        return ret;
     }
 }

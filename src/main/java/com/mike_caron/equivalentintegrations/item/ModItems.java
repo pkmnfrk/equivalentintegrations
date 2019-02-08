@@ -26,6 +26,9 @@ public class ModItems
     @GameRegistry.ObjectHolder(EfficiencyCatalyst.id)
     public static EfficiencyCatalyst efficiencyCatalyst;
 
+    @GameRegistry.ObjectHolder(ConjurationAssembler.id)
+    public static ConjurationAssembler conjurationAssembler;
+
     @SubscribeEvent
     public static void registerItems(RegistryEvent.Register<Item> event)
     {
@@ -34,6 +37,7 @@ public class ModItems
         registry.register(new SoulboundTalisman());
         registry.register(new AlchemicalAlgorithms());
         registry.register(new EfficiencyCatalyst());
+        registry.register(new ConjurationAssembler());
     }
 
     @SideOnly(Side.CLIENT)
