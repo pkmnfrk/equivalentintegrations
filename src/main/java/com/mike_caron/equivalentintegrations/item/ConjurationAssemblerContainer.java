@@ -73,7 +73,7 @@ public class ConjurationAssemblerContainer
                 @Override
                 public boolean isEnabled()
                 {
-                    return slotNumber != protectedSlot && super.isEnabled();
+                    return /*slotNumber != protectedSlot &&*/ super.isEnabled();
                 }
             });
         }
