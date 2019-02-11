@@ -11,6 +11,8 @@ item.alchemical_algorithms.desc1=Allows Transmutation Chambers to learn new item
 
 item.conjuration_assembler.name=Conjuration Assembler
 item.conjuration_assembler.desc1=Remotely converts EMC into blocks that you can place.
+item.conjuration_assembler.desc2=Item: %s
+item.conjuration_assembler.desc2x=Item: No item
 
 item.efficiency_catalyst.name=Efficiency Catalyst
 item.efficiency_catalyst.desc1=Increases efficiency of Transmutation machines

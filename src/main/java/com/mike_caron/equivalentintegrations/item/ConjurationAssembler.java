@@ -1,5 +1,8 @@
 package com.mike_caron.equivalentintegrations.item;
 
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
 import com.mike_caron.equivalentintegrations.EquivalentIntegrationsMod;
 import com.mike_caron.equivalentintegrations.client.renderer.item.ConjurationAssemblerModel;
 import com.mike_caron.equivalentintegrations.inventory.ItemInventory;
@@ -32,6 +35,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 public class ConjurationAssembler extends ItemBase
 {
@@ -39,6 +43,20 @@ public class ConjurationAssembler extends ItemBase
 
     public static int STACK_LIMIT = 1;
     public static final int NESTED_ITEM_TINT_DELTA = 1;
+
+    private static final LoadingCache<ItemStack, ItemStack> itemCache = CacheBuilder
+        .newBuilder()
+        .softValues()
+        .expireAfterAccess(10, TimeUnit.SECONDS)
+        .build(new CacheLoader<ItemStack, ItemStack>()
+        {
+            @Override
+            @Nonnull
+            public ItemStack load(@Nonnull ItemStack key) throws Exception
+            {
+                return getFilter(key);
+            }
+        });
 
     public ConjurationAssembler()
     {
@@ -49,7 +67,7 @@ public class ConjurationAssembler extends ItemBase
         this.addPropertyOverride(new ResourceLocation("active"), new IItemPropertyGetter()
         {
             @Override
-            public float apply(ItemStack stack, @Nullable World worldIn, @Nullable EntityLivingBase entityIn)
+            public float apply(@Nonnull ItemStack stack, @Nullable World worldIn, @Nullable EntityLivingBase entityIn)
             {
                 boolean isActive = getPlayerUUID(stack) != null && !getFilter(stack).isEmpty();
                 return isActive ? 1F : 0F;
@@ -75,6 +93,33 @@ public class ConjurationAssembler extends ItemBase
         {
             tooltip.add(TextFormatting.GRAY + "" + TextFormatting.ITALIC + tip);
         }
+
+        /*
+        ItemStack held = getFilter(stack);
+        if(held.isEmpty())
+        {
+            tip = I18n.format("item.conjuration_assembler.desc2x");
+        }
+        else
+        {
+            tip = I18n.format("item.conjuration_assembler.desc2", held.getDisplayName());
+        }
+
+        tooltip.add(tip);
+        */
+    }
+
+    @Override
+    @Nonnull
+    public String getItemStackDisplayName(@Nonnull ItemStack stack)
+    {
+        String base = super.getItemStackDisplayName(stack);
+
+        ItemStack held = itemCache.getUnchecked(stack);
+        if(!held.isEmpty())
+            base += " (" + held.getDisplayName() + ")";
+
+        return base;
     }
 
     @Override
