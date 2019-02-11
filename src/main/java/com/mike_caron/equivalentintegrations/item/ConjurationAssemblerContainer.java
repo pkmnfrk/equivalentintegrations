@@ -69,12 +69,6 @@ public class ConjurationAssemblerContainer
                 {
                     return slotNumber != protectedSlot && super.canTakeStack(playerIn);
                 }
-
-                @Override
-                public boolean isEnabled()
-                {
-                    return /*slotNumber != protectedSlot &&*/ super.isEnabled();
-                }
             });
         }
     }
@@ -115,11 +109,13 @@ public class ConjurationAssemblerContainer
             }
             else
             {
+                /*
                 //transferring from player -> block
                 if(filterSlot.getStack().isEmpty() && filterSlot.isItemValid(itemstack))
                 {
                     this.filterSlot.putStack(itemstack);
                 }
+                */
 
                 if(index <= 27)
                 {
@@ -163,6 +159,23 @@ public class ConjurationAssemblerContainer
             super.slotClick(slotId, dragType, clickType, player);
             playerInventory.setItemStack(held);
             return held;
+        }
+        if(clickType == ClickType.QUICK_MOVE)
+        {
+           if(slotId == 0)
+           {
+               filterSlot.putStack(ItemStack.EMPTY);
+               return ItemStack.EMPTY;
+           }
+           else
+           {
+               ItemStack held = inventorySlots.get(slotId).getStack();
+               if(filterSlot.getStack().isEmpty() && filterSlot.isItemValid(held))
+               {
+                   filterSlot.putStack(held);
+                   return held;
+               }
+           }
         }
 
         return super.slotClick(slotId, dragType, clickType, player);
