@@ -30,6 +30,8 @@ container.transmutation_generator.mod3=ALT - x 1/2
 container.transmutation_generator.poweron=Enable (currently disabled)
 container.transmutation_generator.poweroff=Disable (currently enabled)
 
+container.conjuration_assembler.title=Conjuration Assembler
+
 #make sure to include a trailing space!
 container.transmutation_generator.efficiency=EMC per FE:
 

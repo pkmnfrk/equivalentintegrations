@@ -1,0 +1,24 @@
+{
+  "result": {
+    "item": "equivalentintegrations:conjuration_assembler"
+},
+  "pattern": [
+    "iti",
+    "ibi",
+    "iii"
+  ],
+  "type": "forge:ore_shaped",
+  "key": {
+    "i": {
+      "type": "forge:ore_dict",
+      "ore": "ingotIron"
+    },
+    "t": {
+      "item": "projecte:item.pe_transmutation_tablet"
+    },
+    "b": {
+      "item": "projecte:item.pe_alchemical_bag",
+      "data": 32767
+    }
+  }
+}
