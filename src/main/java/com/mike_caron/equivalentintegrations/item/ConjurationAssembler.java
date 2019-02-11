@@ -44,17 +44,31 @@ public class ConjurationAssembler extends ItemBase
     public static int STACK_LIMIT = 1;
     public static final int NESTED_ITEM_TINT_DELTA = 1;
 
-    private static final LoadingCache<ItemStack, ItemStack> itemCache = CacheBuilder
+    private static final class Data
+    {
+        @Nullable
+        public final UUID playerUuid;
+        @Nonnull
+        public final ItemStack itemStack;
+
+        public Data(@Nullable UUID playerUuid, @Nonnull ItemStack itemStack)
+        {
+            this.playerUuid = playerUuid;
+            this.itemStack = itemStack;
+        }
+    }
+
+    private static final LoadingCache<ItemStack, Data> itemCache = CacheBuilder
         .newBuilder()
         .softValues()
         .expireAfterAccess(10, TimeUnit.SECONDS)
-        .build(new CacheLoader<ItemStack, ItemStack>()
+        .build(new CacheLoader<ItemStack, Data>()
         {
             @Override
             @Nonnull
-            public ItemStack load(@Nonnull ItemStack key) throws Exception
+            public Data load(@Nonnull ItemStack key) throws Exception
             {
-                return getFilter(key);
+                return getData(key);
             }
         });
 
@@ -69,7 +83,8 @@ public class ConjurationAssembler extends ItemBase
             @Override
             public float apply(@Nonnull ItemStack stack, @Nullable World worldIn, @Nullable EntityLivingBase entityIn)
             {
-                boolean isActive = getPlayerUUID(stack) != null && !getFilter(stack).isEmpty();
+                final Data data = itemCache.getUnchecked(stack);
+                boolean isActive = data.playerUuid != null && !data.itemStack.isEmpty();
                 return isActive ? 1F : 0F;
             }
         });
@@ -115,9 +130,9 @@ public class ConjurationAssembler extends ItemBase
     {
         String base = super.getItemStackDisplayName(stack);
 
-        ItemStack held = itemCache.getUnchecked(stack);
-        if(!held.isEmpty())
-            base += " (" + held.getDisplayName() + ")";
+        Data held = itemCache.getUnchecked(stack);
+        if(!held.itemStack.isEmpty())
+            base += " (" + held.itemStack.getDisplayName() + ")";
 
         return base;
     }
@@ -127,6 +142,7 @@ public class ConjurationAssembler extends ItemBase
     public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer player, @Nonnull EnumHand hand)
     {
         ItemStack stack = player.getHeldItem(hand);
+        final Data data = itemCache.getUnchecked(stack);
 
         if(hand != EnumHand.MAIN_HAND)
         {
@@ -135,7 +151,7 @@ public class ConjurationAssembler extends ItemBase
 
         if(!world.isRemote && (player.isSneaking()))
         {
-            if(!player.getUniqueID().equals(getPlayerUUID(stack)))
+            if(!player.getUniqueID().equals(data.playerUuid))
             {
                 stack = withOwner(stack, player.getUniqueID());
                 player.setHeldItem(hand, stack);
@@ -153,12 +169,11 @@ public class ConjurationAssembler extends ItemBase
         if(!worldIn.isRemote)
         {
             final ItemStack containerStack = player.getHeldItem(EnumHand.MAIN_HAND);
-            final ItemStack filter = getFilter(containerStack);
-            final UUID playerUuid = getPlayerUUID(containerStack);
+            final Data data = itemCache.getUnchecked(containerStack);
 
-            if (playerUuid != null && !filter.isEmpty())
+            if (data.playerUuid != null && !data.itemStack.isEmpty())
             {
-                EMCItemHandler handler = getItemHandler(playerUuid, worldIn, filter);
+                EMCItemHandler handler = getItemHandler(data.playerUuid, worldIn, data.itemStack);
 
                 ItemStack actualStack = handler.getStackInSlot(0).copy();
                 if(!actualStack.isEmpty())
@@ -202,27 +217,37 @@ public class ConjurationAssembler extends ItemBase
 
     public static ItemStack getFilter(final @Nonnull ItemStack container)
     {
-        if(container.isEmpty())
-            return ItemStack.EMPTY;
-
-        ItemInventory inv = new ItemInventory(container, 1);
-        return inv.getStackInSlot(0);
+        final Data data = itemCache.getUnchecked(container);
+        return data.itemStack;
     }
 
     @Nullable
     private static UUID getPlayerUUID(final @Nonnull ItemStack container)
     {
-        if(container.isEmpty())
-            return null;
+        final Data data = itemCache.getUnchecked(container);
+        return data.playerUuid;
+    }
 
-        NBTTagCompound compound = container.getTagCompound();
+    @Nonnull
+    private static Data getData(final @Nonnull ItemStack container)
+    {
+        UUID uuid = null;
+        ItemStack stack = ItemStack.EMPTY;
 
-        if(compound == null || !compound.hasKey("player"))
-            return null;
+        if(!container.isEmpty())
+        {
+            NBTTagCompound compound = container.getTagCompound();
 
-        String playerUuid = compound.getString("player");
+            if (compound != null && compound.hasKey("player"))
+            {
+                uuid = UUID.fromString(compound.getString("player"));
+            }
 
-        return UUID.fromString(playerUuid);
+            ItemInventory inv = new ItemInventory(container, 1);
+            stack = inv.getStackInSlot(0);
+        }
+
+        return new Data(uuid, stack);
     }
 
     private static ItemStack getDelta(@Nonnull ItemStack before, @Nonnull ItemStack after)
@@ -248,15 +273,15 @@ public class ConjurationAssembler extends ItemBase
     @Nonnull
     public static ItemStack withOwner(@Nonnull ItemStack original, @Nonnull UUID owner)
     {
-        ItemStack filter = getFilter(original);
-        return withOwnerAndFilter(owner, filter);
+        final Data data = itemCache.getUnchecked(original);
+        return withOwnerAndFilter(owner, data.itemStack);
     }
 
     @Nonnull
     public static ItemStack withFilter(@Nonnull ItemStack original, @Nonnull ItemStack filter)
     {
-        UUID owner = getPlayerUUID(original);
-        return withOwnerAndFilter(owner, filter);
+        final Data data = itemCache.getUnchecked(original);
+        return withOwnerAndFilter(data.playerUuid, filter);
     }
 
     @Nonnull
@@ -296,13 +321,12 @@ public class ConjurationAssembler extends ItemBase
             final ItemStack stack = player.inventory.getStackInSlot(i);
 
             if (stack.getItem() == this) {
-                final ItemStack containedStack = getFilter(stack);
-                final UUID playerUuid = getPlayerUUID(stack);
-                if (!containedStack.isEmpty()) {
-                    final boolean isMatching = containedStack.isItemEqualIgnoreDurability(pickedStack);
+                final Data data = itemCache.getUnchecked(stack);
+                if (!data.itemStack.isEmpty()) {
+                    final boolean isMatching = data.itemStack.isItemEqualIgnoreDurability(pickedStack);
                     if (isMatching) {
 
-                        EMCItemHandler handler = getItemHandler(playerUuid, evt.getItem().world, containedStack);
+                        EMCItemHandler handler = getItemHandler(data.playerUuid, evt.getItem().world, data.itemStack);
                         ItemStack result = handler.insertItem(0, pickedStack, false);
                         if(result.getCount() != pickedStack.getCount())
                         {
@@ -328,7 +352,5 @@ public class ConjurationAssembler extends ItemBase
         {
             super(player, 1, inventorySlot);
         }
-
-
     }
 }
