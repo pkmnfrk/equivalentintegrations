@@ -1,5 +1,6 @@
 package com.mike_caron.equivalentintegrations.item;
 
+import com.mike_caron.equivalentintegrations.block.transmutation_chamber.TransmutationChamberItemStackHandler;
 import com.mike_caron.equivalentintegrations.inventory.GhostSlot;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
@@ -7,6 +8,7 @@ import net.minecraft.inventory.ClickType;
 import net.minecraft.inventory.Container;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.Slot;
+import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 
 import javax.annotation.Nonnull;
@@ -79,7 +81,17 @@ public class ConjurationAssemblerContainer
 
     private void addOwnSlots()
     {
-        filterSlot = addSlotToContainer(new GhostSlot(this.containerInventory, 0, 83, 32));
+        filterSlot = addSlotToContainer(new GhostSlot(this.containerInventory, 0, 83, 32)
+        {
+            @Override
+            public boolean isItemValid(ItemStack stack)
+            {
+                if(!super.isItemValid(stack)) return false;
+                if(!(stack.getItem() instanceof ItemBlock)) return false;
+
+                return true;
+            }
+        });
 
     }
 
@@ -103,8 +115,29 @@ public class ConjurationAssemblerContainer
             }
             else
             {
-                this.filterSlot.putStack(itemstack);
-                return itemstack;
+                //transferring from player -> block
+                if(filterSlot.getStack().isEmpty() && filterSlot.isItemValid(itemstack))
+                {
+                    this.filterSlot.putStack(itemstack);
+                }
+
+                if(index <= 27)
+                {
+                    if (!this.mergeItemStack(itemstack1, 28, 36, false))
+                    {
+                        return ItemStack.EMPTY;
+                    }
+                }
+                else
+                {
+                    if (!this.mergeItemStack(itemstack1, 1, 27, false))
+                    {
+                        return ItemStack.EMPTY;
+                    }
+                }
+
+
+
             }
         }
 

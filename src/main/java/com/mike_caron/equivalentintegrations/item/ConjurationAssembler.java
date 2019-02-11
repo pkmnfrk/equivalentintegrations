@@ -247,8 +247,6 @@ public class ConjurationAssembler extends ItemBase
 
         if (pickedStack.isEmpty() || player == null) return;
 
-        boolean foundMatchingContainer = false;
-
         for (int i = 0; i < player.inventory.getSizeInventory(); i++) {
             final ItemStack stack = player.inventory.getStackInSlot(i);
 
