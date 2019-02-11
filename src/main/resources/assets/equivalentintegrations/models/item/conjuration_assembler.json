@@ -4,6 +4,21 @@
     "layer0":"equivalentintegrations:items/conjuration_assembler"
   },
   "overrides": [
-    {"predicate": { "active": 1 }, "model": "equivalentintegrations:item/conjuration_assembler_active"}
+    {"predicate": { "active": 1, "color": 0  }, "model": "equivalentintegrations:item/conjuration_assembler_0"  },
+    {"predicate": { "active": 1, "color": 1  }, "model": "equivalentintegrations:item/conjuration_assembler_1"  },
+    {"predicate": { "active": 1, "color": 2  }, "model": "equivalentintegrations:item/conjuration_assembler_2"  },
+    {"predicate": { "active": 1, "color": 3  }, "model": "equivalentintegrations:item/conjuration_assembler_3"  },
+    {"predicate": { "active": 1, "color": 4  }, "model": "equivalentintegrations:item/conjuration_assembler_4"  },
+    {"predicate": { "active": 1, "color": 5  }, "model": "equivalentintegrations:item/conjuration_assembler_5"  },
+    {"predicate": { "active": 1, "color": 6  }, "model": "equivalentintegrations:item/conjuration_assembler_6"  },
+    {"predicate": { "active": 1, "color": 7  }, "model": "equivalentintegrations:item/conjuration_assembler_7"  },
+    {"predicate": { "active": 1, "color": 8  }, "model": "equivalentintegrations:item/conjuration_assembler_8"  },
+    {"predicate": { "active": 1, "color": 9  }, "model": "equivalentintegrations:item/conjuration_assembler_9"  },
+    {"predicate": { "active": 1, "color": 10 }, "model": "equivalentintegrations:item/conjuration_assembler_10" },
+    {"predicate": { "active": 1, "color": 11 }, "model": "equivalentintegrations:item/conjuration_assembler_11" },
+    {"predicate": { "active": 1, "color": 12 }, "model": "equivalentintegrations:item/conjuration_assembler_12" },
+    {"predicate": { "active": 1, "color": 13 }, "model": "equivalentintegrations:item/conjuration_assembler_13" },
+    {"predicate": { "active": 1, "color": 14 }, "model": "equivalentintegrations:item/conjuration_assembler_14" },
+    {"predicate": { "active": 1, "color": 15 }, "model": "equivalentintegrations:item/conjuration_assembler_15" }
   ]
 }

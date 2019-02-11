@@ -22,49 +22,44 @@ public class PacketHandlerServer implements IMessageHandler<CtoSMessage, IMessag
         final World world = player.world;
 
         final IThreadListener mainThread = (WorldServer)world;
-        mainThread.addScheduledTask(new Runnable()
-        {
-            @Override
-            public void run()
-            {
-                try {
-                    TileEntity te = world.getTileEntity(message.getPos());
+        mainThread.addScheduledTask(() -> {
+            try {
+                TileEntity te = world.getTileEntity(message.getPos());
 
-                    switch (message.getKind())
-                    {
-                        case PowerDelta:
-                            if(te instanceof TransmutationGeneratorTileEntity)
-                            {
-                                TransmutationGeneratorTileEntity gen = (TransmutationGeneratorTileEntity)te;
-
-                                gen.setPowerPerTick(gen.getPowerPerTick() + message.getPowerDelta());
-                            }
-                            break;
-                        case OnOff:
-                            if(te instanceof TransmutationGeneratorTileEntity)
-                            {
-                                ((TransmutationGeneratorTileEntity)te).setGenerating(message.getOnOff());
-                            }
-                            break;
-                        case ToggleForbidNbt:
-                            if(te instanceof TransmutationChamberTileEntity)
-                            {
-                                ((TransmutationChamberTileEntity)te).setForbidNbt(message.getOnOff());
-                            }
-                            break;
-                        case ToggleForbidDamage:
-                            if(te instanceof TransmutationChamberTileEntity)
-                            {
-                                ((TransmutationChamberTileEntity)te).setForbidDamaged(message.getOnOff());
-                            }
-                            break;
-                    }
-
-                }
-                catch (Exception e)
+                switch (message.getKind())
                 {
-                    EquivalentIntegrationsMod.logger.error("Error while handling message", e);
+                    case PowerDelta:
+                        if(te instanceof TransmutationGeneratorTileEntity)
+                        {
+                            TransmutationGeneratorTileEntity gen = (TransmutationGeneratorTileEntity)te;
+
+                            gen.setPowerPerTick(gen.getPowerPerTick() + message.getPowerDelta());
+                        }
+                        break;
+                    case OnOff:
+                        if(te instanceof TransmutationGeneratorTileEntity)
+                        {
+                            ((TransmutationGeneratorTileEntity)te).setGenerating(message.getOnOff());
+                        }
+                        break;
+                    case ToggleForbidNbt:
+                        if(te instanceof TransmutationChamberTileEntity)
+                        {
+                            ((TransmutationChamberTileEntity)te).setForbidNbt(message.getOnOff());
+                        }
+                        break;
+                    case ToggleForbidDamage:
+                        if(te instanceof TransmutationChamberTileEntity)
+                        {
+                            ((TransmutationChamberTileEntity)te).setForbidDamaged(message.getOnOff());
+                        }
+                        break;
                 }
+
+            }
+            catch (Exception e)
+            {
+                EquivalentIntegrationsMod.logger.error("Error while handling message", e);
             }
         });
 

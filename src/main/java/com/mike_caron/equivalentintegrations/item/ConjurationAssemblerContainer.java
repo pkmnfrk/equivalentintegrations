@@ -1,7 +1,11 @@
 package com.mike_caron.equivalentintegrations.item;
 
+import com.mike_caron.equivalentintegrations.EquivalentIntegrationsMod;
 import com.mike_caron.equivalentintegrations.block.transmutation_chamber.TransmutationChamberItemStackHandler;
 import com.mike_caron.equivalentintegrations.inventory.GhostSlot;
+import com.mike_caron.equivalentintegrations.network.ItemConfigMessage;
+import moze_intel.projecte.api.ProjectEAPI;
+import moze_intel.projecte.api.proxy.ITransmutationProxy;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.ClickType;
@@ -17,7 +21,7 @@ public class ConjurationAssemblerContainer
         extends Container
 {
     private final InventoryPlayer playerInventory;
-    private final IInventory containerInventory;
+    private final ConjurationAssembler.Inventory containerInventory;
     private Slot filterSlot;
 
     private final int protectedSlot;
@@ -25,7 +29,7 @@ public class ConjurationAssemblerContainer
 
     public static final int GUI_ID = 3;
 
-    public ConjurationAssemblerContainer(IInventory playerInventory, IInventory containerInventory, int protectedIndex)
+    public ConjurationAssemblerContainer(IInventory playerInventory, ConjurationAssembler.Inventory containerInventory, int protectedIndex)
     {
         this.playerInventory = (InventoryPlayer)playerInventory;
         this.containerInventory = containerInventory;
@@ -81,7 +85,8 @@ public class ConjurationAssemblerContainer
             public boolean isItemValid(ItemStack stack)
             {
                 if(!super.isItemValid(stack)) return false;
-                if(!(stack.getItem() instanceof ItemBlock)) return false;
+
+                if(!ProjectEAPI.getEMCProxy().hasValue(stack)) return false;
 
                 return true;
             }
@@ -179,5 +184,18 @@ public class ConjurationAssemblerContainer
         }
 
         return super.slotClick(slotId, dragType, clickType, player);
+    }
+
+
+
+    public int getCurrentColor()
+    {
+        return containerInventory.getCurrentColor();
+    }
+
+    public void setCurrentColor(int color)
+    {
+        ItemConfigMessage msg = new ItemConfigMessage(1, color);
+        EquivalentIntegrationsMod.networkWrapper.sendToServer(msg);
     }
 }

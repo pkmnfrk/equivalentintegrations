@@ -64,6 +64,9 @@ public class PlayerItemInventory extends ItemInventory {
     public void onInventoryChanged(int slotNumber) {
         super.onInventoryChanged(slotNumber);
         if (isValid)
-            player.inventory.setInventorySlotContents(inventorySlot, containerStack.copy());
+        {
+            containerStack = containerStack.copy();
+            player.inventory.setInventorySlotContents(inventorySlot, containerStack);
+        }
     }
 }

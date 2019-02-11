@@ -5,10 +5,13 @@ import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.mike_caron.equivalentintegrations.EquivalentIntegrationsMod;
 import com.mike_caron.equivalentintegrations.client.renderer.item.ConjurationAssemblerModel;
+import com.mike_caron.equivalentintegrations.inventory.IInventoryCallback;
 import com.mike_caron.equivalentintegrations.inventory.ItemInventory;
 import com.mike_caron.equivalentintegrations.inventory.PlayerItemInventory;
 import com.mike_caron.equivalentintegrations.storage.EMCItemHandler;
+import com.mike_caron.equivalentintegrations.util.ItemUtils;
 import com.mike_caron.equivalentintegrations.util.MappedModelLoader;
+import com.mike_caron.equivalentintegrations.util.OptionalInt;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.client.resources.IResourceManager;
 import net.minecraft.client.util.ITooltipFlag;
@@ -26,6 +29,7 @@ import net.minecraft.world.World;
 import net.minecraftforge.client.model.ICustomModelLoader;
 import net.minecraftforge.client.model.IModel;
 import net.minecraftforge.client.model.ModelLoaderRegistry;
+import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.event.entity.player.EntityItemPickupEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.Side;
@@ -33,11 +37,14 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.awt.Color;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
-public class ConjurationAssembler extends ItemBase
+public class ConjurationAssembler
+    extends ItemBase
+    implements IItemConfig
 {
     public static final String id = "conjuration_assembler";
 
@@ -46,18 +53,20 @@ public class ConjurationAssembler extends ItemBase
 
     private static final class Data
     {
+
         @Nullable
         public final UUID playerUuid;
         @Nonnull
         public final ItemStack itemStack;
-
-        public Data(@Nullable UUID playerUuid, @Nonnull ItemStack itemStack)
+        public final int color;
+        public Data(@Nullable UUID playerUuid, @Nonnull ItemStack itemStack, @Nonnull int color)
         {
             this.playerUuid = playerUuid;
             this.itemStack = itemStack;
+            this.color = color;
         }
-    }
 
+    }
     private static final LoadingCache<ItemStack, Data> itemCache = CacheBuilder
         .newBuilder()
         .softValues()
@@ -78,15 +87,15 @@ public class ConjurationAssembler extends ItemBase
         setTranslationKey(id);
         setMaxStackSize(1);
 
-        this.addPropertyOverride(new ResourceLocation("active"), new IItemPropertyGetter()
-        {
-            @Override
-            public float apply(@Nonnull ItemStack stack, @Nullable World worldIn, @Nullable EntityLivingBase entityIn)
-            {
-                final Data data = itemCache.getUnchecked(stack);
-                boolean isActive = data.playerUuid != null && !data.itemStack.isEmpty();
-                return isActive ? 1F : 0F;
-            }
+        this.addPropertyOverride(new ResourceLocation("active"), (stack, worldIn, entityIn) -> {
+            final Data data = itemCache.getUnchecked(stack);
+            boolean isActive = data.playerUuid != null && !data.itemStack.isEmpty();
+            return isActive ? 1F : 0F;
+        });
+
+        this.addPropertyOverride(new ResourceLocation("color"), (stack, worldIn, entityIn) -> {
+            final Data data = itemCache.getUnchecked(stack);
+            return data.color;
         });
     }
 
@@ -233,6 +242,7 @@ public class ConjurationAssembler extends ItemBase
     {
         UUID uuid = null;
         ItemStack stack = ItemStack.EMPTY;
+        int color = 9;
 
         if(!container.isEmpty())
         {
@@ -243,11 +253,16 @@ public class ConjurationAssembler extends ItemBase
                 uuid = UUID.fromString(compound.getString("player"));
             }
 
+            if(compound != null && compound.hasKey("color"))
+            {
+                color = compound.getInteger("color");
+            }
+
             ItemInventory inv = new ItemInventory(container, 1);
             stack = inv.getStackInSlot(0);
         }
 
-        return new Data(uuid, stack);
+        return new Data(uuid, stack, color);
     }
 
     private static ItemStack getDelta(@Nonnull ItemStack before, @Nonnull ItemStack after)
@@ -267,25 +282,25 @@ public class ConjurationAssembler extends ItemBase
     @Nonnull
     public static ItemStack withOwner(@Nonnull UUID owner)
     {
-        return withOwnerAndFilter(owner, ItemStack.EMPTY);
+        return withOwnerAndFilter(owner, ItemStack.EMPTY, 9);
     }
 
     @Nonnull
     public static ItemStack withOwner(@Nonnull ItemStack original, @Nonnull UUID owner)
     {
         final Data data = itemCache.getUnchecked(original);
-        return withOwnerAndFilter(owner, data.itemStack);
+        return withOwnerAndFilter(owner, data.itemStack, data.color);
     }
 
     @Nonnull
     public static ItemStack withFilter(@Nonnull ItemStack original, @Nonnull ItemStack filter)
     {
         final Data data = itemCache.getUnchecked(original);
-        return withOwnerAndFilter(data.playerUuid, filter);
+        return withOwnerAndFilter(data.playerUuid, filter, data.color);
     }
 
     @Nonnull
-    public static ItemStack withOwnerAndFilter(@Nullable UUID owner, @Nonnull ItemStack filter)
+    public static ItemStack withOwnerAndFilter(@Nullable UUID owner, @Nonnull ItemStack filter, int color)
     {
         NBTTagCompound tag = new NBTTagCompound();
 
@@ -298,6 +313,8 @@ public class ConjurationAssembler extends ItemBase
         {
             tag.setTag(ItemInventory.TAG_INVENTORY, filter.serializeNBT());
         }
+
+        tag.setInteger("color", color);
 
 
         ItemStack ret =  new ItemStack(ModItems.conjurationAssembler, 1);
@@ -343,14 +360,33 @@ public class ConjurationAssembler extends ItemBase
     public static class Inventory
         extends PlayerItemInventory
     {
+
         public Inventory(EntityPlayer player)
         {
             super(player, 1);
         }
-
         public Inventory(EntityPlayer player, int inventorySlot)
         {
             super(player, 1, inventorySlot);
+        }
+
+        public int getCurrentColor()
+        {
+            NBTTagCompound compound = ItemUtils.getItemTag(containerStack);
+            if(!compound.hasKey("color"))
+                return 9;
+            return compound.getInteger("color");
+        }
+    }
+
+    @Override
+    public void onConfig(@Nonnull ItemStack stack, int discriminator, int payload)
+    {
+        NBTTagCompound compound = ItemUtils.getItemTag(stack);
+        switch(discriminator)
+        {
+            case 1:
+                compound.setInteger("color", payload);
         }
     }
 }

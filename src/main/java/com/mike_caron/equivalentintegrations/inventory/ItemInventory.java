@@ -12,7 +12,7 @@ public class ItemInventory extends GenericInventory {
     public static final String TAG_INVENTORY = "inventory";
 
     @Nonnull
-    protected final ItemStack containerStack;
+    protected ItemStack containerStack;
 
     public ItemInventory(@Nonnull ItemStack containerStack, int size) {
         super("", false, size);

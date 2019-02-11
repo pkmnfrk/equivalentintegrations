@@ -5,6 +5,7 @@ import com.mike_caron.equivalentintegrations.command.DumpCacheCommand;
 import com.mike_caron.equivalentintegrations.impl.ManagedEMCManager;
 import com.mike_caron.equivalentintegrations.integrations.MainCompatHandler;
 import com.mike_caron.equivalentintegrations.network.CtoSMessage;
+import com.mike_caron.equivalentintegrations.network.ItemConfigMessage;
 import com.mike_caron.equivalentintegrations.network.PacketHandlerServer;
 import com.mike_caron.equivalentintegrations.proxy.IModProxy;
 import net.minecraftforge.common.MinecraftForge;
@@ -70,6 +71,7 @@ public class EquivalentIntegrationsMod {
         proxy.postInit(event);
         networkWrapper = NetworkRegistry.INSTANCE.newSimpleChannel(modId.substring(0, 20));
         networkWrapper.registerMessage(PacketHandlerServer.class, CtoSMessage.class, 2, Side.SERVER);
+        networkWrapper.registerMessage(ItemConfigMessage.Handler.class, ItemConfigMessage.class, 3, Side.SERVER);
     }
 
     @Mod.EventHandler
