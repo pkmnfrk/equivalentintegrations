@@ -73,6 +73,7 @@ public class ConjurationAssembler
         setRegistryName(id);
         setTranslationKey(id);
         setMaxStackSize(1);
+        setCreativeTab(EquivalentIntegrationsMod.creativeTab);
 
         this.addPropertyOverride(new ResourceLocation("active"), (stack, worldIn, entityIn) -> {
             final Data data = itemCache.getUnchecked(stack);

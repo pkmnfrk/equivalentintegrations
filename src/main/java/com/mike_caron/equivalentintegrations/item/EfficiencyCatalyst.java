@@ -1,5 +1,6 @@
 package com.mike_caron.equivalentintegrations.item;
 
+import com.mike_caron.equivalentintegrations.EquivalentIntegrationsMod;
 import com.mike_caron.mikesmodslib.item.ItemBase;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.client.util.ITooltipFlag;
@@ -21,6 +22,7 @@ public class EfficiencyCatalyst extends ItemBase
         setRegistryName(id);
         setTranslationKey(id);
         setMaxStackSize(4);
+        setCreativeTab(EquivalentIntegrationsMod.creativeTab);
     }
 
     @Override

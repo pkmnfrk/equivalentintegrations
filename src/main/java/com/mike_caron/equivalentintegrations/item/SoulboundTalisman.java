@@ -1,5 +1,6 @@
 package com.mike_caron.equivalentintegrations.item;
 
+import com.mike_caron.equivalentintegrations.EquivalentIntegrationsMod;
 import com.mike_caron.mikesmodslib.item.ItemBase;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.client.util.ITooltipFlag;
@@ -29,6 +30,7 @@ public class SoulboundTalisman extends ItemBase
     {
         setRegistryName(id);
         setTranslationKey(id);
+        setCreativeTab(EquivalentIntegrationsMod.creativeTab);
     }
 
     @Override

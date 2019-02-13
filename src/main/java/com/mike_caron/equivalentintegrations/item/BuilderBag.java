@@ -1,5 +1,6 @@
 package com.mike_caron.equivalentintegrations.item;
 
+import com.mike_caron.equivalentintegrations.EquivalentIntegrationsMod;
 import com.mike_caron.mikesmodslib.item.ItemBase;
 import com.mike_caron.mikesmodslib.util.ItemUtils;
 import net.minecraft.client.resources.I18n;
@@ -31,6 +32,7 @@ public class BuilderBag
         setRegistryName(id);
         setTranslationKey(id);
         setMaxStackSize(1);
+        setCreativeTab(EquivalentIntegrationsMod.creativeTab);
     }
 
     @Override
