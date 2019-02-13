@@ -51,7 +51,11 @@ repositories {
         ivyPattern "https://maven.tterrag.com/[module]-[revision].[ext]"
         artifactPattern "http://media.forgecdn.net/files/${pe_cf}/[module]-[revision].[ext]"
     }
-
+    ivy {
+        name 'MikesModsLib'
+        ivyPattern "https://maven.tterrag.com/[module]-[revision].[ext]"
+        artifactPattern "https://media.forgecdn.net/files/${mikesmodslib_cf}/[module]-[revision](-[classifier]).[ext]"
+    }
 }
 
 dependencies {
@@ -60,7 +64,8 @@ dependencies {
     deobfCompile ("mcjty.theoneprobe:TheOneProbe-1.12:${top_version}"){
         transitive = false
     }
-    
+
+    deobfCompile name: 'MikesModsLib', version: "${mikesmodslib_version}", classifier: 'dev', ext: 'jar'
 
     // deobfProvided "refinedstorage:refinedstorage:${rs_version}:deobf"
 
