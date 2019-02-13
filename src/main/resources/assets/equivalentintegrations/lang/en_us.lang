@@ -14,6 +14,9 @@ item.conjuration_assembler.desc1=Remotely converts EMC into blocks that you can 
 item.conjuration_assembler.desc2=Item: %s
 item.conjuration_assembler.desc2x=Item: No item
 
+item.builder_bag.name=Builder Bag
+item.builder_bag.desc1=Automatically provides blocks to things like wands
+
 item.efficiency_catalyst.name=Efficiency Catalyst
 item.efficiency_catalyst.desc1=Increases efficiency of Transmutation machines
 

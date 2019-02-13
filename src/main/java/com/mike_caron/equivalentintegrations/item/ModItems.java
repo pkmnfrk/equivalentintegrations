@@ -33,6 +33,9 @@ public class ModItems
     @GameRegistry.ObjectHolder(ConjurationAssembler.id)
     public static ConjurationAssembler conjurationAssembler;
 
+    @GameRegistry.ObjectHolder(BuilderBag.id)
+    public static BuilderBag builderBag;
+
     @SubscribeEvent
     public static void registerItems(RegistryEvent.Register<Item> event)
     {
@@ -42,11 +45,13 @@ public class ModItems
         registry.register(new AlchemicalAlgorithms());
         registry.register(new EfficiencyCatalyst());
         registry.register(new ConjurationAssembler());
+        registry.register(new BuilderBag());
     }
 
     public static void registerEvents()
     {
         MinecraftForge.EVENT_BUS.register(conjurationAssembler);
+        MinecraftForge.EVENT_BUS.register(builderBag);
     }
 
     @SideOnly(Side.CLIENT)
