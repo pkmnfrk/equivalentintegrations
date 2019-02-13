@@ -67,7 +67,12 @@ public class ConjurationAssemblerContainer
     {
         super.onReadNBT(tag);
 
-        currentColor = tag.getInteger("color");
+        changed = false;
+        if(tag.getInteger("color") != currentColor)
+        {
+            currentColor = tag.getInteger("color");
+            changed = true;
+        }
     }
 
     @Override
@@ -236,5 +241,8 @@ public class ConjurationAssemblerContainer
     {
         ItemConfigMessage msg = new ItemConfigMessage(1, color);
         EquivalentIntegrationsMod.networkWrapper.sendToServer(msg);
+
+        currentColor = color;
+        notifyGuiUpdate();
     }
 }
