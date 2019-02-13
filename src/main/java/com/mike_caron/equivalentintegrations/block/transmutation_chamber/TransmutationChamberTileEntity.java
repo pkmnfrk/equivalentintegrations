@@ -14,7 +14,6 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.ItemStackHandler;
-import scala.collection.parallel.ParIterableLike;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;

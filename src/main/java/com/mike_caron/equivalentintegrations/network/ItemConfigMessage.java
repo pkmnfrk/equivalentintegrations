@@ -1,14 +1,11 @@
 package com.mike_caron.equivalentintegrations.network;
 
 import com.mike_caron.equivalentintegrations.EquivalentIntegrationsMod;
-import com.mike_caron.equivalentintegrations.block.transmutation_chamber.TransmutationChamberTileEntity;
-import com.mike_caron.equivalentintegrations.block.transmutation_generator.TransmutationGeneratorTileEntity;
 import com.mike_caron.equivalentintegrations.item.IItemConfig;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.IThreadListener;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;

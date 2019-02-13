@@ -1,6 +1,5 @@
 package com.mike_caron.equivalentintegrations.impl;
 
-import com.mike_caron.equivalentintegrations.EquivalentIntegrationsMod;
 import com.mike_caron.equivalentintegrations.OfflineEMCWorldData;
 import com.mike_caron.equivalentintegrations.api.events.EMCChangedEvent;
 import com.mike_caron.equivalentintegrations.storage.EMCInventory;
@@ -9,10 +8,8 @@ import moze_intel.projecte.api.capabilities.IKnowledgeProvider;
 import moze_intel.projecte.api.event.EMCRemapEvent;
 import moze_intel.projecte.api.proxy.IEMCProxy;
 import moze_intel.projecte.api.proxy.ITransmutationProxy;
-import moze_intel.projecte.emc.EMCMapper;
 import moze_intel.projecte.utils.EMCHelper;
 import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.World;
@@ -24,8 +21,10 @@ import net.minecraftforge.fml.common.gameevent.PlayerEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 
 import javax.annotation.Nullable;
-import java.util.*;
-import java.util.concurrent.Callable;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.UUID;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 

@@ -4,7 +4,6 @@ import com.mike_caron.equivalentintegrations.inventory.BetterItemStackHandler;
 import com.mike_caron.equivalentintegrations.item.ModItems;
 import com.mike_caron.equivalentintegrations.item.SoulboundTalisman;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
 
 import javax.annotation.Nonnull;
 

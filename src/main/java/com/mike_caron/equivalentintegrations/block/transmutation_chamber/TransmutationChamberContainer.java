@@ -1,18 +1,11 @@
 package com.mike_caron.equivalentintegrations.block.transmutation_chamber;
 
-import com.mike_caron.equivalentintegrations.EquivalentIntegrationsMod;
-import com.mike_caron.equivalentintegrations.integrations.ITOPInfoProvider;
 import com.mike_caron.equivalentintegrations.inventory.SoulboundTalismanSlot;
-import mcjty.theoneprobe.api.IProbeHitData;
-import mcjty.theoneprobe.api.IProbeInfo;
-import mcjty.theoneprobe.api.ProbeMode;
-import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.Container;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
-import net.minecraft.world.World;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.SlotItemHandler;

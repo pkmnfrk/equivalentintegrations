@@ -2,22 +2,16 @@ package com.mike_caron.equivalentintegrations.block.transmutation_generator;
 
 
 import com.mike_caron.equivalentintegrations.EquivalentIntegrationsMod;
-import com.mike_caron.equivalentintegrations.item.EfficiencyCatalyst;
 import com.mike_caron.equivalentintegrations.item.ModItems;
 import com.mike_caron.equivalentintegrations.network.CtoSMessage;
-import moze_intel.projecte.playerData.Transmutation;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.util.text.TextFormatting;
-import net.minecraftforge.energy.IEnergyStorage;
-import net.minecraftforge.fml.client.config.HoverChecker;
-import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;

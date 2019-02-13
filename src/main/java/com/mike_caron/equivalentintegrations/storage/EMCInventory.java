@@ -5,7 +5,6 @@ import com.mike_caron.equivalentintegrations.ModConfig;
 import com.mike_caron.equivalentintegrations.api.events.EMCChangedEvent;
 import com.mike_caron.equivalentintegrations.impl.ManagedEMCManager;
 import moze_intel.projecte.api.ProjectEAPI;
-import moze_intel.projecte.api.capabilities.IKnowledgeProvider;
 import moze_intel.projecte.api.event.EMCRemapEvent;
 import moze_intel.projecte.api.event.PlayerKnowledgeChangeEvent;
 import moze_intel.projecte.api.proxy.IEMCProxy;

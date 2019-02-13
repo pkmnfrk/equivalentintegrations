@@ -2,6 +2,7 @@ package com.mike_caron.equivalentintegrations.integrations;
 
 import com.mike_caron.equivalentintegrations.EquivalentIntegrationsMod;
 import com.mike_caron.equivalentintegrations.block.BlockBase;
+import com.mike_caron.mikesmodslib.integrations.IWailaInfoProvider;
 import mcp.mobius.waila.api.IWailaConfigHandler;
 import mcp.mobius.waila.api.IWailaDataAccessor;
 import mcp.mobius.waila.api.IWailaDataProvider;

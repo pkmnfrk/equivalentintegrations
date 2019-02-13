@@ -1,8 +1,8 @@
 package com.mike_caron.equivalentintegrations.block;
 
-import com.mike_caron.equivalentintegrations.integrations.ITOPInfoProvider;
-import com.mike_caron.equivalentintegrations.integrations.IWailaInfoProvider;
 import com.mike_caron.equivalentintegrations.item.ModItems;
+import com.mike_caron.mikesmodslib.integrations.ITOPInfoProvider;
+import com.mike_caron.mikesmodslib.integrations.IWailaInfoProvider;
 import mcjty.theoneprobe.api.ElementAlignment;
 import mcjty.theoneprobe.api.IProbeHitData;
 import mcjty.theoneprobe.api.IProbeInfo;
@@ -29,18 +29,14 @@ import javax.annotation.Nullable;
 import java.util.List;
 
 public abstract class TransmutationBlockBase
-        extends BlockBase
+    extends BlockBase
         implements ITileEntityProvider, ITOPInfoProvider, IWailaInfoProvider
 {
     public TransmutationBlockBase(String id)
     {
-        super(Material.IRON);
+        super(Material.IRON, id);
         setHardness(4);
-        setRegistryName(id);
-        setTranslationKey(id);
         setHarvestLevel("pickaxe", 1);
-
-
     }
 
     @Override

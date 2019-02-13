@@ -1,6 +1,7 @@
 package com.mike_caron.equivalentintegrations.integrations;
 
 import com.mike_caron.equivalentintegrations.EquivalentIntegrationsMod;
+import com.mike_caron.mikesmodslib.integrations.ITOPInfoProvider;
 import mcjty.theoneprobe.api.*;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;

@@ -9,9 +9,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.util.text.TextFormatting;
-import org.lwjgl.opengl.GL11;
 
-import javax.xml.soap.Text;
 import java.io.IOException;
 import java.util.List;
 

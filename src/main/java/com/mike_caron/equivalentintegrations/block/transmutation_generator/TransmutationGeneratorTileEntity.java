@@ -1,7 +1,7 @@
 package com.mike_caron.equivalentintegrations.block.transmutation_generator;
 
-import com.mike_caron.equivalentintegrations.ModConfig;
 import com.mike_caron.equivalentintegrations.EquivalentIntegrationsMod;
+import com.mike_caron.equivalentintegrations.ModConfig;
 import com.mike_caron.equivalentintegrations.block.TransmutationTileEntityBase;
 import com.mike_caron.equivalentintegrations.item.SoulboundTalisman;
 import net.minecraft.item.ItemStack;
