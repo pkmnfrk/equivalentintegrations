@@ -1,6 +1,7 @@
 package com.mike_caron.equivalentintegrations.item;
 
-import com.mike_caron.equivalentintegrations.util.ItemUtils;
+import com.mike_caron.mikesmodslib.item.ItemBase;
+import com.mike_caron.mikesmodslib.util.ItemUtils;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.player.EntityPlayer;
@@ -91,7 +92,7 @@ public class BuilderBag
         @Override
         public <T> T getCapability(@Nonnull Capability<T> capability, @Nullable EnumFacing facing)
         {
-            //UUID playerUuid = ItemUtils.getPlayerUUID(self);
+            //UUID playerUuid = ItemStackUtils.getPlayerUUID(self);
             //EntityPlayer player =
             //World world = player.getWorld();
 
