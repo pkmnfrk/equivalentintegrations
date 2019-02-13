@@ -46,16 +46,16 @@ repositories {
         name "RefinedStorage Repo"
         url "https://repo.raoulvdberge.com/"
     }
+    maven {
+        name 'CurseForge'
+        url "https://minecraft.curseforge.com/api/maven"
+    }
     ivy {
         name 'ProjectE'
         ivyPattern "https://maven.tterrag.com/[module]-[revision].[ext]"
         artifactPattern "http://media.forgecdn.net/files/${pe_cf}/[module]-[revision].[ext]"
     }
-    ivy {
-        name 'MikesModsLib'
-        ivyPattern "https://maven.tterrag.com/[module]-[revision].[ext]"
-        artifactPattern "https://media.forgecdn.net/files/${mikesmodslib_cf}/[module]-[revision](-[classifier]).[ext]"
-    }
+
 }
 
 dependencies {
@@ -65,7 +65,8 @@ dependencies {
         transitive = false
     }
 
-    deobfCompile name: 'MikesModsLib', version: "${mikesmodslib_version}", classifier: 'dev', ext: 'jar'
+    //deobfCompile name: 'MikesModsLib', version: "${mikesmodslib_version}", classifier: 'dev', ext: 'jar'
+    deobfCompile "mikes-mods-library:MikesModsLib:release"
 
     // deobfProvided "refinedstorage:refinedstorage:${rs_version}:deobf"
 
