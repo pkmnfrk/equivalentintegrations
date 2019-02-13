@@ -1,0 +1,4 @@
+[submodule "mikesmodslib"]
+	path = mikesmodslib
+	url = https://github.com/pkmnfrk/mikesmodslib.git
+	branch = 1.12.2

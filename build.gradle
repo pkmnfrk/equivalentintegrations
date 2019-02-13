@@ -10,7 +10,6 @@ buildscript {
 apply plugin: 'net.minecraftforge.gradle.forge'
 //Only edit below this line, the above code adds and enables the necessary things for Forge to be setup.
 
-
 version="${eiversion}${eiversionsuf}"
 group = "com.mike-caron.equivalentintegrations" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = "EquivalentIntegrations"
@@ -65,8 +64,8 @@ dependencies {
         transitive = false
     }
 
-    //deobfCompile name: 'MikesModsLib', version: "${mikesmodslib_version}", classifier: 'dev', ext: 'jar'
-    deobfCompile "mikes-mods-library:MikesModsLib:release"
+    //deobfCompile "mikes-mods-library:MikesModsLib:release"
+    compile project(":mikesmodslib")
 
     // deobfProvided "refinedstorage:refinedstorage:${rs_version}:deobf"
 
