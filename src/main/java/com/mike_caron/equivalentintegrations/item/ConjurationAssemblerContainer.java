@@ -2,20 +2,21 @@ package com.mike_caron.equivalentintegrations.item;
 
 import com.mike_caron.equivalentintegrations.EquivalentIntegrationsMod;
 import com.mike_caron.equivalentintegrations.network.ItemConfigMessage;
+import com.mike_caron.mikesmodslib.block.ContainerBase;
 import com.mike_caron.mikesmodslib.inventory.GhostSlot;
 import moze_intel.projecte.api.ProjectEAPI;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.ClickType;
-import net.minecraft.inventory.Container;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
 
 import javax.annotation.Nonnull;
 
 public class ConjurationAssemblerContainer
-        extends Container
+    extends ContainerBase
 {
     private final InventoryPlayer playerInventory;
     private final ConjurationAssembler.Inventory containerInventory;
@@ -24,10 +25,14 @@ public class ConjurationAssemblerContainer
     private final int protectedSlot;
     private final int protectedIndex;
 
+    public int currentColor;
+
     public static final int GUI_ID = 3;
 
     public ConjurationAssemblerContainer(IInventory playerInventory, ConjurationAssembler.Inventory containerInventory, int protectedIndex)
     {
+        super(playerInventory);
+
         this.playerInventory = (InventoryPlayer)playerInventory;
         this.containerInventory = containerInventory;
 
@@ -36,6 +41,47 @@ public class ConjurationAssemblerContainer
 
         this.protectedIndex = protectedIndex;
         this.protectedSlot = findSlotForIndex(protectedIndex);
+
+        this.currentColor = containerInventory.getCurrentColor();
+    }
+
+    @Override
+    public void detectAndSendChanges()
+    {
+        super.detectAndSendChanges();
+
+        if(currentColor != containerInventory.getCurrentColor())
+        {
+            currentColor = containerInventory.getCurrentColor();
+            changed = true;
+        }
+
+        if(changed)
+        {
+            triggerUpdate();
+        }
+    }
+
+    @Override
+    protected void onReadNBT(NBTTagCompound tag)
+    {
+        super.onReadNBT(tag);
+
+        currentColor = tag.getInteger("color");
+    }
+
+    @Override
+    protected void onWriteNBT(NBTTagCompound tag)
+    {
+        super.onWriteNBT(tag);
+
+        tag.setInteger("color", currentColor);
+    }
+
+    @Override
+    public int getId()
+    {
+        return GUI_ID;
     }
 
     private int findSlotForIndex(int index)
@@ -49,7 +95,8 @@ public class ConjurationAssemblerContainer
         return -1;
     }
 
-    private void addPlayerSlots(IInventory playerInventory)
+    @Override
+    protected void addPlayerSlots(IInventory playerInventory)
     {
         // Slots for the main inventory
         for (int row = 0; row < 3; ++row) {
@@ -74,7 +121,8 @@ public class ConjurationAssemblerContainer
         }
     }
 
-    private void addOwnSlots()
+    @Override
+    protected void addOwnSlots()
     {
         filterSlot = addSlotToContainer(new GhostSlot(this.containerInventory, 0, 83, 32)
         {
@@ -183,12 +231,6 @@ public class ConjurationAssemblerContainer
         return super.slotClick(slotId, dragType, clickType, player);
     }
 
-
-
-    public int getCurrentColor()
-    {
-        return containerInventory.getCurrentColor();
-    }
 
     public void setCurrentColor(int color)
     {
