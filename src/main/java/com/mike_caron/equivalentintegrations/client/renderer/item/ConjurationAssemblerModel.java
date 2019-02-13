@@ -6,7 +6,10 @@ import com.google.common.collect.Sets;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.mike_caron.equivalentintegrations.client.renderer.item.ConjurationAssemblerOverride.BakedModelParams;
+import com.mike_caron.mikesmodslib.util.Collect;
 import net.minecraft.client.renderer.block.model.IBakedModel;
+import net.minecraft.client.renderer.block.model.ItemCameraTransforms.TransformType;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.texture.TextureMap;
@@ -17,15 +20,13 @@ import net.minecraftforge.client.model.IModel;
 import net.minecraftforge.client.model.ModelLoaderRegistry;
 import net.minecraftforge.common.model.IModelState;
 import net.minecraftforge.common.model.TRSRTransformation;
-import org.codehaus.plexus.util.CollectionUtils;
-import net.minecraft.client.renderer.block.model.ItemCameraTransforms.TransformType;
+
 import javax.vecmath.Matrix4f;
-
-import java.util.*;
+import java.util.Collection;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 import java.util.function.Function;
-
-import com.mike_caron.equivalentintegrations.util.Collect;
-import com.mike_caron.equivalentintegrations.client.renderer.item.ConjurationAssemblerOverride.BakedModelParams;
 
 public class ConjurationAssemblerModel implements IModel
 {

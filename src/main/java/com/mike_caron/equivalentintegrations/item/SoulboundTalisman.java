@@ -1,5 +1,6 @@
 package com.mike_caron.equivalentintegrations.item;
 
+import com.mike_caron.mikesmodslib.item.ItemBase;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;

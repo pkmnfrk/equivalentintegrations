@@ -1,7 +1,8 @@
 package com.mike_caron.equivalentintegrations.item;
 
 import com.mike_caron.equivalentintegrations.EquivalentIntegrationsMod;
-import com.mike_caron.equivalentintegrations.util.MappedModelLoader;
+import com.mike_caron.mikesmodslib.item.ItemBase;
+import com.mike_caron.mikesmodslib.util.MappedModelLoader;
 import net.minecraft.item.Item;
 import net.minecraftforge.client.model.ModelLoaderRegistry;
 import net.minecraftforge.common.MinecraftForge;
@@ -60,7 +61,7 @@ public class ModItems
                 {
                     ItemBase item = (ItemBase) field.get(null);
 
-                    item.initModel(models);
+                    item.initModel();
                 }
             }
         }

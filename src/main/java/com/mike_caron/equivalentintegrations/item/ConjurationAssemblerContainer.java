@@ -1,18 +1,15 @@
 package com.mike_caron.equivalentintegrations.item;
 
 import com.mike_caron.equivalentintegrations.EquivalentIntegrationsMod;
-import com.mike_caron.equivalentintegrations.block.transmutation_chamber.TransmutationChamberItemStackHandler;
-import com.mike_caron.equivalentintegrations.inventory.GhostSlot;
 import com.mike_caron.equivalentintegrations.network.ItemConfigMessage;
+import com.mike_caron.mikesmodslib.inventory.GhostSlot;
 import moze_intel.projecte.api.ProjectEAPI;
-import moze_intel.projecte.api.proxy.ITransmutationProxy;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.ClickType;
 import net.minecraft.inventory.Container;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.Slot;
-import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 
 import javax.annotation.Nonnull;

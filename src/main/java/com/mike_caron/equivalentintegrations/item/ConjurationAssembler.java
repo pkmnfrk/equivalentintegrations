@@ -4,32 +4,20 @@ import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.mike_caron.equivalentintegrations.EquivalentIntegrationsMod;
-import com.mike_caron.equivalentintegrations.client.renderer.item.ConjurationAssemblerModel;
-import com.mike_caron.equivalentintegrations.inventory.IInventoryCallback;
-import com.mike_caron.equivalentintegrations.inventory.ItemInventory;
-import com.mike_caron.equivalentintegrations.inventory.PlayerItemInventory;
 import com.mike_caron.equivalentintegrations.storage.EMCItemHandler;
-import com.mike_caron.equivalentintegrations.util.ItemUtils;
-import com.mike_caron.equivalentintegrations.util.MappedModelLoader;
-import com.mike_caron.equivalentintegrations.util.OptionalInt;
+import com.mike_caron.mikesmodslib.util.ItemUtils;
+import com.mike_caron.mikesmodslib.inventory.ItemInventory;
+import com.mike_caron.mikesmodslib.inventory.PlayerItemInventory;
+import com.mike_caron.mikesmodslib.item.ItemBase;
 import net.minecraft.client.resources.I18n;
-import net.minecraft.client.resources.IResourceManager;
 import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Blocks;
-import net.minecraft.inventory.IInventory;
-import net.minecraft.item.IItemPropertyGetter;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.*;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
-import net.minecraftforge.client.model.ICustomModelLoader;
-import net.minecraftforge.client.model.IModel;
-import net.minecraftforge.client.model.ModelLoaderRegistry;
-import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.event.entity.player.EntityItemPickupEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.Side;
@@ -37,7 +25,6 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.awt.Color;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
@@ -99,12 +86,12 @@ public class ConjurationAssembler
         });
     }
 
-    @Override
-    public void initModel(MappedModelLoader.Builder models)
-    {
-        //models.put("magic-" + id, ConjurationAssemblerModel.INSTANCE);
-        super.initModel(models);
-    }
+    //@Override
+    //public void initModel(MappedModelLoader.Builder models)
+    //{
+    //    //models.put("magic-" + id, ConjurationAssemblerModel.INSTANCE);
+    //    super.initModel(models);
+    //}
 
     @Override
     @SideOnly(Side.CLIENT)
