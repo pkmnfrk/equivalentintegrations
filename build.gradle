@@ -66,6 +66,9 @@ dependencies {
         transitive = false
     }
 
+    //this doesn't work, so I just put the damned file in libs:
+    //compile 'better-builders-wands:BetterBuildersWands-1.12.2:0.13.0.267+dc89c58'
+
     //deobfCompile "mikes-mods-library:MikesModsLib:release"
     compile project(":mikesmodslib")
 
