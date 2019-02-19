@@ -2,8 +2,10 @@ package com.mike_caron.equivalentintegrations.storage;
 
 import com.mike_caron.equivalentintegrations.EquivalentIntegrationsMod;
 import com.mike_caron.equivalentintegrations.impl.ManagedEMCManager;
+import com.mike_caron.mikesmodslib.util.LastResortUtils;
 import moze_intel.projecte.api.ProjectEAPI;
 import moze_intel.projecte.api.capabilities.IKnowledgeProvider;
+import moze_intel.projecte.api.event.PlayerAttemptLearnEvent;
 import moze_intel.projecte.api.proxy.IEMCProxy;
 import moze_intel.projecte.utils.ItemHelper;
 import moze_intel.projecte.utils.NBTWhitelist;
@@ -11,6 +13,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.items.IItemHandlerModifiable;
 import net.minecraftforge.items.ItemHandlerHelper;
 
@@ -141,8 +144,6 @@ public final class EMCItemHandler
 
             if(canLearn || knowledge.hasKnowledge(stack))
             {
-
-
                 double emc = emcManager.getEMC(owner);
 
                 long singleValue = emcManager.getEmcSellValue(stack);
@@ -153,37 +154,17 @@ public final class EMCItemHandler
 
                 //EquivalentIntegrationsMod.logger.info("Burning a stack ({}) for {} EMC each, a total of {} (Simulation: {})", stack, singleValue, emcValue, simulate);
 
+                if(!knowledge.hasKnowledge(stack))
+                {
+                    if(!tryLearn(stack, knowledge, simulate))
+                    {
+                        return stack;
+                    }
+                }
+
                 if(!simulate)
                 {
                     emcManager.depositEMC(owner, emcValue);
-
-                    //then, clean up the stack a bit
-                    if(ItemHelper.isDamageable(stack))
-                    {
-                        stack.setItemDamage(0);
-                    }
-
-                    stack.setCount(1);
-
-                    if(canLearn && !knowledge.hasKnowledge(stack))
-                    {
-
-                        if (stack.hasTagCompound() && !NBTWhitelist.shouldDupeWithNBT(stack))
-                        {
-                            stack.setTagCompound(null);
-                        }
-
-                        //TODO: When 1.3.1 comes out, put this back in
-                        //EntityPlayer player = world.getPlayerEntityByUUID(owner);
-                        //if (!MinecraftForge.EVENT_BUS.post(new PlayerAttemptLearnEvent(player, stack))) //Only show the "learned" text if the knowledge was added
-                        //{
-                            //note: this will not work if the user is offline. In this case, the later
-                            //knowledge check will return false, thus rejecting the item
-                            knowledge.addKnowledge(stack);
-                        //}
-
-                    }
-
                 }
 
                 //EquivalentIntegrationsMod.logger.info("Done burning said stack");
@@ -193,6 +174,37 @@ public final class EMCItemHandler
         }
 
         return stack;
+    }
+
+    private boolean tryLearn(@Nonnull ItemStack stack, IKnowledgeProvider knowledge, boolean simulate)
+    {
+        if(!simulate)
+        {
+            stack = stack.copy();
+
+            //then, clean up the stack a bit
+            if (ItemHelper.isDamageable(stack))
+            {
+                stack.setItemDamage(0);
+            }
+
+            stack.setCount(1);
+            if (stack.hasTagCompound() && !NBTWhitelist.shouldDupeWithNBT(stack))
+            {
+                stack.setTagCompound(null);
+            }
+        }
+
+        EntityPlayer player = world.getPlayerEntityByUUID(owner);
+        if (player != null && !MinecraftForge.EVENT_BUS.post(new PlayerAttemptLearnEvent(player, stack)))
+        {
+            //note: this will not work if the user is offline. In this case, the later
+            //knowledge check will return false, thus rejecting the item
+
+            return simulate || knowledge.addKnowledge(stack);
+        }
+
+        return false;
     }
 
     public ItemStack extractItem(ItemStack desired, boolean simulate)
@@ -348,5 +360,10 @@ public final class EMCItemHandler
     public void setForbidDamaged(boolean forbidDamaged)
     {
         this.forbidDamaged = forbidDamaged;
+    }
+
+    private static boolean isPlayerOnline(UUID player)
+    {
+        return LastResortUtils.getPlayer(player) != null;
     }
 }
