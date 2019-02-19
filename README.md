@@ -8,6 +8,10 @@ Join our Discord!
 
 [![Discord](https://img.shields.io/discord/501821606062981121.svg?style=plastic&logo=discord)](https://discord.gg/S254Nuh)
 
+## Dependencies
+ * [ProjectE](https://github.com/sinkillerj/ProjectE) ([Forge](https://minecraft.curseforge.com/projects/projecte)): Required
+ * [Mike's Mods Lib](https://github.com/pkmnfrk/mikesmodslib) ([Forge](https://minecraft.curseforge.com/projects/mikes-mods-library)): Required
+
 ## Issues
 
 Please report issues to this repository's issue tracks: https://github.com/pkmnfrk/equivalentintegrations/issues

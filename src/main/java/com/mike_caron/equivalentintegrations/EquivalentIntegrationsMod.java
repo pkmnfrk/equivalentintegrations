@@ -24,7 +24,8 @@ import org.apache.logging.log4j.Logger;
         name = EquivalentIntegrationsMod.name,
         version = EquivalentIntegrationsMod.version,
         acceptedMinecraftVersions = "[1.12.2]",
-        dependencies = "required-after:projecte@[1.12-PE1.3.1,)"
+        dependencies = "required-after:projecte@[1.12-PE1.3.1,)" +
+            ";required-after:mikesmodslib@[1.0.1,)"
 )
 @Mod.EventBusSubscriber
 public class EquivalentIntegrationsMod {
