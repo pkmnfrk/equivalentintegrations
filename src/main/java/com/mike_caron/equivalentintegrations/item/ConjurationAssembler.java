@@ -106,19 +106,14 @@ public class ConjurationAssembler
             tooltip.add(TextFormatting.GRAY + "" + TextFormatting.ITALIC + tip);
         }
 
-        /*
-        ItemStack held = getFilter(stack);
-        if(held.isEmpty())
+
+        UUID owner = getPlayerUUID(stack);
+        if(owner == null)
         {
-            tip = I18n.format("item.conjuration_assembler.desc2x");
-        }
-        else
-        {
-            tip = I18n.format("item.conjuration_assembler.desc2", held.getDisplayName());
+            tip = I18n.format("item.conjuration_assembler.bind_tip");
+            tooltip.add(TextFormatting.GRAY + "" + TextFormatting.ITALIC + tip);
         }
 
-        tooltip.add(tip);
-        */
     }
 
     @Override
