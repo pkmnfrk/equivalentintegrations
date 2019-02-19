@@ -1,5 +1,5 @@
-tile.transmutation_chamber.name=Transmutation Chamber
-tile.transmutation_generator.name=Transmutation Generator
+tile.equivalentintegrations:transmutation_chamber.name=Transmutation Chamber
+tile.equivalentintegrations:transmutation_generator.name=Transmutation Generator
 
 item.soulbound_talisman.name=Soulbound Talisman
 item.soulbound_talisman.bound=Bound to %1$s

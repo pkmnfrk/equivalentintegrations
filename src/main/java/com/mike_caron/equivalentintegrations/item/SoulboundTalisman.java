@@ -2,14 +2,17 @@ package com.mike_caron.equivalentintegrations.item;
 
 import com.mike_caron.equivalentintegrations.EquivalentIntegrationsMod;
 import com.mike_caron.mikesmodslib.item.ItemBase;
+import com.mike_caron.mikesmodslib.util.ItemUtils;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.client.util.ITooltipFlag;
+import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumHand;
+import net.minecraft.util.NonNullList;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
@@ -34,6 +37,16 @@ public class SoulboundTalisman extends ItemBase
     }
 
     @Override
+    public void getSubItems(CreativeTabs tab, NonNullList<ItemStack> items)
+    {
+        //super.getSubItems(tab, items);
+        if(this.isInCreativeTab(tab))
+        {
+            items.add(new ItemStack(this));
+        }
+    }
+
+    @Override
     public ActionResult<ItemStack> onItemRightClick(World worldIn, EntityPlayer playerIn, EnumHand handIn)
     {
         ItemStack talisman = playerIn.getHeldItem(handIn);
@@ -41,19 +54,9 @@ public class SoulboundTalisman extends ItemBase
         if(worldIn.isRemote || isBound(talisman))
             return new ActionResult<>(EnumActionResult.PASS, talisman);
 
-        NBTTagCompound nbt = null;
+        NBTTagCompound nbt = ItemUtils.getItemTag(talisman);
 
-        if(talisman.hasTagCompound()) {
-            nbt = talisman.getTagCompound();
-        }
-
-        if(nbt == null)
-        {
-            nbt = new NBTTagCompound();
-        }
-
-        nbt.setString(OWNER_UUID, playerIn.getUniqueID().toString());
-        nbt.setString(OWNER_NAME, playerIn.getDisplayNameString());
+        addOwner(nbt, playerIn.getUniqueID(), playerIn.getDisplayNameString());
 
         talisman.setTagCompound(nbt);
 
@@ -136,5 +139,20 @@ public class SoulboundTalisman extends ItemBase
         }
 
         return null;
+    }
+
+    public static void addOwner(NBTTagCompound nbt, UUID uuid, String name)
+    {
+        nbt.setString(OWNER_UUID, uuid.toString());
+        nbt.setString(OWNER_NAME, name);
+    }
+
+    public ItemStack withOwner(UUID uuid, String name)
+    {
+        ItemStack ret = new ItemStack(this);
+
+        addOwner(ItemUtils.getItemTag(ret), uuid, name);
+
+        return ret;
     }
 }
