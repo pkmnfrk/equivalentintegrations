@@ -199,7 +199,7 @@ public class ConjurationAssembler
     {
         EMCItemHandler handler = new EMCItemHandler(playerUuid, worldIn, true, true, filter);
 
-        handler.setCanLearn(false);
+        handler.setCanLearn(EMCItemHandler.EnumLearning.CANNOT);
         handler.setForbidDamaged(true);
         handler.setForbidNbt(true);
         handler.setEfficiencyThreshold(Integer.MAX_VALUE);

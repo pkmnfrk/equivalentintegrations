@@ -35,7 +35,7 @@ public final class EMCItemHandler
     private final World world;
 
     private int efficiencyThreshold = 10;
-    private boolean canLearn = false;
+    private EnumLearning canLearn = EnumLearning.CANNOT;
 
     private boolean forbidNbt = false;
     private boolean forbidDamaged = false;
@@ -87,12 +87,12 @@ public final class EMCItemHandler
         return this.efficiencyThreshold;
     }
 
-    public void setCanLearn(boolean canLearn)
+    public void setCanLearn(EnumLearning canLearn)
     {
         this.canLearn = canLearn;
     }
 
-    public boolean getCanLearn()
+    public EnumLearning getCanLearn()
     {
         return this.canLearn;
     }
@@ -153,7 +153,7 @@ public final class EMCItemHandler
                 return stack;
             }
 
-            if(canLearn || knowledge.hasKnowledge(stack))
+            if(canLearn != EnumLearning.CANNOT || knowledge.hasKnowledge(stack))
             {
                 double emc = emcManager.getEMC(owner);
 
@@ -165,7 +165,7 @@ public final class EMCItemHandler
 
                 //EquivalentIntegrationsMod.logger.info("Burning a stack ({}) for {} EMC each, a total of {} (Simulation: {})", stack, singleValue, emcValue, simulate);
 
-                if(!knowledge.hasKnowledge(stack))
+                if(canLearn == EnumLearning.CAN && !knowledge.hasKnowledge(stack))
                 {
                     if(!tryLearn(stack, knowledge, simulate))
                     {
@@ -277,7 +277,7 @@ public final class EMCItemHandler
     {
         if(!canExport)
             return ItemStack.EMPTY;
-        
+
         if(slot < 0 || slot >= emcInventory.realSize())
         {
             return ItemStack.EMPTY;
@@ -382,5 +382,12 @@ public final class EMCItemHandler
     private static boolean isPlayerOnline(UUID player)
     {
         return LastResortUtils.getPlayer(player) != null;
+    }
+
+    public enum EnumLearning
+    {
+        CAN,
+        CANNOT,
+        SKIP
     }
 }

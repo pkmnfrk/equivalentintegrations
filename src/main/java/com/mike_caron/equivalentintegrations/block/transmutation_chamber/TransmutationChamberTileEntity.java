@@ -116,11 +116,18 @@ public class TransmutationChamberTileEntity
         return (int)(10 * Math.pow(10, count));
     }
 
-    private boolean getCanLearn()
+    private EMCItemHandler.EnumLearning getCanLearn()
     {
         ItemStack stack = inventory.getStackInSlot(1);
 
-        return !stack.isEmpty();
+        boolean canLearn = !stack.isEmpty();
+
+        if(type == 0)
+            return canLearn ? EMCItemHandler.EnumLearning.CAN : EMCItemHandler.EnumLearning.CANNOT;
+        else if(type == 1)
+            return canLearn ? EMCItemHandler.EnumLearning.CAN : EMCItemHandler.EnumLearning.SKIP;
+
+        return EMCItemHandler.EnumLearning.CANNOT;
     }
 
     private void setTransmutationParameters()
