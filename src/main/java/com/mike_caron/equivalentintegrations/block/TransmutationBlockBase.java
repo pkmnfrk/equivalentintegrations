@@ -1,6 +1,8 @@
 package com.mike_caron.equivalentintegrations.block;
 
+import com.mike_caron.equivalentintegrations.EquivalentIntegrationsMod;
 import com.mike_caron.equivalentintegrations.item.ModItems;
+import com.mike_caron.mikesmodslib.block.BlockBase;
 import com.mike_caron.mikesmodslib.integrations.ITOPInfoProvider;
 import com.mike_caron.mikesmodslib.integrations.IWailaInfoProvider;
 import mcjty.theoneprobe.api.ElementAlignment;
@@ -37,6 +39,7 @@ public abstract class TransmutationBlockBase
         super(Material.IRON, id);
         setHardness(4);
         setHarvestLevel("pickaxe", 1);
+        setCreativeTab(EquivalentIntegrationsMod.creativeTab);
     }
 
     @Override

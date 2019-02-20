@@ -51,3 +51,4 @@ term.equivalentintegrations.emcpt=EMC/t
 equivalentintegrations.config.title=Config
 equivalentintegrations.config.generatoremcmultiplier=Generator EMC Multiplier
 equivalentintegrations.config.maximumexposedstacksize=Maximum Exposed Stack Size
+equivalentintegrations.config.exposeinvalidtalisman=Expose Invalid Soulbound Talisman

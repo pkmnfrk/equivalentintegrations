@@ -16,6 +16,7 @@ import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.registries.IForgeRegistry;
+import com.mike_caron.mikesmodslib.block.BlockBase;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
