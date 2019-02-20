@@ -22,6 +22,10 @@ public class ModConfig
     @Config.LangKey("equivalentintegrations.config.maximumexposedstacksize")
     public static int maximumExposedStackSize = 1000000;
 
+    @Config.Comment("Whether to expose a Soulbound Talisman linked to an invalid player. Only enable if you know what this means.")
+    @Config.LangKey("equivalentintegrations.config.exposeinvalidtalisman")
+    public static boolean exposeInvalidTalisman = false;
+
     @Mod.EventBusSubscriber(modid = EquivalentIntegrationsMod.modId)
     private static class EventHandler
     {

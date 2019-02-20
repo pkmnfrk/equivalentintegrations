@@ -1,6 +1,7 @@
 package com.mike_caron.equivalentintegrations.item;
 
 import com.mike_caron.equivalentintegrations.EquivalentIntegrationsMod;
+import com.mike_caron.equivalentintegrations.ModConfig;
 import com.mike_caron.mikesmodslib.item.ItemBase;
 import com.mike_caron.mikesmodslib.util.ItemUtils;
 import net.minecraft.client.resources.I18n;
@@ -43,6 +44,10 @@ public class SoulboundTalisman extends ItemBase
         if(this.isInCreativeTab(tab))
         {
             items.add(new ItemStack(this));
+            if(ModConfig.exposeInvalidTalisman)
+            {
+                items.add(withOwner(UUID.randomUUID(), "A Stranger"));
+            }
         }
     }
 
