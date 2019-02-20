@@ -40,20 +40,25 @@ public final class EMCItemHandler
     private boolean forbidNbt = false;
     private boolean forbidDamaged = false;
 
+    private boolean canImport;
+    private boolean canExport;
+
     private IEMCProxy emcProxy;
     private ManagedEMCManager emcManager;
 
     private final EMCInventory emcInventory;
 
-    public EMCItemHandler(@Nonnull UUID owner, @Nonnull World world)
+    public EMCItemHandler(@Nonnull UUID owner, @Nonnull World world, boolean canImport, boolean canExport)
     {
-        this(owner, world, null);
+        this(owner, world, canImport, canExport, null);
     }
 
-    public EMCItemHandler(@Nonnull UUID owner, @Nonnull World world, @Nullable ItemStack filter)
+    public EMCItemHandler(@Nonnull UUID owner, @Nonnull World world, boolean canImport, boolean canExport, @Nullable ItemStack filter)
     {
         this.owner = owner;
         this.world = world;
+        this.canImport = canImport;
+        this.canExport = canExport;
 
         this.emcProxy = ProjectEAPI.getEMCProxy();
 
@@ -111,6 +116,9 @@ public final class EMCItemHandler
     @Override
     public ItemStack getStackInSlot(int slot)
     {
+        if(!canExport)
+            return ItemStack.EMPTY;
+
         ItemStack ret = this.emcInventory.getStackInSlot(slot);
 
         return ret;
@@ -120,6 +128,9 @@ public final class EMCItemHandler
     @Override
     public ItemStack insertItem(int slot, @Nonnull ItemStack stack, boolean simulate)
     {
+        if(!canImport)
+            return stack;
+
         long startTime = System.nanoTime();
 
         if(slot < 0 || slot >= emcInventory.getSlots())
@@ -209,6 +220,9 @@ public final class EMCItemHandler
 
     public ItemStack extractItem(ItemStack desired, boolean simulate)
     {
+        if(!canExport)
+            return ItemStack.EMPTY;
+
         double emc = emcManager.getEMC(owner);
 
         long emcCost = emcManager.getEmcValue(desired);
@@ -261,6 +275,9 @@ public final class EMCItemHandler
     @Override
     public ItemStack extractItem(int slot, int amount, boolean simulate)
     {
+        if(!canExport)
+            return ItemStack.EMPTY;
+        
         if(slot < 0 || slot >= emcInventory.realSize())
         {
             return ItemStack.EMPTY;

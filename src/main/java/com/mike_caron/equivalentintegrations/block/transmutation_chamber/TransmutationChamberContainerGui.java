@@ -18,17 +18,35 @@ public class TransmutationChamberContainerGui extends GuiContainer
     public static final int WIDTH = 182;
     public static final int HEIGHT = 154;
 
-    private static final ResourceLocation background = new ResourceLocation(EquivalentIntegrationsMod.modId, "textures/gui/transmutation_chamber_gui.png");
+    private static final ResourceLocation background_chamber = new ResourceLocation(EquivalentIntegrationsMod.modId, "textures/gui/transmutation_chamber_gui.png");
+    private static final ResourceLocation background_disassembler = new ResourceLocation(EquivalentIntegrationsMod.modId, "textures/gui/transmutation_disassembler_gui.png");
+
+    private final ResourceLocation background;
 
     TransmutationChamberTileEntity te;
 
-    public TransmutationChamberContainerGui(TransmutationChamberTileEntity tileEntity, TransmutationChamberContainer container) {
+    public TransmutationChamberContainerGui(TransmutationChamberTileEntity tileEntity, TransmutationChamberContainer container)
+    {
         super(container);
 
         xSize = WIDTH;
         ySize = HEIGHT;
 
         this.te = tileEntity;
+
+        if (te.getType() == 0)
+        {
+            background = background_chamber;
+        }
+        else if (te.getType() == 1)
+        {
+            background = background_disassembler;
+        }
+        else
+        {
+            throw new Error("Unknown type!?");
+        }
+
     }
 
     @Override
@@ -42,7 +60,13 @@ public class TransmutationChamberContainerGui extends GuiContainer
     @Override
     protected void drawGuiContainerForegroundLayer(int mouseX, int mouseY)
     {
-        this.fontRenderer.drawString(new TextComponentTranslation("container.transmutation_chamber.title", new Object[0]).getUnformattedText(), 8, 6, 4210752);
+        String title = "container.transmutation_chamber.title";
+        if(te.getType() == 1)
+        {
+            title = "container.transmutation_disassembler.title";
+        }
+
+        this.fontRenderer.drawString(new TextComponentTranslation(title, new Object[0]).getUnformattedText(), 8, 6, 4210752);
         if(te.getForbidDamage() || te.getForbidNbt())
         {
             mc.getTextureManager().bindTexture(background);
@@ -112,7 +136,7 @@ public class TransmutationChamberContainerGui extends GuiContainer
     {
         List<String> ret = super.getItemToolTip(stack);
 
-        if(stack.getItem() == ModItems.efficiencyCatalyst)
+        if(te.getType() == 0 && stack.getItem() == ModItems.efficiencyCatalyst)
         {
             StringBuilder sb = new StringBuilder();
 

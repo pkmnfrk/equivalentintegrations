@@ -25,6 +25,8 @@ public class TransmutationChamberTileEntity
 {
     private EMCItemHandler emcItemHandler;
 
+    private int type = -1; //0 = normal, 1 = disassembler only
+
     private int ticksSinceLastUpdate = 0;
 
     private boolean forbidNbt = false;
@@ -32,11 +34,21 @@ public class TransmutationChamberTileEntity
 
     private static final EmptyItemHandler emptyInventory = new EmptyItemHandler();
 
+    public TransmutationChamberTileEntity()
+    {
+
+    }
+
+    public TransmutationChamberTileEntity(int type)
+    {
+        this.type = type;
+    }
+
     @Nonnull
     @Override
     protected ItemStackHandler createInventory()
     {
-        return new TransmutationChamberItemStackHandler()
+        return new TransmutationChamberItemStackHandler(type == 0)
         {
             @Override
             protected void onContentsChanged(int slot)
@@ -79,7 +91,7 @@ public class TransmutationChamberTileEntity
 
         if(newOwner != null)
         {
-            emcItemHandler = new EMCItemHandler(newOwner, world);
+            emcItemHandler = new EMCItemHandler(newOwner, world, true, type == 0);
             MinecraftForge.EVENT_BUS.register(emcItemHandler);
         }
     }
@@ -203,6 +215,15 @@ public class TransmutationChamberTileEntity
     {
         super.readFromNBT(compound);
 
+        if(compound.hasKey("type"))
+        {
+            type = compound.getInteger("type");
+        }
+        else
+        {
+            type = 0;
+        }
+
         if(compound.hasKey("forbidNbt"))
         {
             forbidNbt = compound.getBoolean("forbidNbt");
@@ -228,9 +249,15 @@ public class TransmutationChamberTileEntity
     {
         NBTTagCompound ret = super.writeToNBT(compound);
 
+        ret.setInteger("type", type);
         ret.setBoolean("forbidDamaged", forbidDamaged);
         ret.setBoolean("forbidNbt", forbidNbt);
 
         return ret;
+    }
+
+    public int getType()
+    {
+        return type;
     }
 }

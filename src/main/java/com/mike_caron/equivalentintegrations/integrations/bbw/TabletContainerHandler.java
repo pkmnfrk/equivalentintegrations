@@ -33,7 +33,7 @@ public class TabletContainerHandler
     {
         if(inventoryStack.getItem() instanceof TransmutationTablet)
         {
-            EMCItemHandler handler = new EMCItemHandler(entityPlayer.getUniqueID(), entityPlayer.world, itemStack);
+            EMCItemHandler handler = new EMCItemHandler(entityPlayer.getUniqueID(), entityPlayer.world, true, true, itemStack);
 
             for(ItemStack stack : handler.getCachedInventory())
             {
@@ -48,7 +48,7 @@ public class TabletContainerHandler
     {
         if(inventoryStack.getItem() instanceof TransmutationTablet)
         {
-            EMCItemHandler handler = new EMCItemHandler(entityPlayer.getUniqueID(), entityPlayer.world, itemStack);
+            EMCItemHandler handler = new EMCItemHandler(entityPlayer.getUniqueID(), entityPlayer.world, true, true, itemStack);
 
             ItemStack extrack = itemStack.copy();
             extrack.setCount(num);

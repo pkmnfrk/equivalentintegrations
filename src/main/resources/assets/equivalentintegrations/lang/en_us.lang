@@ -1,4 +1,5 @@
 tile.equivalentintegrations:transmutation_chamber.name=Transmutation Chamber
+tile.equivalentintegrations:transmutation_disassembler.name=Transmutation Disassembler
 tile.equivalentintegrations:transmutation_generator.name=Transmutation Generator
 
 item.soulbound_talisman.name=Soulbound Talisman
@@ -22,6 +23,7 @@ item.efficiency_catalyst.name=Efficiency Catalyst
 item.efficiency_catalyst.desc1=Increases efficiency of Transmutation machines
 
 container.transmutation_chamber.title=Transmutation Chamber
+container.transmutation_disassembler.title=Transmutation Disassembler
 
 #trailing space!
 container.transmutation_chamber.efficiency=Threshold:

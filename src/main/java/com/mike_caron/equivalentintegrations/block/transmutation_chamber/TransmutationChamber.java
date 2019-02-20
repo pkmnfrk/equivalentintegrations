@@ -21,12 +21,14 @@ public class TransmutationChamber
         extends TransmutationBlockBase
         implements ITileEntityProvider
 {
-    public static final String id = "transmutation_chamber";
+    public static final String ID_TRANSMUTATION_CHAMBER = "transmutation_chamber";
+    public static final String ID_TRANSMUTATION_DISASSEMBLER = "transmutation_disassembler";
     public static final PropertyBool ACTIVE = PropertyBool.create("active");
 
     public static final int GUI_ID = 1;
 
-    public TransmutationChamber() {
+    public TransmutationChamber(String id)
+    {
         super(id);
 
         setDefaultState(this.blockState.getBaseState().withProperty(ACTIVE,false));
@@ -35,7 +37,17 @@ public class TransmutationChamber
     @Override
     public TileEntity createNewTileEntity(World worldIn, int meta)
     {
-        return new TransmutationChamberTileEntity();
+        String type = this.getRegistryName().getPath();
+        if(type.equals(ID_TRANSMUTATION_CHAMBER))
+        {
+            return new TransmutationChamberTileEntity(0);
+        }
+        else if(type.equals(ID_TRANSMUTATION_DISASSEMBLER))
+        {
+            return new TransmutationChamberTileEntity(1);
+        }
+
+        return null;
     }
 
     @SuppressWarnings("deprecation")

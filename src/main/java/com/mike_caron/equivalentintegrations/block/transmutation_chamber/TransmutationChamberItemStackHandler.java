@@ -9,11 +9,12 @@ import javax.annotation.Nonnull;
 
 public class TransmutationChamberItemStackHandler extends BetterItemStackHandler
 {
-    public static final int NUM_SLOTS = 3;
+    private boolean hasEfficiency;
 
-    public TransmutationChamberItemStackHandler()
+    public TransmutationChamberItemStackHandler(boolean hasEfficiency)
     {
-        super(NUM_SLOTS);
+        super(hasEfficiency ? 3 : 2);
+        this.hasEfficiency = hasEfficiency;
     }
 
     @Override
@@ -27,7 +28,7 @@ public class TransmutationChamberItemStackHandler extends BetterItemStackHandler
         {
             return 1;
         }
-        else if(slot == 2 && stack.getItem() == ModItems.efficiencyCatalyst)
+        else if(hasEfficiency && slot == 2 && stack.getItem() == ModItems.efficiencyCatalyst)
         {
             return 4;
         }

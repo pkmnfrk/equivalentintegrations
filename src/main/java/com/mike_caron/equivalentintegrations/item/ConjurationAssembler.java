@@ -90,7 +90,7 @@ public class ConjurationAssembler
     //@Override
     //public void initModel(MappedModelLoader.Builder models)
     //{
-    //    //models.put("magic-" + id, ConjurationAssemblerModel.INSTANCE);
+    //    //models.put("magic-" + ID_TRANSMUTATION_CHAMBER, ConjurationAssemblerModel.INSTANCE);
     //    super.initModel(models);
     //}
 
@@ -197,7 +197,7 @@ public class ConjurationAssembler
 
     private static EMCItemHandler getItemHandler(UUID playerUuid, World worldIn, ItemStack filter)
     {
-        EMCItemHandler handler = new EMCItemHandler(playerUuid, worldIn, filter);
+        EMCItemHandler handler = new EMCItemHandler(playerUuid, worldIn, true, true, filter);
 
         handler.setCanLearn(false);
         handler.setForbidDamaged(true);

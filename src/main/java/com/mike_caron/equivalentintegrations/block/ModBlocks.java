@@ -25,8 +25,10 @@ import java.lang.reflect.Modifier;
 @GameRegistry.ObjectHolder (EquivalentIntegrationsMod.modId)
 public class ModBlocks
 {
-    @GameRegistry.ObjectHolder(TransmutationChamber.id)
+    @GameRegistry.ObjectHolder(TransmutationChamber.ID_TRANSMUTATION_CHAMBER)
     public static TransmutationChamber transmutationChamber;
+    @GameRegistry.ObjectHolder(TransmutationChamber.ID_TRANSMUTATION_DISASSEMBLER)
+    public static TransmutationChamber transmutationDisassembler;
 
     @GameRegistry.ObjectHolder(TransmutationGenerator.id)
     public static TransmutationGenerator transmutationGenerator;
@@ -36,10 +38,11 @@ public class ModBlocks
     {
         IForgeRegistry<Block> registry = event.getRegistry();
 
-        registry.register(new TransmutationChamber());
+        registry.register(new TransmutationChamber(TransmutationChamber.ID_TRANSMUTATION_CHAMBER));
+        registry.register(new TransmutationChamber(TransmutationChamber.ID_TRANSMUTATION_DISASSEMBLER));
         registry.register(new TransmutationGenerator());
 
-        GameRegistry.registerTileEntity(TransmutationChamberTileEntity.class, new ResourceLocation(EquivalentIntegrationsMod.modId, TransmutationChamber.id));
+        GameRegistry.registerTileEntity(TransmutationChamberTileEntity.class, new ResourceLocation(EquivalentIntegrationsMod.modId, TransmutationChamber.ID_TRANSMUTATION_CHAMBER));
         GameRegistry.registerTileEntity(TransmutationGeneratorTileEntity.class, new ResourceLocation(EquivalentIntegrationsMod.modId, TransmutationGenerator.id));
     }
 
