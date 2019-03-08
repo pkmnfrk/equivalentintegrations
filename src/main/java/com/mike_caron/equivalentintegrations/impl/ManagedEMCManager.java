@@ -10,6 +10,7 @@ import moze_intel.projecte.api.proxy.IEMCProxy;
 import moze_intel.projecte.api.proxy.ITransmutationProxy;
 import moze_intel.projecte.utils.EMCHelper;
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.World;
@@ -19,6 +20,7 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
+import scala.Tuple2;
 
 import javax.annotation.Nullable;
 import java.util.HashMap;
@@ -43,7 +45,7 @@ public class ManagedEMCManager
     //private HashMap<UUID, IKnowledgeProvider> knowledgeProviders = new HashMap<>();
     private HashSet<UUID> updateEmc = new HashSet<>();
 
-    //private final HashMap<ItemStack, Long> emcValues = new HashMap<>();
+    private final HashMap<Tuple2<Item, Integer>, Long> emcValues = new HashMap<>();
     private final Lock lock = new ReentrantLock();
     //private final HashMap<ItemStack, Boolean> cacheBlacklist = new HashMap<>();
 
@@ -302,33 +304,32 @@ public class ManagedEMCManager
 
     public long getEmcValue(ItemStack stack)
     {
-        return EMCHelper.getEmcValue(stack);
-        /*
+        //return 100;
+        //return EMCHelper.getEmcValue(stack);
+
         lock.lock();
         try
         {
-            if(!cacheBlacklist.containsKey(stack.getItem()))
+            if(!stack.isItemStackDamageable() && !stack.hasTagCompound())
             {
-                cacheBlacklist.put(stack.getItem(), stack.getMaxDamage() > 0);
+                Tuple2<Item, Integer> key = new Tuple2<>(stack.getItem(), stack.getMetadata());
+                if (!emcValues.containsKey(key))
+                {
+                    long value = EMCHelper.getEmcValue(stack);
+                    emcValues.put(key, value);
+                }
+                return emcValues.get(key);
             }
-
-            if(cacheBlacklist.get(stack.getItem()))
+            else
             {
                 return EMCHelper.getEmcValue(stack);
             }
-
-            if (!emcValues.containsKey(stack.getItem()))
-            {
-                long value = EMCHelper.getEmcValue(stack);
-                emcValues.put(stack.getItem(), value);
-            }
-            return emcValues.get(stack.getItem());
         }
         finally
         {
             lock.unlock();
         }
-        */
+
     }
 
     public long getEmcSellValue(ItemStack stack)
@@ -385,18 +386,18 @@ public class ManagedEMCManager
 
     private void bustCache()
     {
-        /*
+
         lock.lock();
         try
         {
             //cacheBlacklist.clear();
-            //emcValues.clear();
+            emcValues.clear();
         }
         finally
         {
             lock.unlock();
         }
-        */
+
     }
 
     private void markDirty(UUID owner)
