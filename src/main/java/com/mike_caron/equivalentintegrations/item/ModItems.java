@@ -63,6 +63,21 @@ public class ModItems
 
                     item.initModel();
                 }
+
+                if (Modifier.isStatic(field.getModifiers()) && field.getType().isArray() && ItemBase.class.isAssignableFrom(field.getType().getComponentType()))
+                {
+                    ItemBase[] items = (ItemBase[]) field.get(null);
+
+                    if(items == null) continue;
+
+                    for(ItemBase item : items)
+                    {
+                        if(item != null)
+                        {
+                            item.initModel();
+                        }
+                    }
+                }
             }
         }
         catch(IllegalAccessException ex)
