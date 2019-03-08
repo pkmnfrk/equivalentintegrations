@@ -1,9 +1,13 @@
 package com.mike_caron.equivalentintegrations.item;
 
 import com.mike_caron.equivalentintegrations.EquivalentIntegrationsMod;
+import com.mike_caron.equivalentintegrations.ModConfig;
 import com.mike_caron.mikesmodslib.item.ItemBase;
 import com.mike_caron.mikesmodslib.util.MappedModelLoader;
+import moze_intel.projecte.api.ProjectEAPI;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraft.util.NonNullList;
 import net.minecraftforge.client.model.ModelLoaderRegistry;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.RegistryEvent;
@@ -33,6 +37,8 @@ public class ModItems
     @GameRegistry.ObjectHolder(ConjurationAssembler.id)
     public static ConjurationAssembler conjurationAssembler;
 
+    public static TestItem[] testItems;
+
     @SubscribeEvent
     public static void registerItems(RegistryEvent.Register<Item> event)
     {
@@ -42,6 +48,8 @@ public class ModItems
         registry.register(new AlchemicalAlgorithms());
         registry.register(new EfficiencyCatalyst());
         registry.register(new ConjurationAssembler());
+
+        addDummyItems(registry);
     }
 
     public static void registerEvents()
@@ -87,5 +95,25 @@ public class ModItems
         //soulboundTalisman.initModel();
 
         ModelLoaderRegistry.registerLoader(models.build(EquivalentIntegrationsMod.modId));
+    }
+
+    private static void addDummyItems(IForgeRegistry<Item> registry)
+    {
+        if(ModConfig.exposeDummyTestItems)
+        {
+            testItems = new TestItem[500];
+            for (int i = 0; i < testItems.length; i++)
+            {
+                registry.register(testItems[i] = new TestItem("testitem"));
+
+                NonNullList<ItemStack> items = NonNullList.create();
+                testItems[i].getSubItems(EquivalentIntegrationsMod.creativeTab, items);
+
+                for (int m = 0; m < items.size(); m++)
+                {
+                    ProjectEAPI.getEMCProxy().registerCustomEMC(items.get(m), (long) (i * items.size() + m + 1));
+                }
+            }
+        }
     }
 }

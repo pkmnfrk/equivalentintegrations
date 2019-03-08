@@ -26,6 +26,10 @@ public class ModConfig
     @Config.LangKey("equivalentintegrations.config.exposeinvalidtalisman")
     public static boolean exposeInvalidTalisman = false;
 
+    @Config.Comment("Whether to expose bunch of dummy items. You really don't want to do this.")
+    @Config.LangKey("equivalentintegrations.config.exposedummytestitems")
+    public static boolean exposeDummyTestItems = false;
+
     @Mod.EventBusSubscriber(modid = EquivalentIntegrationsMod.modId)
     private static class EventHandler
     {
