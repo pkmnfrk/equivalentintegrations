@@ -91,4 +91,9 @@ public class EquivalentIntegrationsMod {
         emcManager = null;
     }
 
+    public static void debugLog(String message, Object... params)
+    {
+        logger.debug(message, params);
+    }
+
 }

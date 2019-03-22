@@ -71,23 +71,23 @@ public class TransmutationGeneratorContainer extends Container
 
             if (index < TransmutationGeneratorStackHandler.NUM_SLOTS)
             { //transferring from block -> player
-                EquivalentIntegrationsMod.logger.info("Transferring {} into the player", itemstack1);
+                EquivalentIntegrationsMod.debugLog("Transferring {} into the player", itemstack1);
                 if (!this.mergeItemStack(itemstack1, TransmutationGeneratorStackHandler.NUM_SLOTS, this.inventorySlots.size(), true)) {
-                    EquivalentIntegrationsMod.logger.info("Transferred {} into the player", itemstack1);
+                    EquivalentIntegrationsMod.debugLog("Transferred {} into the player", itemstack1);
                     return ItemStack.EMPTY;
                 }
             }
             else
             {
-                EquivalentIntegrationsMod.logger.info("Transferring {} into the block", itemstack1);
+                EquivalentIntegrationsMod.debugLog("Transferring {} into the block", itemstack1);
                 if (!this.mergeItemStack(itemstack1, 0, TransmutationGeneratorStackHandler.NUM_SLOTS, false))
                 { //transferring from player -> block
-                    EquivalentIntegrationsMod.logger.info("Transferred {} into the block", itemstack1);
+                    EquivalentIntegrationsMod.debugLog("Transferred {} into the block", itemstack1);
                     return ItemStack.EMPTY;
                 }
             }
 
-            EquivalentIntegrationsMod.logger.info("Itemstack1: {}", itemstack1);
+            EquivalentIntegrationsMod.debugLog("Itemstack1: {}", itemstack1);
             if (itemstack1.isEmpty()) {
 
                 slot.putStack(ItemStack.EMPTY);
@@ -97,7 +97,7 @@ public class TransmutationGeneratorContainer extends Container
         }
         else
         {
-            EquivalentIntegrationsMod.logger.info("Did nothing");
+            EquivalentIntegrationsMod.debugLog("Did nothing");
         }
 
         return itemstack;

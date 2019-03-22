@@ -1,5 +1,6 @@
 package com.mike_caron.equivalentintegrations.impl;
 
+import com.mike_caron.equivalentintegrations.EquivalentIntegrationsMod;
 import com.mike_caron.equivalentintegrations.OfflineEMCWorldData;
 import com.mike_caron.equivalentintegrations.api.events.EMCChangedEvent;
 import com.mike_caron.equivalentintegrations.storage.EMCInventory;
@@ -70,13 +71,13 @@ public class ManagedEMCManager
 
         if(player == null && OfflineEMCWorldData.get(world).hasCachedEMC(owner))
         {
-            //EquivalentIntegrationsMod.logger.debug("Retrieving cached EMC value for {}", owner);
+            EquivalentIntegrationsMod.debugLog("Retrieving cached EMC value for {}", owner);
             ret = OfflineEMCWorldData.get(world).getCachedEMC(owner);
         }
 
         if(ret == -1D)
         {
-            //EquivalentIntegrationsMod.logger.debug("Retrieving live EMC value for {}", owner);
+            EquivalentIntegrationsMod.debugLog("Retrieving live EMC value for {}", owner);
             IKnowledgeProvider knowledge = getKnowledgeProvider(owner);
             ret = knowledge.getEmc();
         }
@@ -93,6 +94,8 @@ public class ManagedEMCManager
             //MinecraftForge.EVENT_BUS.post(new EMCChangedEvent(owner, ret));
             updateEmc.add(owner);
         }
+
+        EquivalentIntegrationsMod.debugLog("Returned EMC value: {}", ret);
 
         return ret;
     }
