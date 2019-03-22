@@ -89,6 +89,7 @@ public class ManagedEMCManager
         if(lastKnownEmc.get(owner) != ret)
         {
             lastKnownEmc.put(owner, ret);
+            OfflineEMCWorldData.get(world).setCachedEMC(owner, ret);
             //MinecraftForge.EVENT_BUS.post(new EMCChangedEvent(owner, ret));
             updateEmc.add(owner);
         }
@@ -259,7 +260,7 @@ public class ManagedEMCManager
             {
                 IKnowledgeProvider knowledge = ProjectEAPI.getTransmutationProxy().getKnowledgeProviderFor(owner);
                 knowledge.setEmc(data.getCachedEMC(owner));
-                data.clearCachedEMC(owner);
+                //data.clearCachedEMC(owner);
 
                 EntityPlayerMP player = getEntityPlayerMP(owner);
                 knowledge.sync(player);
