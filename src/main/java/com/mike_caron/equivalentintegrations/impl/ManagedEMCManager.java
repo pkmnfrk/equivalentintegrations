@@ -158,22 +158,7 @@ public class ManagedEMCManager
 
             if (newEmc != currentEmc)
             {
-                EntityPlayerMP player = getEntityPlayerMP(owner);
-
-                if (player != null)
-                {
-                    IKnowledgeProvider knowledge = getKnowledgeProvider(owner);
-                    knowledge.setEmc(newEmc);
-                    markDirty(owner);
-                }
-                else
-                {
-                    OfflineEMCWorldData.get(world).setCachedEMC(owner, newEmc);
-                }
-
-                lastKnownEmc.put(owner, newEmc);
-                //MinecraftForge.EVENT_BUS.post(new EMCChangedEvent(owner, newEmc));
-                updateEmc.add(owner);
+                setEMC(owner, newEmc);
             }
 
             return amt;
@@ -195,22 +180,7 @@ public class ManagedEMCManager
 
             if (newEmc != currentEmc)
             {
-                EntityPlayerMP player = getEntityPlayerMP(owner);
-
-                if (player != null)
-                {
-                    IKnowledgeProvider knowledge = getKnowledgeProvider(owner);
-                    knowledge.setEmc(newEmc);
-                    markDirty(owner);
-                }
-                else
-                {
-                    OfflineEMCWorldData.get(world).setCachedEMC(owner, newEmc);
-                }
-
-                lastKnownEmc.put(owner, newEmc);
-                //MinecraftForge.EVENT_BUS.post(new EMCChangedEvent(owner, newEmc));
-                updateEmc.add(owner);
+                setEMC(owner, newEmc);
             }
         }
         finally
