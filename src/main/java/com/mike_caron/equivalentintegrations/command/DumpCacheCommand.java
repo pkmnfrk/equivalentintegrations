@@ -39,7 +39,7 @@ public class DumpCacheCommand
         if(sender instanceof EntityPlayer)
         {
             //EMCItemHandler.cleanupKnowledge((EntityPlayer)sender);
-            EMCInventory inventory = EquivalentIntegrationsMod.emcManager.getEMCInventory(((EntityPlayer) sender).getUniqueID());
+            EMCInventory inventory = EquivalentIntegrationsMod.emcManager.getEMCInventory(server.getEntityWorld(), ((EntityPlayer) sender).getUniqueID());
 
             if(inventory != null)
             {

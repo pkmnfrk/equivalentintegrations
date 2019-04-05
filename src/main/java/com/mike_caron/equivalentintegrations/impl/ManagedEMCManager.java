@@ -3,12 +3,9 @@ package com.mike_caron.equivalentintegrations.impl;
 import com.mike_caron.equivalentintegrations.EquivalentIntegrationsMod;
 import com.mike_caron.equivalentintegrations.OfflineEMCWorldData;
 import com.mike_caron.equivalentintegrations.api.events.EMCChangedEvent;
+import com.mike_caron.equivalentintegrations.integrations.projecte.ProjectEWrapper;
 import com.mike_caron.equivalentintegrations.storage.EMCInventory;
-import moze_intel.projecte.api.ProjectEAPI;
-import moze_intel.projecte.api.capabilities.IKnowledgeProvider;
 import moze_intel.projecte.api.event.EMCRemapEvent;
-import moze_intel.projecte.api.proxy.IEMCProxy;
-import moze_intel.projecte.api.proxy.ITransmutationProxy;
 import moze_intel.projecte.utils.EMCHelper;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.Item;
@@ -23,6 +20,7 @@ import net.minecraftforge.fml.common.gameevent.PlayerEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 import scala.Tuple2;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -43,43 +41,45 @@ public class ManagedEMCManager
 
     private HashMap<UUID, Integer> dirtyPlayers = new HashMap<>();
     private HashMap<UUID, Double> lastKnownEmc = new HashMap<>();
-    //private HashMap<UUID, IKnowledgeProvider> knowledgeProviders = new HashMap<>();
     private HashSet<UUID> updateEmc = new HashSet<>();
 
     private final HashMap<Tuple2<Item, Integer>, Long> emcValues = new HashMap<>();
     private final Lock lock = new ReentrantLock();
     //private final HashMap<ItemStack, Boolean> cacheBlacklist = new HashMap<>();
 
-    private ITransmutationProxy transmutationProxy;
-    private IEMCProxy emcProxy;
 
     private int emcCheckTimer = 0;
 
     public ManagedEMCManager(World world)
     {
         this.world = world;
-
-        transmutationProxy = ProjectEAPI.getTransmutationProxy();
-        emcProxy = ProjectEAPI.getEMCProxy();
     }
 
-    public double getEMC(UUID owner)
+    public double getEMC(@Nonnull World world, @Nonnull UUID owner)
     {
         double ret = -1D;
 
-        EntityPlayerMP player = getEntityPlayerMP(owner);
-
-        if(player == null && OfflineEMCWorldData.get(world).hasCachedEMC(owner))
+        if(ProjectEWrapper.instance.isSafe())
         {
-            EquivalentIntegrationsMod.debugLog("Retrieving cached EMC value for {}", owner);
-            ret = OfflineEMCWorldData.get(world).getCachedEMC(owner);
+            ret = ProjectEWrapper.instance.getEmc(world, owner);
         }
-
-        if(ret == -1D)
+        else
         {
-            EquivalentIntegrationsMod.debugLog("Retrieving live EMC value for {}", owner);
-            IKnowledgeProvider knowledge = getKnowledgeProvider(owner);
-            ret = knowledge.getEmc();
+
+            EntityPlayerMP player = getEntityPlayerMP(owner);
+
+            if (player == null && OfflineEMCWorldData.get(world).hasCachedEMC(owner))
+            {
+                EquivalentIntegrationsMod.debugLog("Retrieving cached EMC value for {}", owner);
+                ret = OfflineEMCWorldData.get(world).getCachedEMC(owner);
+            }
+
+            if (ret == -1D)
+            {
+                EquivalentIntegrationsMod.debugLog("Retrieving live EMC value for {}", owner);
+                ret = ProjectEWrapper.instance.getEmc(world, owner);
+            }
+
         }
 
         if(!lastKnownEmc.containsKey(owner))
@@ -90,7 +90,10 @@ public class ManagedEMCManager
         if(lastKnownEmc.get(owner) != ret)
         {
             lastKnownEmc.put(owner, ret);
-            OfflineEMCWorldData.get(world).setCachedEMC(owner, ret);
+            if(!ProjectEWrapper.instance.isSafe())
+            {
+                OfflineEMCWorldData.get(world).setCachedEMC(owner, ret);
+            }
             //MinecraftForge.EVENT_BUS.post(new EMCChangedEvent(owner, ret));
             updateEmc.add(owner);
         }
@@ -100,40 +103,31 @@ public class ManagedEMCManager
         return ret;
     }
 
-    private IKnowledgeProvider getKnowledgeProvider(UUID owner)
-    {
-        IKnowledgeProvider knowledge;
-        //if(knowledgeProviders.containsKey(owner))
-        //{
-        //    knowledge = knowledgeProviders.get(owner);
-        //}
-        //else
-        //{
-            knowledge = transmutationProxy.getKnowledgeProviderFor(owner);
-        //    knowledgeProviders.put(owner, knowledge);
-        //}
-        return knowledge;
-    }
-
-    public void setEMC(UUID owner, double emc)
+    public void setEMC(@Nonnull World world, @Nonnull UUID owner, double emc)
     {
         lock.lock();
         try
         {
-            double currentEmc = getEMC(owner);
+            double currentEmc = getEMC(world, owner);
             if (emc != currentEmc)
             {
-                EntityPlayerMP player = getEntityPlayerMP(owner);
-
-                if (player != null)
+                if(ProjectEWrapper.instance.isSafe())
                 {
-                    IKnowledgeProvider knowledge = getKnowledgeProvider(owner);
-                    knowledge.setEmc(emc);
-                    markDirty(owner);
+                    ProjectEWrapper.instance.setEmc(world, owner, emc);
                 }
                 else
                 {
-                    OfflineEMCWorldData.get(world).setCachedEMC(owner, emc);
+                    EntityPlayerMP player = getEntityPlayerMP(owner);
+
+                    if (player != null)
+                    {
+                        ProjectEWrapper.instance.setEmc(world, owner, emc);
+                        markDirty(owner);
+                    }
+                    else
+                    {
+                        OfflineEMCWorldData.get(world).setCachedEMC(owner, emc);
+                    }
                 }
 
                 lastKnownEmc.put(owner, emc);
@@ -147,12 +141,12 @@ public class ManagedEMCManager
         }
     }
 
-    public long withdrawEMC(UUID owner, long amt)
+    public long withdrawEMC(@Nonnull World world, @Nonnull UUID owner, long amt)
     {
         lock.lock();
         try
         {
-            double currentEmc = getEMC(owner);
+            double currentEmc = getEMC(world, owner);
             if (amt > currentEmc)
             {
                 amt = (long) currentEmc;
@@ -162,7 +156,7 @@ public class ManagedEMCManager
 
             if (newEmc != currentEmc)
             {
-                setEMC(owner, newEmc);
+                setEMC(world, owner, newEmc);
             }
 
             return amt;
@@ -173,18 +167,18 @@ public class ManagedEMCManager
         }
     }
 
-    public void depositEMC(UUID owner, long amt)
+    public void depositEMC(@Nonnull World world, @Nonnull UUID owner, long amt)
     {
         lock.lock();
         try
         {
-            double currentEmc = getEMC(owner);
+            double currentEmc = getEMC(world, owner);
 
             double newEmc = currentEmc + amt;
 
             if (newEmc != currentEmc)
             {
-                setEMC(owner, newEmc);
+                setEMC(world, owner, newEmc);
             }
         }
         finally
@@ -193,7 +187,7 @@ public class ManagedEMCManager
         }
     }
 
-    public void tick()
+    public void tick(@Nonnull World world)
     {
         lock.lock();
 
@@ -218,8 +212,7 @@ public class ManagedEMCManager
                     }
                     else
                     {
-                        IKnowledgeProvider knowledge = getKnowledgeProvider(player);
-                        knowledge.sync(playermp);
+                        ProjectEWrapper.instance.sync(playermp);
                     }
                 }
                 else
@@ -234,7 +227,7 @@ public class ManagedEMCManager
 
                 for (UUID player : lastKnownEmc.keySet())
                 {
-                    getEMC(player); //the event will be fired from within
+                    getEMC(world, player); //the event will be fired from within
                 }
             }
 
@@ -255,18 +248,19 @@ public class ManagedEMCManager
 
     public void playerLoggedIn(UUID owner)
     {
+        if(ProjectEWrapper.instance.isSafe())
+            return;
+
         lock.lock();
         try
         {
             OfflineEMCWorldData data = OfflineEMCWorldData.get(FMLCommonHandler.instance().getMinecraftServerInstance().getEntityWorld());
             if (data.hasCachedEMC(owner))
             {
-                IKnowledgeProvider knowledge = ProjectEAPI.getTransmutationProxy().getKnowledgeProviderFor(owner);
-                knowledge.setEmc(data.getCachedEMC(owner));
-                //data.clearCachedEMC(owner);
+                ProjectEWrapper.instance.setEmc(world, owner, data.getCachedEMC(owner));
 
                 EntityPlayerMP player = getEntityPlayerMP(owner);
-                knowledge.sync(player);
+                ProjectEWrapper.instance.sync(player);
             }
             //knowledgeProviders.remove(owner);
         }
@@ -339,14 +333,14 @@ public class ManagedEMCManager
         }*/
     }
 
-    public EMCInventory getEMCInventory(UUID owner)
+    public EMCInventory getEMCInventory(@Nonnull World world, UUID owner)
     {
         lock.lock();
         try
         {
             if (!emcInventories.containsKey(owner))
             {
-                EMCInventory inv = new EMCInventory(owner, this);
+                EMCInventory inv = new EMCInventory(world, owner, this);
                 MinecraftForge.EVENT_BUS.register(inv);
                 emcInventories.put(owner, inv);
             }
@@ -397,7 +391,7 @@ public class ManagedEMCManager
     @SubscribeEvent
     public void onWorldTick(TickEvent.WorldTickEvent event)
     {
-        tick();
+        tick(event.world);
     }
 
     @SubscribeEvent

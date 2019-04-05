@@ -7,11 +7,12 @@ import com.mike_caron.equivalentintegrations.impl.ManagedEMCManager;
 import moze_intel.projecte.api.ProjectEAPI;
 import moze_intel.projecte.api.event.EMCRemapEvent;
 import moze_intel.projecte.api.event.PlayerKnowledgeChangeEvent;
-import moze_intel.projecte.api.proxy.IEMCProxy;
 import net.minecraft.item.ItemStack;
+import net.minecraft.world.World;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -23,7 +24,8 @@ public class EMCInventory
 {
     private final UUID owner;
     private final ManagedEMCManager emcManager;
-    private final IEMCProxy emcProxy;
+    private final World world;
+    //private final IEMCProxy emcProxy;
 
     //private double cachedEmc;
 
@@ -35,17 +37,18 @@ public class EMCInventory
     private List<ItemStack> cachedInventory = null;
     private List<ItemStack> cachedKnowledge = null;
 
-    public EMCInventory(UUID owner, ManagedEMCManager manager)
+    public EMCInventory(@Nonnull World world, UUID owner, ManagedEMCManager manager)
     {
-        this(owner, manager, null);
+        this(world, owner, manager, null);
     }
 
-    private EMCInventory(UUID owner, ManagedEMCManager manager, @Nullable ItemStack filter)
+    private EMCInventory(@Nonnull World world, UUID owner, ManagedEMCManager manager, @Nullable ItemStack filter)
     {
         this.owner = owner;
         this.emcManager = manager;
-        this.emcProxy = ProjectEAPI.getEMCProxy();
+        //this.emcProxy = ProjectEAPI.getEMCProxy();
         this.filter = filter;
+        this.world = world;
 
         refresh();
     }
@@ -103,7 +106,7 @@ public class EMCInventory
             {
                 cachedKnowledge = newKnowledge;
             }
-            calculateInventory();
+            calculateInventory(world);
             ret = true;
         }
         catch(IllegalStateException ex)
@@ -162,7 +165,7 @@ public class EMCInventory
         }
     }
 
-    private void calculateInventory()
+    private void calculateInventory(@Nonnull World world)
     {
         if(cachedInventory != null)
         {
@@ -176,7 +179,7 @@ public class EMCInventory
 
         //cachedInventory = new ArrayList<>();
 
-        double cachedEmc = emcManager.getEMC(owner);
+        double cachedEmc = emcManager.getEMC(world, owner);
 
         int ix = 0;
         int addedNew = 0;
@@ -254,6 +257,6 @@ public class EMCInventory
 
     public EMCInventory withFilter(ItemStack filter)
     {
-        return new EMCInventory(owner, emcManager, filter);
+        return new EMCInventory(world, owner, emcManager, filter);
     }
 }

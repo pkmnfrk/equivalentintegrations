@@ -2,9 +2,9 @@ package com.mike_caron.equivalentintegrations.storage;
 
 import com.mike_caron.equivalentintegrations.EquivalentIntegrationsMod;
 import com.mike_caron.equivalentintegrations.impl.ManagedEMCManager;
+import com.mike_caron.equivalentintegrations.integrations.projecte.ProjectEWrapper;
 import com.mike_caron.mikesmodslib.util.LastResortUtils;
 import moze_intel.projecte.api.ProjectEAPI;
-import moze_intel.projecte.api.capabilities.IKnowledgeProvider;
 import moze_intel.projecte.api.event.PlayerAttemptLearnEvent;
 import moze_intel.projecte.api.proxy.IEMCProxy;
 import moze_intel.projecte.utils.ItemHelper;
@@ -19,9 +19,7 @@ import net.minecraftforge.items.ItemHandlerHelper;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 import java.util.UUID;
 
 //import moze_intel.projecte.api.event.PlayerAttemptLearnEvent;
@@ -64,7 +62,7 @@ public final class EMCItemHandler
 
         this.emcManager = EquivalentIntegrationsMod.emcManager;
 
-        EMCInventory inv = this.emcManager.getEMCInventory(owner);
+        EMCInventory inv = this.emcManager.getEMCInventory(world, owner);
         if(filter != null)
             inv = inv.withFilter(filter);
 
@@ -139,10 +137,6 @@ public final class EMCItemHandler
         }
 
         if(emcProxy.hasValue(stack)){
-            IKnowledgeProvider knowledge;
-
-            knowledge = ProjectEAPI.getTransmutationProxy().getKnowledgeProviderFor(owner);
-
             if(forbidNbt && stack.hasTagCompound() && !(stack.getTagCompound().getSize() == 0))
             {
                 return stack;
@@ -153,9 +147,9 @@ public final class EMCItemHandler
                 return stack;
             }
 
-            if(canLearn != EnumLearning.CANNOT || knowledge.hasKnowledge(stack))
+            if(canLearn != EnumLearning.CANNOT || ProjectEWrapper.instance.hasKnowledge(world, owner, stack))
             {
-                double emc = emcManager.getEMC(owner);
+                double emc = emcManager.getEMC(world, owner);
 
                 long singleValue = emcManager.getEmcSellValue(stack);
 
@@ -165,9 +159,9 @@ public final class EMCItemHandler
 
                 //EquivalentIntegrationsMod.logger.info("Burning a stack ({}) for {} EMC each, a total of {} (Simulation: {})", stack, singleValue, emcValue, simulate);
 
-                if(canLearn == EnumLearning.CAN && !knowledge.hasKnowledge(stack))
+                if(canLearn == EnumLearning.CAN && !ProjectEWrapper.instance.hasKnowledge(world, owner, stack))
                 {
-                    if(!tryLearn(stack, knowledge, simulate))
+                    if(!tryLearn(stack, simulate))
                     {
                         return stack;
                     }
@@ -175,7 +169,7 @@ public final class EMCItemHandler
 
                 if(!simulate)
                 {
-                    emcManager.depositEMC(owner, emcValue);
+                    emcManager.depositEMC(world, owner, emcValue);
                 }
 
                 //EquivalentIntegrationsMod.logger.info("Done burning said stack");
@@ -187,7 +181,7 @@ public final class EMCItemHandler
         return stack;
     }
 
-    private boolean tryLearn(@Nonnull ItemStack stack, IKnowledgeProvider knowledge, boolean simulate)
+    private boolean tryLearn(@Nonnull ItemStack stack, boolean simulate)
     {
         if(!simulate)
         {
@@ -212,7 +206,7 @@ public final class EMCItemHandler
             //note: this will not work if the user is offline. In this case, the later
             //knowledge check will return false, thus rejecting the item
 
-            return simulate || knowledge.addKnowledge(stack);
+            return simulate || ProjectEWrapper.instance.addKnowledge(world, owner, stack);
         }
 
         return false;
@@ -223,7 +217,7 @@ public final class EMCItemHandler
         if(!canExport)
             return ItemStack.EMPTY;
 
-        double emc = emcManager.getEMC(owner);
+        double emc = emcManager.getEMC(world, owner);
 
         long emcCost = emcManager.getEmcValue(desired);
 
@@ -263,7 +257,7 @@ public final class EMCItemHandler
 
         if (!simulate && desiredEMC > 0)
         {
-            emcManager.withdrawEMC(owner, desiredEMC);
+            emcManager.withdrawEMC(world, owner, desiredEMC);
         }
 
         //EquivalentIntegrationsMod.logger.info("Done materializing said stack");
@@ -324,34 +318,7 @@ public final class EMCItemHandler
 
     public static void cleanupKnowledge(EntityPlayer player)
     {
-        IKnowledgeProvider knowledge;
-
-        knowledge = ProjectEAPI.getTransmutationProxy().getKnowledgeProviderFor(player.getUniqueID());
-
-        List<ItemStack> oldKnowledge = new ArrayList<>(knowledge.getKnowledge());
-
-        knowledge.clearKnowledge();
-
-        for(ItemStack stack : oldKnowledge)
-        {
-            if(stack.isItemStackDamageable() && stack.isItemDamaged())
-            {
-                stack.setItemDamage(0);
-            }
-
-            if(stack.hasTagCompound() && !NBTWhitelist.shouldDupeWithNBT(stack))
-            {
-                stack.setTagCompound(null);
-            }
-
-            if(!knowledge.hasKnowledge(stack))
-            {
-                knowledge.addKnowledge(stack);
-            }
-        }
-
-        knowledge.sync((EntityPlayerMP)player);
-
+        ProjectEWrapper.instance.cleanupKnowledge((EntityPlayerMP)player);
     }
 
     public Collection<ItemStack> getCachedInventory()

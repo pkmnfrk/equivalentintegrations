@@ -384,7 +384,7 @@ public class TransmutationGeneratorTileEntity
     {
         if(EquivalentIntegrationsMod.emcManager != null)
         {
-            EquivalentIntegrationsMod.emcManager.depositEMC(owner, (long)internalEmcBuffer);
+            EquivalentIntegrationsMod.emcManager.depositEMC(world, owner, (long)internalEmcBuffer);
             internalEmcBuffer = 0;
         }
     }
@@ -396,7 +396,7 @@ public class TransmutationGeneratorTileEntity
         float energyModifier = getEfficiency();
         long emcToGet = (long)Math.ceil(powerPerTick * 20 / energyModifier);
 
-        emcToGet = EquivalentIntegrationsMod.emcManager.withdrawEMC(owner, emcToGet);
+        emcToGet = EquivalentIntegrationsMod.emcManager.withdrawEMC(world, owner, emcToGet);
 
         internalEmcBuffer += emcToGet;
     }

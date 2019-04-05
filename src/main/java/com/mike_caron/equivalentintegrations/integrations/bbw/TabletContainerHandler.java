@@ -1,9 +1,8 @@
 package com.mike_caron.equivalentintegrations.integrations.bbw;
 
 
+import com.mike_caron.equivalentintegrations.integrations.projecte.ProjectEWrapper;
 import com.mike_caron.equivalentintegrations.storage.EMCItemHandler;
-import moze_intel.projecte.api.ProjectEAPI;
-import moze_intel.projecte.api.capabilities.IKnowledgeProvider;
 import moze_intel.projecte.gameObjs.items.TransmutationTablet;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
@@ -18,9 +17,7 @@ public class TabletContainerHandler
     {
         if(inventoryStack.getItem() instanceof TransmutationTablet)
         {
-            IKnowledgeProvider knowledge = ProjectEAPI.getTransmutationProxy().getKnowledgeProviderFor(entityPlayer.getUniqueID());
-
-            if(knowledge.hasKnowledge(itemStack))
+            if(ProjectEWrapper.instance.hasKnowledge(entityPlayer, itemStack))
             {
                 return true;
             }
