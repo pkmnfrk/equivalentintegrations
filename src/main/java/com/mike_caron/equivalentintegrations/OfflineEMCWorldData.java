@@ -1,5 +1,6 @@
 package com.mike_caron.equivalentintegrations;
 
+import com.mike_caron.equivalentintegrations.integrations.projecte.ProjectEWrapper;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.world.World;
 import net.minecraft.world.storage.WorldSavedData;
@@ -43,6 +44,11 @@ public class OfflineEMCWorldData extends WorldSavedData
         cachedEMCValues.put(uuid, d);
 
         markDirty();
+
+        if(ProjectEWrapper.instance.isSafe())
+        {
+            EquivalentIntegrationsMod.logger.warn("Setting offline EMC when ProjectEX is installed");
+        }
     }
 
     public void clearCachedEMC(UUID uuid)
