@@ -35,7 +35,7 @@ minecraft {
 }
 
 repositories {
-    maven {
+    maven { //The One Probe
         name 'tterrag maven'
         url "https://maven.tterrag.com/"
     }
@@ -43,13 +43,20 @@ repositories {
         name "Mobius Repo"
         url "http://tehnut.info/maven"
     }
-    maven {
-        name "RefinedStorage Repo"
-        url "https://repo.raoulvdberge.com/"
-    }
-    maven {
+    //maven { //Refined Storage
+    //    name "RefinedStorage Repo"
+    //    url "https://repo.raoulvdberge.com/"
+    //}
+    maven { //ProjectE/Misc
         name 'CurseForge'
         url "https://minecraft.curseforge.com/api/maven/"
+    }
+    maven { //ProjectEX
+        name 'LatvianModder'
+        url "https://maven.latmod.com/"
+    }
+    maven { //JEI
+        url "https://dvs1.progwml6.com/files/maven"
     }
 }
 
@@ -59,6 +66,7 @@ dependencies {
     deobfCompile ("mcjty.theoneprobe:TheOneProbe-1.12:${top_version}"){
         transitive = false
     }
+    deobfProvided "com.latmod.mods:ProjectEX:1.1.0.25"
 
     //this doesn't work, so I just put the damned file in libs:
     //compile 'better-builders-wands:BetterBuildersWands-1.12.2:0.13.0.267+dc89c58'
