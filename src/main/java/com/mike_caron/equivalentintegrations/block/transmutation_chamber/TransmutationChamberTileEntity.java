@@ -267,4 +267,9 @@ public class TransmutationChamberTileEntity
     {
         return type;
     }
+
+    public EMCItemHandler getEmcItemHandler()
+    {
+        return emcItemHandler;
+    }
 }
