@@ -49,18 +49,12 @@ repositories {
     }
     maven {
         name 'CurseForge'
-        url "https://minecraft.curseforge.com/api/maven"
+        url "https://minecraft.curseforge.com/api/maven/"
     }
-    ivy {
-        name 'ProjectE'
-        ivyPattern "https://maven.tterrag.com/[module]-[revision].[ext]"
-        artifactPattern "http://media.forgecdn.net/files/${pe_cf}/[module]-[revision].[ext]"
-    }
-
 }
 
 dependencies {
-    deobfCompile name: 'ProjectE', version: "${pe_version}", ext: 'jar'
+    deobfCompile "projecte:ProjectE:1.12.2:${pe_version}"
     deobfCompile "mcp.mobius.waila:Hwyla:${hwyla_version}"
     deobfCompile ("mcjty.theoneprobe:TheOneProbe-1.12:${top_version}"){
         transitive = false
