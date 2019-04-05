@@ -149,8 +149,6 @@ public final class EMCItemHandler
 
             if(canLearn != EnumLearning.CANNOT || ProjectEWrapper.instance.hasKnowledge(world, owner, stack))
             {
-                double emc = emcManager.getEMC(world, owner);
-
                 long singleValue = emcManager.getEmcSellValue(stack);
 
                 long emcValue = singleValue * stack.getCount();

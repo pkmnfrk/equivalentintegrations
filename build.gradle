@@ -58,6 +58,10 @@ repositories {
     maven { //JEI
         url "https://dvs1.progwml6.com/files/maven"
     }
+    maven { //common capabilities
+        name "Cyclops Repo"
+        url "https://oss.jfrog.org/artifactory/simple/libs-release/"
+    }
 }
 
 dependencies {
@@ -67,6 +71,7 @@ dependencies {
         transitive = false
     }
     deobfProvided "com.latmod.mods:ProjectEX:${pex_version}"
+    deobfProvided "org.cyclops.commoncapabilities:CommonCapabilities:1.12.2-${comcap_version}"
 
     //this doesn't work, so I just put the damned file in libs:
     //compile 'better-builders-wands:BetterBuildersWands-1.12.2:0.13.0.267+dc89c58'
