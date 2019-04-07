@@ -27,4 +27,10 @@ public class ProjectEXWrapper extends ProjectEWrapper
     {
         return PersonalEMC.get(player);
     }
+
+    public void test()
+        throws NoClassDefFoundError
+    {
+        PersonalEMC.class.getName();
+    }
 }

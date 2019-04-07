@@ -1,5 +1,6 @@
 package com.mike_caron.equivalentintegrations.integrations.projecte;
 
+import com.mike_caron.equivalentintegrations.EquivalentIntegrationsMod;
 import moze_intel.projecte.api.ProjectEAPI;
 import moze_intel.projecte.api.capabilities.IKnowledgeProvider;
 import moze_intel.projecte.api.proxy.ITransmutationProxy;
@@ -30,7 +31,18 @@ public class ProjectEWrapper
     {
         if(Loader.isModLoaded("projectex"))
         {
-            return new ProjectEXWrapper();
+            ProjectEXWrapper wrapper = new ProjectEXWrapper();
+
+            try
+            {
+                wrapper.test();
+                return wrapper;
+            }
+            catch(NoClassDefFoundError er)
+            {
+                EquivalentIntegrationsMod.logger.error("Tried to instantiate ProjectEX API, but failed. Try updating Project-EX!", er);
+            }
+
         }
 
         return new ProjectEWrapper();
