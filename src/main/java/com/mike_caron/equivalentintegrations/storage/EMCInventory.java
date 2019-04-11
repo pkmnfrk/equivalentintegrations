@@ -238,7 +238,9 @@ public class EMCInventory
         int cap = ModConfig.maximumExposedStackSize;
 
         if(cost == 0) return 0;
-        long tmp = Math.floorDiv((long) emc, cost);
+
+        double raw = emc / cost;
+        long tmp = (long)Math.floor(raw);
         if (tmp > cap)
         {
             // er, let's cap it at that, shall we?
