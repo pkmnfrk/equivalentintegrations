@@ -18,7 +18,7 @@ public class TestItem
 
     public TestItem(String id)
     {
-        super();
+        super(id);
 
         num = numCounter++;
 

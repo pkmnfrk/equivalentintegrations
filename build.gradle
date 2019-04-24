@@ -70,7 +70,7 @@ dependencies {
     deobfCompile ("mcjty.theoneprobe:TheOneProbe-1.12:${top_version}"){
         transitive = false
     }
-    deobfProvided "com.latmod.mods:ProjectEX:${pex_version}"
+    compileOnly "com.latmod.mods:ProjectEX:${pex_version}"
     deobfProvided "org.cyclops.commoncapabilities:CommonCapabilities:1.12.2-${comcap_version}"
 
     //this doesn't work, so I just put the damned file in libs:
