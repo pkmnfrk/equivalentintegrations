@@ -60,7 +60,14 @@ public final class EMCItemHandler
 
         this.emcProxy = ProjectEAPI.getEMCProxy();
 
-        this.emcManager = EquivalentIntegrationsMod.emcManager;
+        if(world.isRemote)
+        {
+            this.emcManager = new ManagedEMCManager(world);
+        }
+        else
+        {
+            this.emcManager = EquivalentIntegrationsMod.emcManager;
+        }
 
         EMCInventory inv = this.emcManager.getEMCInventory(world, owner);
         if(filter != null)

@@ -33,7 +33,6 @@ public class CommonProxy
     public void init(FMLInitializationEvent e)
     {
         NetworkRegistry.INSTANCE.registerGuiHandler(EquivalentIntegrationsMod.instance, new GuiProxy());
-        //CapabilityManager.INSTANCE.register(IEMCManager.class, new DummyIStorage<>(), new ManagedEMCManager.Factory());
 
         ModItems.registerEvents();
     }

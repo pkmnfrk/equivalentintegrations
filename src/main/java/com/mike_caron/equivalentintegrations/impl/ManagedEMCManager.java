@@ -61,7 +61,7 @@ public class ManagedEMCManager
 
         if(ProjectEWrapper.instance.isSafe())
         {
-            ret = ProjectEWrapper.instance.getEmc(world, owner);
+                ret = ProjectEWrapper.instance.getEmc(world, owner);
         }
         else
         {
@@ -105,6 +105,9 @@ public class ManagedEMCManager
 
     public void setEMC(@Nonnull World world, @Nonnull UUID owner, double emc)
     {
+        if(world.isRemote)
+            throw new IllegalStateException("Unable to modify EMC on client side");
+
         lock.lock();
         try
         {
@@ -143,6 +146,9 @@ public class ManagedEMCManager
 
     public long withdrawEMC(@Nonnull World world, @Nonnull UUID owner, long amt)
     {
+        if(world.isRemote)
+            throw new IllegalStateException("Unable to modify EMC on client side");
+
         lock.lock();
         try
         {
@@ -169,6 +175,9 @@ public class ManagedEMCManager
 
     public void depositEMC(@Nonnull World world, @Nonnull UUID owner, long amt)
     {
+        if(world.isRemote)
+            throw new IllegalStateException("Unable to modify EMC on client side");
+
         lock.lock();
         try
         {
@@ -189,6 +198,9 @@ public class ManagedEMCManager
 
     public void tick(@Nonnull World world)
     {
+        if(world.isRemote)
+            return;
+
         lock.lock();
 
         try
@@ -248,6 +260,9 @@ public class ManagedEMCManager
 
     public void playerLoggedIn(UUID owner)
     {
+        if(world.isRemote)
+            return;
+
         if(ProjectEWrapper.instance.isSafe())
             return;
 
@@ -354,6 +369,8 @@ public class ManagedEMCManager
 
     private void bustCache()
     {
+        if(world.isRemote)
+            return;
 
         lock.lock();
         try
@@ -370,6 +387,9 @@ public class ManagedEMCManager
 
     private void markDirty(UUID owner)
     {
+        if(world.isRemote)
+            return;
+
         if(!dirtyPlayers.containsKey(owner))
         {
             dirtyPlayers.put(owner, TICK_DELAY);
@@ -379,6 +399,9 @@ public class ManagedEMCManager
     @Nullable
     private EntityPlayerMP getEntityPlayerMP(UUID owner)
     {
+        if(world.isRemote)
+            return null;
+
         EntityPlayerMP player = null;
         MinecraftServer server = world.getMinecraftServer();
         if (server != null)
@@ -397,6 +420,9 @@ public class ManagedEMCManager
     @SubscribeEvent
     public void onPlayerLogin(PlayerEvent.PlayerLoggedInEvent event)
     {
+        if(world.isRemote)
+            return;
+
         UUID owner = event.player.getUniqueID();
 
         playerLoggedIn(owner);
