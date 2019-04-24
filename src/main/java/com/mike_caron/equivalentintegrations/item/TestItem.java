@@ -18,11 +18,10 @@ public class TestItem
 
     public TestItem(String id)
     {
-        super(id);
+        super(id + "" + (numCounter ++));
 
-        num = numCounter++;
+        num = numCounter;
 
-        setRegistryName(id + "" + num);
         setTranslationKey(id);
         setCreativeTab(EquivalentIntegrationsMod.creativeTab);
     }

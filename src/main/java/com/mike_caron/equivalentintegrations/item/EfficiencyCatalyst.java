@@ -19,8 +19,7 @@ public class EfficiencyCatalyst extends ItemBase
 
     public EfficiencyCatalyst()
     {
-        setRegistryName(id);
-        setTranslationKey(id);
+        super(id);
         setMaxStackSize(4);
         setCreativeTab(EquivalentIntegrationsMod.creativeTab);
     }

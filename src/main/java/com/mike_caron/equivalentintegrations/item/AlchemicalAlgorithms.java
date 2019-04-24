@@ -19,8 +19,7 @@ public class AlchemicalAlgorithms extends ItemBase
 
     public AlchemicalAlgorithms()
     {
-        setRegistryName(id);
-        setTranslationKey(id);
+        super(id);
         setMaxStackSize(1);
         setCreativeTab(EquivalentIntegrationsMod.creativeTab);
     }

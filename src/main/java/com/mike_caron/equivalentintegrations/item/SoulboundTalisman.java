@@ -32,8 +32,8 @@ public class SoulboundTalisman extends ItemBase
 
     public SoulboundTalisman()
     {
-        setRegistryName(id);
-        setTranslationKey(id);
+        super(id);
+
         setCreativeTab(EquivalentIntegrationsMod.creativeTab);
     }
 

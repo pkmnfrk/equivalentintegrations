@@ -70,8 +70,7 @@ public class ConjurationAssembler
 
     public ConjurationAssembler()
     {
-        setRegistryName(id);
-        setTranslationKey(id);
+        super(id);
         setMaxStackSize(1);
         setCreativeTab(EquivalentIntegrationsMod.creativeTab);
 
