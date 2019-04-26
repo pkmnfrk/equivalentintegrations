@@ -24,7 +24,7 @@ import org.apache.logging.log4j.Logger;
         name = EquivalentIntegrationsMod.name,
         version = EquivalentIntegrationsMod.version,
         acceptedMinecraftVersions = "[1.12.2]",
-        dependencies = "required-after:projecte@[1.12-PE1.3.1,)" +
+        dependencies = "required-after:projecte@[1.12-PE1.4.1,)" +
             ";required-after:mikesmodslib@[1.0.2,)" +
             ";after:projectex@[1.1.0,)"
 )
@@ -32,7 +32,7 @@ import org.apache.logging.log4j.Logger;
 public class EquivalentIntegrationsMod {
     public static final String modId = "equivalentintegrations";
     public static final String name = "Equivalent Integrations";
-    public static final String version = "0.4.3";
+    public static final String version = "0.4.4";
 
     public static final Logger logger = LogManager.getLogger(modId);
 
