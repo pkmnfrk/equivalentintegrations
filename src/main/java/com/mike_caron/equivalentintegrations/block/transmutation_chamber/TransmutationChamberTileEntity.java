@@ -78,7 +78,7 @@ public class TransmutationChamberTileEntity
 
     private void createEmcItemHandler(UUID newOwner, World world)
     {
-        if(EquivalentIntegrationsMod.emcManager == null) {
+        if(EquivalentIntegrationsMod.getEmcManager(world) == null) {
             //EquivalentIntegrationsMod.logger.error("EMCManager is null when trying to create item handler!");
             return;
         }

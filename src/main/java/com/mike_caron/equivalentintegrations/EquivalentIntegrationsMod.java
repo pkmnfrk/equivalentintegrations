@@ -8,6 +8,7 @@ import com.mike_caron.equivalentintegrations.network.CtoSMessage;
 import com.mike_caron.equivalentintegrations.network.ItemConfigMessage;
 import com.mike_caron.equivalentintegrations.network.PacketHandlerServer;
 import com.mike_caron.equivalentintegrations.proxy.IModProxy;
+import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.SidedProxy;
@@ -50,7 +51,18 @@ public class EquivalentIntegrationsMod {
 
     public static SimpleNetworkWrapper networkWrapper;
 
-    public static ManagedEMCManager emcManager;
+    private static ManagedEMCManager emcManager;
+
+    public static ManagedEMCManager getEmcManager(World world)
+    {
+        if(emcManager == null)
+        {
+            emcManager = new ManagedEMCManager(world);
+            MinecraftForge.EVENT_BUS.register(emcManager);
+            logger.info("Created EMC Manager");
+        }
+        return emcManager;
+    }
 
     @Mod.EventHandler
     public  void preInit(FMLPreInitializationEvent event)
