@@ -59,6 +59,11 @@ public class ManagedEMCManager
     {
         double ret = -1D;
 
+        if(world.isRemote)
+        {
+            return ProjectEWrapper.instance.getEmc(world, owner);
+        }
+
         if(ProjectEWrapper.instance.isSafe())
         {
                 ret = ProjectEWrapper.instance.getEmc(world, owner);
@@ -117,6 +122,7 @@ public class ManagedEMCManager
                 if(ProjectEWrapper.instance.isSafe())
                 {
                     ProjectEWrapper.instance.setEmc(world, owner, emc);
+                    markDirty(owner);
                 }
                 else
                 {
@@ -420,8 +426,8 @@ public class ManagedEMCManager
     @SubscribeEvent
     public void onPlayerLogin(PlayerEvent.PlayerLoggedInEvent event)
     {
-        if(world.isRemote)
-            return;
+        //if(world.isRemote)
+        //    return;
 
         UUID owner = event.player.getUniqueID();
 

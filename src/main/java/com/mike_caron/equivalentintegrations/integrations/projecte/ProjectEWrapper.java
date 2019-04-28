@@ -98,7 +98,13 @@ public class ProjectEWrapper
     public boolean addKnowledge(@Nonnull World world, @Nonnull UUID owner, @Nonnull ItemStack stack)
     {
         IKnowledgeProvider provider = getKnowledgeProvider(world, owner);
-        return provider.addKnowledge(stack);
+        boolean ret = provider.addKnowledge(stack);
+        EntityPlayer player = world.getPlayerEntityByUUID(owner);
+        if(player instanceof EntityPlayerMP)
+        {
+            provider.sync((EntityPlayerMP)player);
+        }
+        return ret;
     }
 
     public void cleanupKnowledge(EntityPlayerMP player)
