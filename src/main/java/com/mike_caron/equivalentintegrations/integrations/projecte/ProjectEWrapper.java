@@ -97,8 +97,8 @@ public class ProjectEWrapper
 
     public boolean addKnowledge(@Nonnull World world, @Nonnull UUID owner, @Nonnull ItemStack stack)
     {
-        IKnowledgeProvider provder = getKnowledgeProvider(world, owner);
-        return provder.addKnowledge(stack);
+        IKnowledgeProvider provider = getKnowledgeProvider(world, owner);
+        return provider.addKnowledge(stack);
     }
 
     public void cleanupKnowledge(EntityPlayerMP player)
@@ -150,4 +150,12 @@ public class ProjectEWrapper
         return knowledge;
     }
 
+    public List<ItemStack> getKnowledge(@Nonnull World world, @Nonnull UUID owner)
+    {
+        IKnowledgeProvider knowledge;
+
+        knowledge = transmutationProxy.getKnowledgeProviderFor(owner);
+
+        return knowledge.getKnowledge();
+    }
 }

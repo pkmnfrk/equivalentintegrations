@@ -4,6 +4,7 @@ import com.mike_caron.equivalentintegrations.EquivalentIntegrationsMod;
 import com.mike_caron.equivalentintegrations.ModConfig;
 import com.mike_caron.equivalentintegrations.api.events.EMCChangedEvent;
 import com.mike_caron.equivalentintegrations.impl.ManagedEMCManager;
+import com.mike_caron.equivalentintegrations.integrations.projecte.ProjectEWrapper;
 import moze_intel.projecte.api.ProjectEAPI;
 import moze_intel.projecte.api.event.EMCRemapEvent;
 import moze_intel.projecte.api.event.PlayerKnowledgeChangeEvent;
@@ -97,7 +98,8 @@ public class EMCInventory
 
         try
         {
-            List<ItemStack> newKnowledge = ProjectEAPI.getTransmutationProxy().getKnowledgeProviderFor(owner).getKnowledge();
+            List<ItemStack> newKnowledge = ProjectEWrapper.instance.getKnowledge(world, owner);
+
             if(filter != null)
             {
                 cachedKnowledge = newKnowledge.stream().filter(is -> is.isItemEqualIgnoreDurability(filter)).collect(Collectors.toList());
