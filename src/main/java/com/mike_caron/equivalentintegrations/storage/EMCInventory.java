@@ -8,17 +8,17 @@ import com.mike_caron.equivalentintegrations.integrations.projecte.ProjectEWrapp
 import moze_intel.projecte.api.ProjectEAPI;
 import moze_intel.projecte.api.event.EMCRemapEvent;
 import moze_intel.projecte.api.event.PlayerKnowledgeChangeEvent;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.Tuple;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
+import scala.Tuple2;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class EMCInventory
@@ -37,6 +37,7 @@ public class EMCInventory
 
     private List<ItemStack> cachedInventory = null;
     private List<ItemStack> cachedKnowledge = null;
+    private Map<Tuple2<Item, Integer>, List<ItemStack>> itemIndex = null;
 
     public EMCInventory(@Nonnull World world, UUID owner, ManagedEMCManager manager)
     {
@@ -179,6 +180,15 @@ public class EMCInventory
             cachedInventory = new ArrayList<>();
         }
 
+        if(itemIndex == null)
+        {
+            itemIndex = new HashMap<>();
+        }
+        else
+        {
+            itemIndex.clear();
+        }
+
         //cachedInventory = new ArrayList<>();
 
         double cachedEmc = emcManager.getEMC(world, owner);
@@ -223,6 +233,29 @@ public class EMCInventory
                     addedNew ++;
                 }
 
+                Tuple2<Item, Integer> t = new Tuple2<>(is.getItem(), is.getMetadata());
+                if(!itemIndex.containsKey(t))
+                {
+                    itemIndex.put(t, new ArrayList<>());
+                }
+
+                ItemStack single = is.copy();
+                single.setCount(1);
+
+                boolean found = false;
+                for(ItemStack i : itemIndex.get(t))
+                {
+                    if(i.isItemEqual(single))
+                    {
+                        found = true;
+                        break;
+                    }
+                }
+                if(!found)
+                {
+                    itemIndex.get(t).add(single);
+                }
+
                 ix += 1;
             }
         }
@@ -233,6 +266,23 @@ public class EMCInventory
         {
             cachedInventory.remove(ix);
         }
+    }
+
+    public boolean itemKnown(@Nonnull ItemStack single)
+    {
+        Tuple2<Item, Integer> t = new Tuple2<>(single.getItem(), single.getMetadata());
+
+        if(!itemIndex.containsKey(t))
+        {
+            return false;
+        }
+
+        for(ItemStack is : itemIndex.get(t))
+        {
+            if(is.isItemEqual(single))
+                return true;
+        }
+        return false;
     }
 
     private static int howManyCanWeMake(double emc, long cost)

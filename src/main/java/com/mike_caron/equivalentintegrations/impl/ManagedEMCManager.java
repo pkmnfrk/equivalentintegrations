@@ -449,13 +449,7 @@ public class ManagedEMCManager
         EMCInventory inv = getEMCInventory(world, owner);
         ItemStack ideal = getIdeal(stack);
 
-        for(ItemStack s : inv.getCachedInventory())
-        {
-            if(s.isItemEqual(ideal))
-                return true;
-        }
-
-        return false;
+        return inv.itemKnown(ideal);
     }
 
     public boolean tryLearn(@Nonnull World world, @Nonnull UUID owner, @Nonnull ItemStack stack, boolean simulate)
