@@ -6,13 +6,18 @@ import com.mike_caron.equivalentintegrations.api.events.EMCChangedEvent;
 import com.mike_caron.equivalentintegrations.integrations.projecte.ProjectEWrapper;
 import com.mike_caron.equivalentintegrations.storage.EMCInventory;
 import moze_intel.projecte.api.event.EMCRemapEvent;
+import moze_intel.projecte.api.event.PlayerAttemptLearnEvent;
 import moze_intel.projecte.utils.EMCHelper;
+import moze_intel.projecte.utils.ItemHelper;
+import moze_intel.projecte.utils.NBTWhitelist;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -439,6 +444,39 @@ public class ManagedEMCManager
         bustCache();
     }
 
+    public boolean hasKnowledge(@Nonnull World world, @Nonnull UUID owner, @Nonnull ItemStack stack)
+    {
+        EMCInventory inv = getEMCInventory(world, owner);
+        ItemStack ideal = getIdeal(stack);
+
+        for(ItemStack s : inv.getCachedInventory())
+        {
+            if(s.isItemEqual(ideal))
+                return true;
+        }
+
+        return false;
+    }
+
+    public boolean tryLearn(@Nonnull World world, @Nonnull UUID owner, @Nonnull ItemStack stack, boolean simulate)
+    {
+        EMCInventory inv = getEMCInventory(world, owner);
+        if(!simulate)
+        {
+            stack = getIdeal(stack);
+        }
+
+        EntityPlayer player = world.getPlayerEntityByUUID(owner);
+        if(player != null && !MinecraftForge.EVENT_BUS.post(new PlayerAttemptLearnEvent(player, stack)))
+        {
+            return simulate || ProjectEWrapper.instance.addKnowledge(world, owner,stack);
+        }
+
+        return false;
+    }
+
+
+
     public void unload()
     {
         lock.lock();
@@ -457,13 +495,17 @@ public class ManagedEMCManager
 
     private ItemStack getIdeal(ItemStack stack)
     {
-        ItemStack idealStack = stack;
-        if(idealStack.getCount() != 1 || idealStack.getItemDamage() != 0)
-        {
-            idealStack = idealStack.copy();
-            idealStack.setItemDamage(0);
+        ItemStack idealStack = stack.copy();
+
+        if(idealStack.getCount() != 1)
             idealStack.setCount(1);
-        }
+
+        if(ItemHelper.isDamageable(idealStack))
+            idealStack.setItemDamage(0);
+
+        if(!NBTWhitelist.shouldDupeWithNBT(idealStack))
+            idealStack.setTagCompound(null);
+
         return idealStack;
     }
 

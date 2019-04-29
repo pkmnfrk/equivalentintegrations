@@ -157,9 +157,9 @@ public final class EMCItemHandler
 
                 //EquivalentIntegrationsMod.logger.info("Burning a stack ({}) for {} EMC each, a total of {} (Simulation: {})", stack, singleValue, emcValue, simulate);
 
-                if(canLearn == EnumLearning.CAN && !ProjectEWrapper.instance.hasKnowledge(world, owner, stack))
+                if(canLearn == EnumLearning.CAN && !emcManager.hasKnowledge(world, owner, stack))
                 {
-                    if(!tryLearn(stack, simulate))
+                    if(!emcManager.tryLearn(world, owner, stack, simulate))
                     {
                         return stack;
                     }
@@ -177,37 +177,6 @@ public final class EMCItemHandler
         }
 
         return stack;
-    }
-
-    private boolean tryLearn(@Nonnull ItemStack stack, boolean simulate)
-    {
-        if(!simulate)
-        {
-            stack = stack.copy();
-
-            //then, clean up the stack a bit
-            if (ItemHelper.isDamageable(stack))
-            {
-                stack.setItemDamage(0);
-            }
-
-            stack.setCount(1);
-            if (stack.hasTagCompound() && !NBTWhitelist.shouldDupeWithNBT(stack))
-            {
-                stack.setTagCompound(null);
-            }
-        }
-
-        EntityPlayer player = world.getPlayerEntityByUUID(owner);
-        if (player != null && !MinecraftForge.EVENT_BUS.post(new PlayerAttemptLearnEvent(player, stack)))
-        {
-            //note: this will not work if the user is offline. In this case, the later
-            //knowledge check will return false, thus rejecting the item
-
-            return simulate || ProjectEWrapper.instance.addKnowledge(world, owner, stack);
-        }
-
-        return false;
     }
 
     public ItemStack extractItem(ItemStack desired, boolean simulate)
