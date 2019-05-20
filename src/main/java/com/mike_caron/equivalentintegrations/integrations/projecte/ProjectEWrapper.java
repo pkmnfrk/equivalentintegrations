@@ -23,8 +23,14 @@ public class ProjectEWrapper
 
     private ITransmutationProxy transmutationProxy;
 
+    private final static DummyKnowledgeProvider dummyKnowledgeProvider = new DummyKnowledgeProvider();
+
     protected ProjectEWrapper() {
         transmutationProxy = ProjectEAPI.getTransmutationProxy();
+        if(transmutationProxy == null)
+        {
+            EquivalentIntegrationsMod.logger.error("Tried to instantiate ProjectE API, but failed.");
+        }
     }
 
     private static ProjectEWrapper getInstance()
@@ -142,7 +148,23 @@ public class ProjectEWrapper
     {
         IKnowledgeProvider knowledge;
 
-        knowledge = transmutationProxy.getKnowledgeProviderFor(player.getUniqueID());
+        if(transmutationProxy == null)
+        {
+            transmutationProxy = ProjectEAPI.getTransmutationProxy();
+            if(transmutationProxy == null)
+            {
+                EquivalentIntegrationsMod.logger.error("Still unable to get transmutation proxy from ProjectE");
+            }
+        }
+
+        if(transmutationProxy == null)
+        {
+            knowledge = dummyKnowledgeProvider;
+        }
+        else
+        {
+            knowledge = transmutationProxy.getKnowledgeProviderFor(player.getUniqueID());
+        }
 
         return knowledge;
     }
@@ -151,7 +173,23 @@ public class ProjectEWrapper
     {
         IKnowledgeProvider knowledge;
 
-        knowledge = transmutationProxy.getKnowledgeProviderFor(owner);
+        if(transmutationProxy == null)
+        {
+            transmutationProxy = ProjectEAPI.getTransmutationProxy();
+            if(transmutationProxy == null)
+            {
+                EquivalentIntegrationsMod.logger.error("Still unable to get transmutation proxy from ProjectE");
+            }
+        }
+
+        if(transmutationProxy == null)
+        {
+            knowledge = dummyKnowledgeProvider;
+        }
+        else
+        {
+            knowledge = transmutationProxy.getKnowledgeProviderFor(owner);
+        }
 
         return knowledge;
     }
@@ -160,7 +198,23 @@ public class ProjectEWrapper
     {
         IKnowledgeProvider knowledge;
 
-        knowledge = transmutationProxy.getKnowledgeProviderFor(owner);
+        if(transmutationProxy == null)
+        {
+            transmutationProxy = ProjectEAPI.getTransmutationProxy();
+            if(transmutationProxy == null)
+            {
+                EquivalentIntegrationsMod.logger.error("Still unable to get transmutation proxy from ProjectE");
+            }
+        }
+
+        if(transmutationProxy == null)
+        {
+            knowledge = dummyKnowledgeProvider;
+        }
+        else
+        {
+            knowledge = transmutationProxy.getKnowledgeProviderFor(owner);
+        }
 
         return knowledge.getKnowledge();
     }
